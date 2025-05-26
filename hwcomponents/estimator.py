@@ -49,7 +49,3 @@ class EnergyAreaEstimator(ListLoggable, ABC):
         """Returns the leakage energy per global cycle or an Estimation object
         with the leakage energy and units."""
         pass
-
-
-class Estimator(EnergyAreaEstimator):
-    pass  # An override of EnergyAreaEstimator.

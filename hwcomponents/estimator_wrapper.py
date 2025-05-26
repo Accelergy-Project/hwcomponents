@@ -69,12 +69,12 @@ class Estimation:
         value: Union[int, float],
         success: bool = True,
     ):
-        self.value = value
+        self.value: Union[int, float] = value
         if not isinstance(value, Number):
             raise TypeError(f"Estimation value must be a number, not {type(value)}")
-        self.success = success
-        self.messages = []
-        self.estimator_name = None
+        self.success: bool = success
+        self.messages: List[str] = []
+        self.estimator_name: Optional[str] = None
 
     def add_messages(self, messages: Union[List[str], str]):
         """
