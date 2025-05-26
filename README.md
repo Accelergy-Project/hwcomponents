@@ -27,7 +27,7 @@ queried for energy.
 If any arguments are invalid, the estimator should raise a `ValueError`.
 
 ```python
-from hwcomponents import EnergyAreaEstimator
+from hwcomponents import EnergyAreaEstimator, actionDynamicEnergy
 from typing import List, Union
 
 # REQUIRED: Declare a new Estimator
@@ -38,6 +38,7 @@ class TernaryMAC(EnergyAreaEstimator):
     percent_accuracy_0_to_100 = 80
 
     def __init__(self, accum_datawidth: int, technology: int):
+        super().__init__() # Essential! This gives us the logger
         self.accum_datawidth = accum_datawidth
         self.technology = technology
 
