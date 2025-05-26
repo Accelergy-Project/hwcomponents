@@ -39,3 +39,10 @@ class EnergyAreaEstimator(ListLoggable, ABC):
         """Returns the leakage energy per global cycle or an Estimation object
         with the leakage energy and units."""
         pass
+    
+    @property
+    def name(self) -> str:
+        return self.component_name
+
+class Estimator(EnergyAreaEstimator):
+    pass # An override of EnergyAreaEstimator.
