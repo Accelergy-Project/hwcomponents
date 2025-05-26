@@ -34,7 +34,7 @@ class EnergyAreaEstimator(ListLoggable, ABC):
                 "EnergyAreaEstimator.name is deprecated and will be removed in a future version. "
                 "Use EnergyAreaEstimator.component_name instead.",
                 DeprecationWarning,
-                stacklevel=2
+                stacklevel=2,
             )
         super().__init__(name=name)
 
@@ -49,5 +49,7 @@ class EnergyAreaEstimator(ListLoggable, ABC):
         """Returns the leakage energy per global cycle or an Estimation object
         with the leakage energy and units."""
         pass
+
+
 class Estimator(EnergyAreaEstimator):
-    pass # An override of EnergyAreaEstimator.
+    pass  # An override of EnergyAreaEstimator.
