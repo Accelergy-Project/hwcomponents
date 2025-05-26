@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from numbers import Number
 from typing import Callable, List, Union
+import warnings
 from hwcomponents.logging import ListLoggable
 
 
@@ -26,6 +27,15 @@ class EnergyAreaEstimator(ListLoggable, ABC):
     percent_accuracy_0_to_100: Number = None
 
     def __init__(self, name: str = None):
+        cls = self.__class__
+        if cls.component_name is None and getattr(cls, "name", None) is not None:
+            cls.component_name = cls.name
+            warnings.warn(
+                "EnergyAreaEstimator.name is deprecated and will be removed in a future version. "
+                "Use EnergyAreaEstimator.component_name instead.",
+                DeprecationWarning,
+                stacklevel=2
+            )
         super().__init__(name=name)
 
     @abstractmethod
@@ -39,10 +49,5 @@ class EnergyAreaEstimator(ListLoggable, ABC):
         """Returns the leakage energy per global cycle or an Estimation object
         with the leakage energy and units."""
         pass
-    
-    @property
-    def name(self) -> str:
-        return self.component_name
-
 class Estimator(EnergyAreaEstimator):
     pass # An override of EnergyAreaEstimator.
