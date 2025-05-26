@@ -20,7 +20,7 @@ class EnergyAreaEstimator(ListLoggable, ABC):
     EnergyAreaEstimator base class. EnergyAreaEstimator class must have "name"
     attribute, "percent_accuracy_0_to_100" attribute, and "get_area" method.
     EnergyAreaEstimators may have any number of methods that are decorated with
-    @.
+    @actionDynamicEnergy.
     """
 
     component_name: Union[str, List[str]] = None
