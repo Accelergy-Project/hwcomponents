@@ -40,12 +40,13 @@ class EnergyAreaEstimator(ListLoggable, ABC):
 
     @abstractmethod
     def get_area(self) -> Number:
-        """Returns the area in m^2 or an Estimation object with the area and
-        units."""
+        """Returns the area in m^2 of the component."""
         pass
 
     @abstractmethod
     def leak(self, global_cycle_seconds: float) -> Number:
-        """Returns the leakage energy per global cycle or an Estimation object
-        with the leakage energy and units."""
+        """
+        Returns the leakage energy per cycle in Joules. The leakage energy is
+        the leakage power multiplied by global_cycle_seconds.
+        """
         pass
