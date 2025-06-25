@@ -1,0 +1,152 @@
+import glob
+import importlib
+from importlib.machinery import SourceFileLoader
+from types import ModuleType
+from typing import List, Set, Union
+from hwcomponents.estimator_wrapper import EnergyAreaEstimatorWrapper
+import inspect
+import logging
+import copy
+import sys
+import os
+from pkgutil import iter_modules
+
+_ALL_ESTIMATORS = None
+
+
+def installed_estimators() -> List[EnergyAreaEstimatorWrapper]:
+    # List all Python packages installed that are prefixed with "hwcomponents_"
+    global _ALL_ESTIMATORS
+    if _ALL_ESTIMATORS is not None:
+        return _ALL_ESTIMATORS
+
+    modules = [p.name for p in iter_modules() if p.name.startswith("hwcomponents_")]
+    for m in modules:
+        logging.info(f"Importing from module: {m}")
+
+    estimators = []
+    estimator_ids = set()
+
+    # Handle the packages
+    for module in modules:
+        estimators.extend(
+            get_estimators_in_module(importlib.import_module(module), estimator_ids)
+        )
+
+    _ALL_ESTIMATORS = estimators
+
+    return estimators
+
+
+def get_estimators_in_module(
+    module: ModuleType, estimator_ids: Set
+) -> List[EnergyAreaEstimatorWrapper]:
+    logging.info(f"Getting estimators in module: {module.__name__}")
+    classes = [
+        (x, name) for name in dir(module) if inspect.isclass(x := getattr(module, name))
+    ]
+    # classes = [(x, name) for x, name in classes if x.__module__ == module.__name__]
+    found = []
+    for x, name in classes:
+        superclasses = [c.__name__ for c in inspect.getmro(x)]
+
+        if (
+            any(base in superclasses for base in ["EnergyAreaEstimator", "Estimator"])
+            and not inspect.isabstract(x)
+            and id(x) not in estimator_ids
+        ):
+            estimator_ids.add(id(x))
+            found.append(EnergyAreaEstimatorWrapper(x, name))
+    return found
+
+
+def get_estimators(
+    *paths_or_packages: Union[str, List[str]], include_installed: bool = None
+) -> List[EnergyAreaEstimatorWrapper]:
+    """
+    Instantiate a list of estimator estimator objects for later queries.
+    """
+    if include_installed is None:
+        include_installed = not paths_or_packages
+
+    estimators = installed_estimators() if include_installed else []
+
+    estimator_ids = set()
+    n_estimators = 0
+
+    packages = []
+    paths = []
+
+    for path_or_package in paths_or_packages:
+        # Check if it's a package first
+        try:
+            importlib.import_module(path_or_package)
+            packages.append(path_or_package)
+        except ImportError:
+            # If not, check if it's a file
+            if os.path.isfile(path_or_package):
+                assert path_or_package.endswith(
+                    ".py"
+                ), f"Path {path_or_package} is not a Python file"
+                paths.append(path_or_package)
+            else:
+                raise ValueError(
+                    f"Path {path_or_package} is not a valid file or package"
+                )
+
+    for package in packages:
+        estimators.extend(
+            get_estimators_in_module(importlib.import_module(package), estimator_ids)
+        )
+
+    # Handle the paths
+    paths_globbed = []
+    allpaths = []
+    for p in paths:
+        if isinstance(p, list):
+            allpaths.extend(p)
+        else:
+            allpaths.append(p)
+
+    for p in allpaths:
+        logging.info(f"Checking path: {p}")
+        newpaths = []
+        if os.path.isfile(p):
+            assert p.endswith(".py"), f"Path {p} is not a Python file"
+            newpaths.append(p)
+        else:
+            newpaths += list(glob.glob(p, recursive=True))
+            newpaths += list(glob.glob(os.path.join(p, "**"), recursive=True))
+        paths_globbed.extend(newpaths)
+        if not newpaths:
+            raise ValueError(
+                f"Path {p} does not have any Python files. Please check the path and try again."
+            )
+
+        newpaths = [p.rstrip("/") for p in newpaths]
+        newpaths = [p.replace("\\", "/") for p in newpaths]
+        newpaths = [p.replace("//", "/") for p in newpaths]
+        newpaths = [p for p in newpaths if p.endswith(".py")]
+        newpaths = [p for p in newpaths if not p.endswith("setup.py")]
+        newpaths = [p for p in newpaths if not p.endswith("__init__.py")]
+
+        new_estimators = []
+        for path in newpaths:
+            logging.info(
+                f"Loading estimators from {path}. Errors below are likely due to the estimator."
+            )
+            prev_sys_path = copy.deepcopy(sys.path)
+            sys.path.append(os.path.dirname(os.path.abspath(path)))
+            python_module = SourceFileLoader(
+                f"estimator{n_estimators}", path
+            ).load_module()
+            new_estimators += get_estimators_in_module(python_module, estimator_ids)
+            sys.path = prev_sys_path
+            n_estimators += 1
+
+        if not new_estimators:
+            raise ValueError(f"No estimators found in {p}")
+
+        estimators.extend(new_estimators)
+
+    return estimators
