@@ -66,12 +66,11 @@ estimators as submodules.
 ```bash
 # Install the main package
 git clone --recurse-submodules <this-repo>
-cd hwcomponents
-pip install .
+pip install ./hwcomponents
 
 # Install estimator packages
 cd hwcomponents/estimators
-pip3 install ./hwcomponents*
+pip3 install ./hwcomponents/estimators/*
 
 # List available estimators
 hwc --list # or hwcomponents --list
