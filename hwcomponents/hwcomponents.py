@@ -1,6 +1,6 @@
 import argparse
-from hwcomponents.estimator_wrapper import EnergyAreaEstimatorWrapper
-from hwcomponents.find_estimators import get_estimators
+from hwcomponents.model_wrapper import EnergyAreaModelWrapper
+from hwcomponents.find_models import get_models
 
 
 def list_components(printfunc=print):
@@ -27,7 +27,7 @@ def list_components(printfunc=print):
             )
 
     entries = []
-    for estimator in get_estimators():
+    for model in get_models():
 
         def add_entry(name, class_names, init_func, actions):
             class_names = [class_names] if isinstance(class_names, str) else class_names
@@ -40,10 +40,10 @@ def list_components(printfunc=print):
                 )
 
         add_entry(
-            estimator.get_name(),
-            estimator.get_component_names(),
-            str(estimator.init_function),
-            estimator.actions,
+            model.get_name(),
+            model.get_component_names(),
+            str(model.init_function),
+            model.actions,
         )
 
     entries = sorted(entries, key=lambda x: x[0].lower())

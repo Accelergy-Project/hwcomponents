@@ -7,18 +7,18 @@ def readme():
 
 
 # IMPORTANT: Check the README.md file in this directory for important information on how
-# to install estimators.
+# to install models.
 # IMPORTANT: Check the README.md file in this directory for important information on how
-# to install estimators.
+# to install models.
 # IMPORTANT: Check the README.md file in this directory for important information on how
-# to install estimators.
+# to install models.
 # IMPORTANT: Check the README.md file in this directory for important information on how
-# to install estimators.
+# to install models.
 
 setup(
     name="hwcomponents_example",
     version="0.1",
-    description="A template hwcomponents estimator.",
+    description="A template hwcomponents model.",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
@@ -36,10 +36,10 @@ setup(
 )
 
 # IMPORTANT: Check the README.md file in this directory for important information on how
-# to install estimators.
+# to install models.
 # IMPORTANT: Check the README.md file in this directory for important information on how
-# to install estimators.
+# to install models.
 # IMPORTANT: Check the README.md file in this directory for important information on how
-# to install estimators.
+# to install models.
 # IMPORTANT: Check the README.md file in this directory for important information on how
-# to install estimators.
+# to install models.

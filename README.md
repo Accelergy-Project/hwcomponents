@@ -4,14 +4,14 @@ of energy, area, and leakage power of hardware components in hardware architectu
 is part of the [CiMLoop](https://github.com/mit-emze/cimloop) project. Key features in
 HWComponents include:
 
-- A simple Python API for writing energy, area, and leakage power estimators. New
-  estimators can be written in minutes.
+- A simple Python API for writing energy, area, and leakage power models. New
+  models can be written in minutes.
 - Automatic scaling of parameters to different configurations, including scaling to
   different technology nodes.
 - Pythonic interfaces for finding components, picking the best components for a given
   request, and more.
 - Automatic gathering of components from available Python packages. This includes
-  support for different estimators in virtual environments.
+  support for different models in virtual environments.
 
 Components are also compatible with
 [Accelergy](https://github.com/accelergy-project/accelergy).
@@ -24,10 +24,10 @@ to scale the width and technology node of the adder.
 Full examples of how to use the package are available in the `tutorials` directory.
 
 ```python
-from hwcomponents import EnergyAreaEstimator, actionDynamicEnergy
+from hwcomponents import EnergyAreaModel, actionDynamicEnergy
 from hwcomponents.scaling import nlog2n, tech_node_area, tech_node_energy, tech_node_leak
 
-class Adder(EnergyAreaEstimator):
+class Adder(EnergyAreaModel):
     component_name = "adder"
     percent_accuracy_0_to_100 = 80
 
@@ -61,25 +61,25 @@ class Adder(EnergyAreaEstimator):
 
 ## Installation
 Clone the repository and install with pip. This repository also contains provided
-estimators as submodules.
+models as submodules.
 
 ```bash
 # Install the main package
 git clone --recurse-submodules <this-repo>
 pip install ./hwcomponents
 
-# Install estimator packages
-cd hwcomponents/estimators
-pip3 install ./hwcomponents/estimators/*
+# Install model packages
+cd hwcomponents/models
+pip3 install ./hwcomponents/models/*
 
-# List available estimators
+# List available models
 hwc --list # or hwcomponents --list
 ```
 
 ## Tutorials
 
 See the `tutorials` directory for examples of how to use the package and to create
-estimators.
+models.
 
 ## Contributing
 
@@ -100,5 +100,16 @@ If you use this package in your work, please cite the CiMLoop project:
   pages={10-23},
   keywords={Performance evaluation;Accuracy;Computational modeling;Computer architecture;Artificial neural networks;In-memory computing;Data models;Compute-In-Memory;Processing-In-Memory;Analog;Deep Neural Networks;Systems;Hardware;Modeling;Open-Source},
   doi={10.1109/ISPASS61541.2024.00012}
+}
+@INPROCEEDINGS{8942149,
+  author={Wu, Yannan Nellie and Emer, Joel S. and Sze, Vivienne},
+  booktitle={2019 IEEE/ACM International Conference on Computer-Aided Design (ICCAD)}, 
+  title={Accelergy: An Architecture-Level Energy Estimation Methodology for Accelerator Designs}, 
+  year={2019},
+  volume={},
+  number={},
+  pages={1-8},
+  keywords={Program processors;Electric breakdown;Neural networks;Estimation;Hardware;Energy efficiency;Compounds},
+  doi={10.1109/ICCAD45719.2019.8942149}
 }
 ```

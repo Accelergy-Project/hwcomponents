@@ -8,12 +8,12 @@ from hwcomponents.util import parse_float
 
 def actionDynamicEnergy(func: Callable) -> Callable:
     """
-    Decorator that adds an action to an energy/area estimator. Actions are
+    Decorator that adds an action to an energy/area model. Actions are
     expected to return an energy value in Juoles or an Estimation object with
     the energy and units.
     """
 
-    def wrapper(self: "EnergyAreaEstimator", *args, **kwargs):
+    def wrapper(self: "EnergyAreaModel", *args, **kwargs):
         return func(self, *args, **kwargs) * self.energy_scale
 
     wrapper._is_component_energy_action = True
@@ -21,11 +21,11 @@ def actionDynamicEnergy(func: Callable) -> Callable:
     return wrapper
 
 
-class EnergyAreaEstimator(ListLoggable, ABC):
+class EnergyAreaModel(ListLoggable, ABC):
     """
-    EnergyAreaEstimator base class. EnergyAreaEstimator class must have "name"
+    EnergyAreaModel base class. EnergyAreaModel class must have "name"
     attribute, "percent_accuracy_0_to_100" attribute, and "get_area" method.
-    EnergyAreaEstimators may have any number of methods that are decorated with
+    EnergyAreaModels may have any number of methods that are decorated with
     @actionDynamicEnergy.
     """
 

@@ -3,7 +3,7 @@ import importlib
 from importlib.machinery import SourceFileLoader
 from types import ModuleType
 from typing import List, Set, Union
-from hwcomponents.estimator_wrapper import EnergyAreaEstimatorWrapper
+from hwcomponents.model_wrapper import EnergyAreaModelWrapper
 import inspect
 import logging
 import copy
@@ -14,7 +14,7 @@ from pkgutil import iter_modules
 _ALL_ESTIMATORS = None
 
 
-def installed_estimators() -> List[EnergyAreaEstimatorWrapper]:
+def installed_models() -> List[EnergyAreaModelWrapper]:
     # List all Python packages installed that are prefixed with "hwcomponents_"
     global _ALL_ESTIMATORS
     if _ALL_ESTIMATORS is not None:
@@ -24,24 +24,24 @@ def installed_estimators() -> List[EnergyAreaEstimatorWrapper]:
     for m in modules:
         logging.info(f"Importing from module: {m}")
 
-    estimators = []
-    estimator_ids = set()
+    models = []
+    model_ids = set()
 
     # Handle the packages
     for module in modules:
-        estimators.extend(
-            get_estimators_in_module(importlib.import_module(module), estimator_ids)
+        models.extend(
+            get_models_in_module(importlib.import_module(module), model_ids)
         )
 
-    _ALL_ESTIMATORS = estimators
+    _ALL_ESTIMATORS = models
 
-    return estimators
+    return models
 
 
-def get_estimators_in_module(
-    module: ModuleType, estimator_ids: Set
-) -> List[EnergyAreaEstimatorWrapper]:
-    logging.info(f"Getting estimators in module: {module.__name__}")
+def get_models_in_module(
+    module: ModuleType, model_ids: Set
+) -> List[EnergyAreaModelWrapper]:
+    logging.info(f"Getting models in module: {module.__name__}")
     classes = [
         (x, name) for name in dir(module) if inspect.isclass(x := getattr(module, name))
     ]
@@ -51,28 +51,28 @@ def get_estimators_in_module(
         superclasses = [c.__name__ for c in inspect.getmro(x)]
 
         if (
-            any(base in superclasses for base in ["EnergyAreaEstimator", "Estimator"])
+            any(base in superclasses for base in ["EnergyAreaModel", "Model"])
             and not inspect.isabstract(x)
-            and id(x) not in estimator_ids
+            and id(x) not in model_ids
         ):
-            estimator_ids.add(id(x))
-            found.append(EnergyAreaEstimatorWrapper(x, name))
+            model_ids.add(id(x))
+            found.append(EnergyAreaModelWrapper(x, name))
     return found
 
 
-def get_estimators(
+def get_models(
     *paths_or_packages: Union[str, List[str]], include_installed: bool = None
-) -> List[EnergyAreaEstimatorWrapper]:
+) -> List[EnergyAreaModelWrapper]:
     """
-    Instantiate a list of estimator estimator objects for later queries.
+    Instantiate a list of model model objects for later queries.
     """
     if include_installed is None:
         include_installed = not paths_or_packages
 
-    estimators = installed_estimators() if include_installed else []
+    models = installed_models() if include_installed else []
 
-    estimator_ids = set()
-    n_estimators = 0
+    model_ids = set()
+    n_models = 0
 
     packages = []
     paths = []
@@ -95,8 +95,8 @@ def get_estimators(
                 )
 
     for package in packages:
-        estimators.extend(
-            get_estimators_in_module(importlib.import_module(package), estimator_ids)
+        models.extend(
+            get_models_in_module(importlib.import_module(package), model_ids)
         )
 
     # Handle the paths
@@ -130,23 +130,23 @@ def get_estimators(
         newpaths = [p for p in newpaths if not p.endswith("setup.py")]
         newpaths = [p for p in newpaths if not p.endswith("__init__.py")]
 
-        new_estimators = []
+        new_models = []
         for path in newpaths:
             logging.info(
-                f"Loading estimators from {path}. Errors below are likely due to the estimator."
+                f"Loading models from {path}. Errors below are likely due to the model."
             )
             prev_sys_path = copy.deepcopy(sys.path)
             sys.path.append(os.path.dirname(os.path.abspath(path)))
             python_module = SourceFileLoader(
-                f"estimator{n_estimators}", path
+                f"model{n_models}", path
             ).load_module()
-            new_estimators += get_estimators_in_module(python_module, estimator_ids)
+            new_models += get_models_in_module(python_module, model_ids)
             sys.path = prev_sys_path
-            n_estimators += 1
+            n_models += 1
 
-        if not new_estimators:
-            raise ValueError(f"No estimators found in {p}")
+        if not new_models:
+            raise ValueError(f"No models found in {p}")
 
-        estimators.extend(new_estimators)
+        models.extend(new_models)
 
-    return estimators
+    return models

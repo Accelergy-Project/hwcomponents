@@ -3,7 +3,7 @@ import logging
 from numbers import Number
 from types import ModuleType
 from typing import Any, Callable, Dict, List, Optional, Set, Union
-from .estimator import EnergyAreaEstimator
+from .model import EnergyAreaModel
 from .logging import move_queue_from_one_logger_to_another, ListLoggable
 
 
@@ -40,7 +40,7 @@ class PrintableCall:
 
 
 class EnergyAreaQuery:
-    """A query to an EnergyAreaEstimator."""
+    """A query to an EnergyAreaModel."""
 
     def __init__(
         self,
@@ -76,15 +76,15 @@ class EnergyAreaQuery:
 
 
 class Estimation:
-    value: Union[int, float, EnergyAreaEstimator]
+    value: Union[int, float, EnergyAreaModel]
     success: bool
     messages: List[str]
-    estimator_name: Optional[str]
+    model_name: Optional[str]
 
     def add_messages(self, messages: Union[List[str], str]):
         """
         Adds messages to the internal message list. The messages are reported
-        depending on estimator selections and verbosity level.
+        depending on model selections and verbosity level.
         """
         if isinstance(messages, str):
             self.add_messages([messages])
@@ -112,13 +112,13 @@ class FloatEstimation(Estimation, float):
         value: Union[int, float],
         success: bool = True,
         messages: List[str] = [],
-        estimator_name: Optional[str] = None,
+        model_name: Optional[str] = None,
     ):
         newval = super().__new__(cls, value)
         newval.value = value
         newval.success = success
         newval.messages = messages
-        newval.estimator_name = estimator_name
+        newval.model_name = model_name
         return newval
 
     def __radd__(self, other):
@@ -130,11 +130,11 @@ class FloatEstimation(Estimation, float):
                 self.value + other.value,
                 self.success and other.success,
                 self.messages + other.messages,
-                self.estimator_name,
+                self.model_name,
             )
         else:
             return FloatEstimation.get_estimation(
-                self.value + other, self.success, self.messages, self.estimator_name
+                self.value + other, self.success, self.messages, self.model_name
             )
 
     def __rmul__(self, other):
@@ -146,11 +146,11 @@ class FloatEstimation(Estimation, float):
                 self.value * other.value,
                 self.success and other.success,
                 self.messages + other.messages,
-                self.estimator_name,
+                self.model_name,
             )
         else:
             return FloatEstimation.get_estimation(
-                self.value * other, self.success, self.messages, self.estimator_name
+                self.value * other, self.success, self.messages, self.model_name
             )
 
     def __rtruediv__(self, other):
@@ -162,11 +162,11 @@ class FloatEstimation(Estimation, float):
                 self.value / other.value,
                 self.success and other.success,
                 self.messages + other.messages,
-                self.estimator_name,
+                self.model_name,
             )
         else:
             return FloatEstimation.get_estimation(
-                self.value / other, self.success, self.messages, self.estimator_name
+                self.value / other, self.success, self.messages, self.model_name
             )
 
     def __rsub__(self, other):
@@ -178,16 +178,16 @@ class FloatEstimation(Estimation, float):
                 self.value - other.value,
                 self.success and other.success,
                 self.messages + other.messages,
-                self.estimator_name,
+                self.model_name,
             )
         else:
             return FloatEstimation.get_estimation(
-                self.value - other, self.success, self.messages, self.estimator_name
+                self.value - other, self.success, self.messages, self.model_name
             )
 
     def __neg__(self):
         return FloatEstimation.get_estimation(
-            -self.value, self.success, self.messages, self.estimator_name
+            -self.value, self.success, self.messages, self.model_name
         )
 
     def __rfloordiv__(self, other):
@@ -199,11 +199,11 @@ class FloatEstimation(Estimation, float):
                 self.value // other.value,
                 self.success and other.success,
                 self.messages + other.messages,
-                self.estimator_name,
+                self.model_name,
             )
         else:
             return FloatEstimation.get_estimation(
-                self.value // other, self.success, self.messages, self.estimator_name
+                self.value // other, self.success, self.messages, self.model_name
             )
 
 
@@ -214,13 +214,13 @@ class EstimatorEstimation(Estimation):
         value: Union[int, float],
         success: bool = True,
         messages: List[str] = [],
-        estimator_name: Optional[str] = None,
+        model_name: Optional[str] = None,
     ):
         newval = super().__new__(cls)
         newval.value = value
         newval.success = success
         newval.messages = messages
-        newval.estimator_name = estimator_name
+        newval.model_name = model_name
         return newval
 
 
@@ -322,14 +322,14 @@ class CallableFunction:
         )
 
 
-class EnergyAreaEstimatorWrapper(ListLoggable):
-    """EnergyArea primitive component estimator that wraps a Python class."""
+class EnergyAreaModelWrapper(ListLoggable):
+    """EnergyArea primitive component model that wraps a Python class."""
 
-    def __init__(self, estimator_cls: type, component_name: str):
-        check_for_valid_estimator_attrs(estimator_cls)
-        self.estimator_cls = estimator_cls
-        self.estimator_name = component_name
-        cls_component_name = estimator_cls.component_name
+    def __init__(self, model_cls: type, component_name: str):
+        check_for_valid_model_attrs(model_cls)
+        self.model_cls = model_cls
+        self.model_name = component_name
+        cls_component_name = model_cls.component_name
         if isinstance(cls_component_name, str):
             cls_component_name = [cls_component_name]
         if not isinstance(cls_component_name, list):
@@ -339,21 +339,21 @@ class EnergyAreaEstimatorWrapper(ListLoggable):
         self.component_name = [c.lower() for c in cls_component_name]
         super().__init__(name=self.get_name())
 
-        self.percent_accuracy = estimator_cls.percent_accuracy_0_to_100
-        self.init_function = CallableFunction(estimator_cls, self.logger, is_init=True)
+        self.percent_accuracy = model_cls.percent_accuracy_0_to_100
+        self.init_function = CallableFunction(model_cls, self.logger, is_init=True)
 
         self.actions = [
-            CallableFunction(getattr(estimator_cls, a), self.logger)
-            for a in dir(estimator_cls)
+            CallableFunction(getattr(model_cls, a), self.logger)
+            for a in dir(model_cls)
             if getattr(
-                getattr(estimator_cls, a),
+                getattr(model_cls, a),
                 "_is_component_energy_action",
                 False,
             )
         ]
-        self.actions.append(CallableFunction(estimator_cls.leak, self.logger))
+        self.actions.append(CallableFunction(model_cls.leak, self.logger))
         logging.debug(
-            f"Added estimator {self.estimator_name} that for component {self.component_name}"
+            f"Added model {self.model_name} that for component {self.component_name}"
         )
 
     def get_action_names(self) -> List[str]:
@@ -379,7 +379,7 @@ class EnergyAreaEstimatorWrapper(ListLoggable):
             raise EstimatorError(init_error)
         return True
 
-    def get_initialized_subclass(self, query: EnergyAreaQuery) -> EnergyAreaEstimator:
+    def get_initialized_subclass(self, query: EnergyAreaQuery) -> EnergyAreaModel:
         subclass = self.init_function.call(
             query.component_attributes, self.component_name
         )
@@ -452,7 +452,7 @@ class EnergyAreaEstimatorWrapper(ListLoggable):
         return FloatEstimation.get_estimation(
             value=self.get_initialized_subclass(query).area,
             success=True,
-            estimator_name=self.estimator_name,
+            model_name=self.model_name,
         )
 
     def estimate_leak_power(self, query: EnergyAreaQuery) -> Estimation:
@@ -460,11 +460,11 @@ class EnergyAreaEstimatorWrapper(ListLoggable):
         return FloatEstimation.get_estimation(
             value=self.get_initialized_subclass(query).leak_power,
             success=True,
-            estimator_name=self.estimator_name,
+            model_name=self.model_name,
         )
 
     def get_name(self) -> str:
-        return self.estimator_name
+        return self.model_name
 
     def get_component_names(self) -> List[str]:
         return (
@@ -478,35 +478,35 @@ class EnergyAreaEstimatorWrapper(ListLoggable):
         return action.function_name
 
 
-def check_for_valid_estimator_attrs(estimator: EnergyAreaEstimator):
+def check_for_valid_model_attrs(model: EnergyAreaModel):
     # Check for valid component_name. Must be a string or list of strings
-    if getattr(estimator, "component_name", None) is None:
+    if getattr(model, "component_name", None) is None:
         raise AttributeError(
-            f"EnergyAreaEstimator {estimator} must have a component_name attribute"
+            f"EnergyAreaModel {model} must have a component_name attribute"
         )
-    component_name = estimator.component_name
+    component_name = model.component_name
     if not isinstance(component_name, str) and not (
         isinstance(component_name, (list, tuple))
         and all(isinstance(n, str) for n in component_name)
     ):
         raise AttributeError(
-            f"EnergyAreaEstimator {estimator} component_name must be a string or list/tuple of strings"
+            f"EnergyAreaModel {model} component_name must be a string or list/tuple of strings"
         )
 
     # Check for valid percent_accuracy. Must be a number between 0 and 100
-    if getattr(estimator, "percent_accuracy_0_to_100", None) is None:
+    if getattr(model, "percent_accuracy_0_to_100", None) is None:
         raise AttributeError(
-            f'EnergyAreaEstimator for {component_name} must have a "percent_accuracy_0_to_100" '
+            f'EnergyAreaModel for {component_name} must have a "percent_accuracy_0_to_100" '
             f"attribute."
         )
-    percent_accuracy = estimator.percent_accuracy_0_to_100
+    percent_accuracy = model.percent_accuracy_0_to_100
     if not isinstance(percent_accuracy, Number):
         raise AttributeError(
-            f"EnergyAreaEstimator for {component_name} percent_accuracy_0_to_100 must be a "
+            f"EnergyAreaModel for {component_name} percent_accuracy_0_to_100 must be a "
             f"number. It is currently a {type(percent_accuracy)}"
         )
     if percent_accuracy < 0 or percent_accuracy > 100:
         raise AttributeError(
-            f"EnergyAreaEstimator for {component_name} percent_accuracy_0_to_100 must be "
+            f"EnergyAreaModel for {component_name} percent_accuracy_0_to_100 must be "
             f"between 0 and 100 inclusive."
         )

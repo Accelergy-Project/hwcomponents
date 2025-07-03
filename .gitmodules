@@ -1,12 +1,12 @@
-[submodule "estimators/hwcomponents-neurosim"]
-	path = estimators/hwcomponents-neurosim
+[submodule "models/hwcomponents-neurosim"]
+	path = models/hwcomponents-neurosim
 	url = https://github.com/Accelergy-Project/hwcomponents-neurosim.git
-[submodule "estimators/hwcomponents-library"]
-	path = estimators/hwcomponents-library
+[submodule "models/hwcomponents-library"]
+	path = models/hwcomponents-library
 	url = https://github.com/Accelergy-Project/hwcomponents-library.git
-[submodule "estimators/hwcomponents-cacti"]
-	path = estimators/hwcomponents-cacti
+[submodule "models/hwcomponents-cacti"]
+	path = models/hwcomponents-cacti
 	url = https://github.com/Accelergy-Project/hwcomponents-cacti.git
-[submodule "estimators/hwcomponents-adc"]
-	path = estimators/hwcomponents-adc
+[submodule "models/hwcomponents-adc"]
+	path = models/hwcomponents-adc
 	url = https://github.com/Accelergy-Project/hwcomponents-adc.git

@@ -9,7 +9,7 @@ def readme():
 setup(
     name="hwcomponents",
     version="0.5",
-    description="Hardware Component Energy+Area Estimators",
+    description="Hardware Component Energy+Area Models",
     classifiers=[],
     keywords="",
     author="Tanner Andrulis",

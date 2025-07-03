@@ -1,17 +1,17 @@
 import logging
 import copy
 from typing import Any, Callable, Dict, List
-from hwcomponents.estimator import EnergyAreaEstimator
+from hwcomponents.model import EnergyAreaModel
 from hwcomponents.logging import get_logger, pop_all_messages, log_all_lines, clear_logs
-from hwcomponents.estimator_wrapper import (
-    EnergyAreaEstimatorWrapper,
+from hwcomponents.model_wrapper import (
+    EnergyAreaModelWrapper,
     EnergyAreaQuery,
     Estimation,
     EstimatorError,
     EstimatorEstimation,
     FloatEstimation,
 )
-from hwcomponents.find_estimators import installed_estimators
+from hwcomponents.find_models import installed_models
 
 
 def indent_list_text_block(prefix: str, list_to_print: List[str]):
@@ -22,20 +22,20 @@ def indent_list_text_block(prefix: str, list_to_print: List[str]):
     )
 
 
-def call_estimator(
-    estimator: EnergyAreaEstimatorWrapper,
+def call_model(
+    model: EnergyAreaModelWrapper,
     query: EnergyAreaQuery,
     target_func: Callable,
 ) -> Estimation:
     # Clear the logger
-    pop_all_messages(estimator.logger)
+    pop_all_messages(model.logger)
     try:
         estimation = target_func(query)
     except Exception as e:
         estimation = FloatEstimation.get_estimation(
-            0, success=False, estimator_name=estimator.get_name()
+            0, success=False, model_name=model.get_name()
         )
-        estimator.logger.error(f"{type(e).__name__}: {e}")
+        model.logger.error(f"{type(e).__name__}: {e}")
         # Add the full traceback
         import traceback
 
@@ -43,26 +43,26 @@ def call_estimator(
         return estimation
 
     # Add message logs
-    estimation.add_messages(pop_all_messages(estimator.logger))
-    estimation.estimator_name = estimator.get_name()
+    estimation.add_messages(pop_all_messages(model.logger))
+    estimation.model_name = model.get_name()
 
-    # See if this estimation matches user requested estimator and min accuracy
+    # See if this estimation matches user requested model and min accuracy
     attrs = query.component_attributes
-    prefix = f"Estimator {estimation.estimator_name} did not"
-    if attrs.get("estimator", estimation.estimator_name) != estimation.estimator_name:
-        estimation.fail(f"{prefix} match requested estimator {attrs['estimator']}")
+    prefix = f"Model {estimation.model_name} did not"
+    if attrs.get("model", estimation.model_name) != estimation.model_name:
+        estimation.fail(f"{prefix} match requested model {attrs['model']}")
     if (
         attrs.get("min_accuracy", -float("inf"))
-        > estimator.estimator_cls.percent_accuracy_0_to_100
+        > model.model_cls.percent_accuracy_0_to_100
     ):
         estimation.fail(f"{prefix} meet min_accuracy {attrs['min_accuracy']}")
     return estimation
 
 
 def _get_energy_estimation(
-    estimator: EnergyAreaEstimatorWrapper, query: EnergyAreaQuery
+    model: EnergyAreaModelWrapper, query: EnergyAreaQuery
 ) -> FloatEstimation:
-    e = call_estimator(estimator, query, estimator.estimate_energy)
+    e = call_model(model, query, model.estimate_energy)
     if e and e.success and query.action_name == "leak":
         n_instances = query.component_attributes.get("n_instances", 1)
         e.add_messages(f"Multiplying by n_instances {n_instances}")
@@ -71,9 +71,9 @@ def _get_energy_estimation(
 
 
 def _get_area_estimation(
-    estimator: EnergyAreaEstimatorWrapper, query: EnergyAreaQuery
+    model: EnergyAreaModelWrapper, query: EnergyAreaQuery
 ) -> FloatEstimation:
-    e = call_estimator(estimator, query, estimator.estimate_area)
+    e = call_model(model, query, model.estimate_area)
     if e and e.success:
         n_instances = query.component_attributes.get("n_instances", 1)
         e.add_messages(f"Multiplying by n_instances {n_instances}")
@@ -82,9 +82,9 @@ def _get_area_estimation(
 
 
 def _get_leak_power_estimation(
-    estimator: EnergyAreaEstimatorWrapper, query: EnergyAreaQuery
+    model: EnergyAreaModelWrapper, query: EnergyAreaQuery
 ) -> FloatEstimation:
-    e = call_estimator(estimator, query, estimator.estimate_leak_power)
+    e = call_model(model, query, model.estimate_leak_power)
     if e and e.success:
         n_instances = query.component_attributes.get("n_instances", 1)
         e.add_messages(f"Multiplying by n_instances {n_instances}")
@@ -92,41 +92,41 @@ def _get_leak_power_estimation(
     return e
 
 
-def _select_estimator(
-    estimator: EnergyAreaEstimatorWrapper,
+def _select_model(
+    model: EnergyAreaModelWrapper,
     query: EnergyAreaQuery,
 ) -> EstimatorEstimation:
     for required_action in query.required_actions:
-        if required_action not in estimator.get_action_names():
+        if required_action not in model.get_action_names():
             e = EstimatorEstimation.get_estimation(
-                0, success=False, estimator_name=estimator.get_name()
+                0, success=False, model_name=model.get_name()
             )
             e.fail(
-                f"Estimator {estimator.get_name()} does not support action {required_action}"
+                f"Model {model.get_name()} does not support action {required_action}"
             )
             return e
     callfunc = lambda x: EstimatorEstimation.get_estimation(
-        estimator.get_initialized_subclass(x),
+        model.get_initialized_subclass(x),
         success=True,
-        estimator_name=estimator.get_name(),
+        model_name=model.get_name(),
     )
-    return call_estimator(estimator, query, callfunc)
+    return call_model(model, query, callfunc)
 
 
 def _get_best_estimate(
     query: EnergyAreaQuery,
     target: str,
-    estimators: List[EnergyAreaEstimatorWrapper] = None,
-) -> FloatEstimation | EnergyAreaEstimator:
-    if estimators is None:
-        estimators = installed_estimators()
+    models: List[EnergyAreaModelWrapper] = None,
+) -> FloatEstimation | EnergyAreaModel:
+    if models is None:
+        models = installed_models()
 
     if target == "energy":
         est_func = _get_energy_estimation
     elif target == "area":
         est_func = _get_area_estimation
-    elif target == "estimator":
-        est_func = _select_estimator
+    elif target == "model":
+        est_func = _select_model
     elif target == "leak_power":
         est_func = _get_leak_power_estimation
     else:
@@ -140,66 +140,66 @@ def _get_best_estimate(
                 del drop_from[to_drop]
 
     estimations = []
-    supported_estimators = sorted(
-        estimators, key=lambda x: x.percent_accuracy, reverse=True
+    supported_models = sorted(
+        models, key=lambda x: x.percent_accuracy, reverse=True
     )
-    supported_estimators = []
+    supported_models = []
     init_errors = []
-    for estimator in estimators:
+    for model in models:
         try:
-            if not estimator.is_component_supported(query):
+            if not model.is_component_supported(query):
                 continue
-            supported_estimators.append(estimator)
+            supported_models.append(model)
         except Exception as e:
-            init_errors.append((estimator, e))
+            init_errors.append((model, e))
 
-    if not supported_estimators:
-        if not estimators:
+    if not supported_models:
+        if not models:
             raise EstimatorError(
-                f"No estimators found. Please install hwcomponents estimators."
+                f"No models found. Please install hwcomponents models."
             )
         supported_classes = set.union(
-            *[set(p.get_component_names()) for p in estimators]
+            *[set(p.get_component_names()) for p in models]
         )
         if init_errors:
             err_str = [
-                f"Component {query.component_name} is supported by estimators, but the "
-                f"following estimators could could not be initialized."
+                f"Component {query.component_name} is supported by models, but the "
+                f"following models could could not be initialized."
             ]
-            for estimator, err in init_errors:
-                err_str.append(f"\t{estimator.get_name()}")
+            for model, err in init_errors:
+                err_str.append(f"\t{model.get_name()}")
                 err_str.append(f"\t" + str(err).replace("\n", "\n\t"))
             raise EstimatorError("\n".join(err_str))
         raise EstimatorError(
-            f"Component {query.component_name} is not supported by any estimators. "
+            f"Component {query.component_name} is not supported by any models. "
             f"Supported components: " + ", ".join(sorted(supported_classes))
         )
 
     estimation = None
-    for estimator in supported_estimators:
-        estimation = est_func(estimator, copy.deepcopy(query))
-        logger = get_logger(estimator.get_name())
+    for model in supported_models:
+        estimation = est_func(model, copy.deepcopy(query))
+        logger = get_logger(model.get_name())
         if not estimation.success:
             estimation.add_messages(pop_all_messages(logger))
-            estimations.append((estimator.percent_accuracy, estimation))
+            estimations.append((model.percent_accuracy, estimation))
         else:
             log_all_lines(
                 f"HWComponents",
                 "info",
-                f"{estimation.estimator_name} returned "
-                f"{estimation} with accuracy {estimator.percent_accuracy}. "
+                f"{estimation.model_name} returned "
+                f"{estimation} with accuracy {model.percent_accuracy}. "
                 + indent_list_text_block("Messages:", estimation.messages),
             )
             break
 
     full_logs = [
         indent_list_text_block(
-            f"{e.estimator_name} with accuracy {a} estimating value: ", e.messages
+            f"{e.model_name} with accuracy {a} estimating value: ", e.messages
         )
         for a, e in estimations
     ]
     fail_reasons = [
-        f"{e.estimator_name} with accuracy {a} estimating value: " f"{e.lastmessage()}"
+        f"{e.model_name} with accuracy {a} estimating value: " f"{e.lastmessage()}"
         for a, e in estimations
     ]
 
@@ -207,33 +207,33 @@ def _get_best_estimate(
         log_all_lines(
             "HWComponents",
             "debug",
-            indent_list_text_block("Estimator logs:", full_logs),
+            indent_list_text_block("Model logs:", full_logs),
         )
     if fail_reasons:
         log_all_lines(
             "HWComponents",
             "debug",
-            indent_list_text_block("Why estimators did not estimate:", fail_reasons),
+            indent_list_text_block("Why models did not estimate:", fail_reasons),
         )
     if fail_reasons:
         log_all_lines(
             "HWComponents",
             "info",
             indent_list_text_block(
-                "Estimators provided accuracy but failed to estimate:",
+                "Models provided accuracy but failed to estimate:",
                 fail_reasons,
             ),
         )
 
     if estimation is not None and estimation.success:
-        return estimation.value if target == "estimator" else estimation
+        return estimation.value if target == "model" else estimation
 
     clear_logs()
 
     raise RuntimeError(
-        f"Can not find an {target} estimator for {query}\n"
-        f'{indent_list_text_block("Logs for estimators that could estimate query:", full_logs)}\n'
-        f'{indent_list_text_block("Why estimators did not estimate:", fail_reasons)}\n'
+        f"Can not find an {target} model for {query}\n"
+        f'{indent_list_text_block("Logs for models that could estimate query:", full_logs)}\n'
+        f'{indent_list_text_block("Why models did not estimate:", fail_reasons)}\n'
         f'\n.\n.\nTo see a list of available component models, run "hwc --list".'
     )
 
@@ -242,39 +242,39 @@ def get_energy(
     component_attributes: Dict[str, Any],
     action_name: str,
     action_arguments: Dict[str, Any],
-    estimators: List[EnergyAreaEstimatorWrapper] = None,
+    models: List[EnergyAreaModelWrapper] = None,
 ) -> Estimation:
     query = EnergyAreaQuery(
         component_name.lower(), component_attributes, action_name, action_arguments
     )
-    return _get_best_estimate(query, "energy", estimators)
+    return _get_best_estimate(query, "energy", models)
 
 
 def get_area(
     component_name: str,
     component_attributes: Dict[str, Any],
-    estimators: List[EnergyAreaEstimatorWrapper] = None,
+    models: List[EnergyAreaModelWrapper] = None,
 ) -> Estimation:
     query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
-    return _get_best_estimate(query, "area", estimators)
+    return _get_best_estimate(query, "area", models)
 
 
 def get_leak_power(
     component_name: str,
     component_attributes: Dict[str, Any],
-    estimators: List[EnergyAreaEstimatorWrapper] = None,
+    models: List[EnergyAreaModelWrapper] = None,
 ) -> Estimation:
     query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
-    return _get_best_estimate(query, "leak_power", estimators)
+    return _get_best_estimate(query, "leak_power", models)
 
 
-def get_estimator(
+def get_model(
     component_name: str,
     component_attributes: Dict[str, Any],
     required_actions: List[str] = (),
-    estimators: List[EnergyAreaEstimatorWrapper] = None,
-) -> EnergyAreaEstimatorWrapper:
+    models: List[EnergyAreaModelWrapper] = None,
+) -> EnergyAreaModelWrapper:
     query = EnergyAreaQuery(
         component_name.lower(), component_attributes, None, None, required_actions
     )
-    return _get_best_estimate(query, "estimator", estimators)
+    return _get_best_estimate(query, "model", models)
