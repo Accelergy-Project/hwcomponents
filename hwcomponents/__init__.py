@@ -9,4 +9,3 @@ from hwcomponents.select_models import (
     get_model,
     get_leak_power,
 )
-from hwcomponents.select_models import EnergyAreaQuery

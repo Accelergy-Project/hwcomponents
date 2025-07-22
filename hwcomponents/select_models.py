@@ -14,7 +14,7 @@ from hwcomponents.model_wrapper import (
 from hwcomponents.find_models import installed_models
 
 
-def indent_list_text_block(prefix: str, list_to_print: List[str]):
+def _indent_list_text_block(prefix: str, list_to_print: List[str]):
     if not list_to_print:
         return ""
     return "\n| ".join(
@@ -22,7 +22,7 @@ def indent_list_text_block(prefix: str, list_to_print: List[str]):
     )
 
 
-def call_model(
+def _call_model(
     model: EnergyAreaModelWrapper,
     query: EnergyAreaQuery,
     target_func: Callable,
@@ -62,7 +62,7 @@ def call_model(
 def _get_energy_estimation(
     model: EnergyAreaModelWrapper, query: EnergyAreaQuery
 ) -> FloatEstimation:
-    e = call_model(model, query, model.estimate_energy)
+    e = _call_model(model, query, model.estimate_energy)
     if e and e.success and query.action_name == "leak":
         n_instances = query.component_attributes.get("n_instances", 1)
         e.add_messages(f"Multiplying by n_instances {n_instances}")
@@ -73,7 +73,7 @@ def _get_energy_estimation(
 def _get_area_estimation(
     model: EnergyAreaModelWrapper, query: EnergyAreaQuery
 ) -> FloatEstimation:
-    e = call_model(model, query, model.estimate_area)
+    e = _call_model(model, query, model.estimate_area)
     if e and e.success:
         n_instances = query.component_attributes.get("n_instances", 1)
         e.add_messages(f"Multiplying by n_instances {n_instances}")
@@ -84,7 +84,7 @@ def _get_area_estimation(
 def _get_leak_power_estimation(
     model: EnergyAreaModelWrapper, query: EnergyAreaQuery
 ) -> FloatEstimation:
-    e = call_model(model, query, model.estimate_leak_power)
+    e = _call_model(model, query, model.estimate_leak_power)
     if e and e.success:
         n_instances = query.component_attributes.get("n_instances", 1)
         e.add_messages(f"Multiplying by n_instances {n_instances}")
@@ -110,7 +110,7 @@ def _select_model(
         success=True,
         model_name=model.get_name(),
     )
-    return call_model(model, query, callfunc)
+    return _call_model(model, query, callfunc)
 
 
 def _get_best_estimate(
@@ -188,12 +188,12 @@ def _get_best_estimate(
                 "info",
                 f"{estimation.model_name} returned "
                 f"{estimation} with accuracy {model.percent_accuracy}. "
-                + indent_list_text_block("Messages:", estimation.messages),
+                + _indent_list_text_block("Messages:", estimation.messages),
             )
             break
 
     full_logs = [
-        indent_list_text_block(
+        _indent_list_text_block(
             f"{e.model_name} with accuracy {a} estimating value: ", e.messages
         )
         for a, e in estimations
@@ -207,19 +207,19 @@ def _get_best_estimate(
         log_all_lines(
             "HWComponents",
             "debug",
-            indent_list_text_block("Model logs:", full_logs),
+            _indent_list_text_block("Model logs:", full_logs),
         )
     if fail_reasons:
         log_all_lines(
             "HWComponents",
             "debug",
-            indent_list_text_block("Why models did not estimate:", fail_reasons),
+            _indent_list_text_block("Why models did not estimate:", fail_reasons),
         )
     if fail_reasons:
         log_all_lines(
             "HWComponents",
             "info",
-            indent_list_text_block(
+            _indent_list_text_block(
                 "Models provided accuracy but failed to estimate:",
                 fail_reasons,
             ),
@@ -232,8 +232,8 @@ def _get_best_estimate(
 
     raise RuntimeError(
         f"Can not find an {target} model for {query}\n"
-        f'{indent_list_text_block("Logs for models that could estimate query:", full_logs)}\n'
-        f'{indent_list_text_block("Why models did not estimate:", fail_reasons)}\n'
+        f'{_indent_list_text_block("Logs for models that could estimate query:", full_logs)}\n'
+        f'{_indent_list_text_block("Why models did not estimate:", fail_reasons)}\n'
         f'\n.\n.\nTo see a list of available component models, run "hwc --list".'
     )
 
