@@ -90,7 +90,7 @@ class EnergyAreaModel(ListLoggable, ABC):
                 )
                 scale = callfunc(target_float, default_float)
                 setattr(self, attr, prev_val * scale)
-                self.log.append(
+                self.logger.info(
                     f"Scaled {key} from {default} to {target}: {attr} multiplied by {scale}"
                 )
 
