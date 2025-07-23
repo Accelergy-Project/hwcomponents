@@ -61,7 +61,8 @@ def get_models_in_module(
 
 
 def get_models(
-    *paths_or_packages: Union[str, List[str]], include_installed: bool = None
+    *paths_or_packages: Union[str, List[str], List[List[str]]], 
+    include_installed: bool = None
 ) -> List[EnergyAreaModelWrapper]:
     """
     Instantiate a list of model model objects for later queries.
@@ -76,8 +77,15 @@ def get_models(
 
     packages = []
     paths = []
-
+    
+    flattened = []
     for path_or_package in paths_or_packages:
+        if isinstance(path_or_package, list):
+            flattened.extend(path_or_package)
+        else:
+            flattened.append(path_or_package)
+
+    for path_or_package in flattened:
         # Check if it's a package first
         try:
             importlib.import_module(path_or_package)
