@@ -305,8 +305,9 @@ class CallableFunction:
         unneeded_args = [k for k in kwargs.keys() if k not in kwags_included]
         if unneeded_args:
             self.logger.warn(
-                f'Unused arguments ({", ".join(unneeded_args)}) provided for {component_name}.'
-                f'{self.function_name}. Arguments used: ({", ".join(kwags_included.keys())})'
+                f'Unused arguments for {component_name}.{self.function_name}: '
+                f'({", ".join(unneeded_args)})'
+                f'Arguments used: ({", ".join(kwags_included.keys())})'
             )
 
         if call_function_on_object is not None:
