@@ -67,23 +67,22 @@ def get_models(
     """
     Instantiate a list of model model objects for later queries.
     """
-    if include_installed is None:
-        include_installed = not paths_or_packages
-
-    models = installed_models() if include_installed else []
-
     model_ids = set()
     n_models = 0
 
     packages = []
     paths = []
-    
+
     flattened = []
     for path_or_package in paths_or_packages:
         if isinstance(path_or_package, list):
             flattened.extend(path_or_package)
         else:
             flattened.append(path_or_package)
+
+    if include_installed is None:
+        include_installed = not flattened
+    models = installed_models() if include_installed else []
 
     for path_or_package in flattened:
         # Check if it's a package first
