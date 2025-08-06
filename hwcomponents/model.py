@@ -6,18 +6,40 @@ from hwcomponents.logging import ListLoggable
 from hwcomponents.util import parse_float
 
 
-def actionDynamicEnergy(func: Callable) -> Callable:
+def actionDynamicEnergy(func: Callable=None, bits_per_action: str = None) -> Callable:
     """
     Decorator that adds an action to an energy/area model. Actions are
     expected to return an energy value in Juoles or an Estimation object with
     the energy and units.
     """
+    if func is None:
+        return lambda func: actionDynamicEnergy(func, bits_per_action)
+
+    additional_kwargs = set()
+    if bits_per_action is not None:
+        additional_kwargs.add("bits_per_action")
 
     def wrapper(self: "EnergyAreaModel", *args, **kwargs):
-        return func(self, *args, **kwargs) * self.energy_scale
+        scale = 1
+        if bits_per_action is not None and "bits_per_action" in kwargs:
+            nominal_bits = None
+            try:
+                nominal_bits = getattr(self, bits_per_action)
+            except:
+                pass
+            if nominal_bits is None:
+                raise ValueError(
+                    f"{self.__class__.__name__} has no attribute {bits_per_action}. "
+                    f"Ensure that the attributes referenced in actionDynamicEnergy "
+                    f"are defined in the class."
+                )
+            scale = kwargs["bits_per_action"] / nominal_bits
+        kwargs = {k: v for k, v in kwargs.items() if k not in additional_kwargs}
+        return func(self, *args, **kwargs) * self.energy_scale * scale
 
     wrapper._is_component_energy_action = True
     wrapper._original_function = func
+    wrapper._additional_kwargs = additional_kwargs
     return wrapper
 
 
@@ -52,9 +74,9 @@ class EnergyAreaModel(ListLoggable, ABC):
         return self._area * self.area_scale
 
     @actionDynamicEnergy
-    def leak(self, time_period: float) -> Number:
+    def leak(self, global_cycle_period: float) -> Number:
         """Returns the energy leakage of the component over a given time period in Joules."""
-        return self.leak_power * time_period
+        return self.leak_power * global_cycle_period
 
     def scale(
         self,

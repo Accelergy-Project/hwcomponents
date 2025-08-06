@@ -241,6 +241,7 @@ class CallableFunction:
             )
 
         self.function = function
+        self.additional_kwargs = getattr(function, "_additional_kwargs", set())
         if is_init:
             function = function.__init__
         elif getattr(function, "_is_component_energy_action", False):
@@ -299,7 +300,7 @@ class CallableFunction:
         kwags_included = {
             k: v
             for k, v in kwargs.items()
-            if k in self.non_default_args or k in self.default_args
+            if k in self.non_default_args or k in self.default_args or k in self.additional_kwargs
         }
         unneeded_args = [k for k in kwargs.keys() if k not in kwags_included]
         if unneeded_args:
