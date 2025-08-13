@@ -1,6 +1,7 @@
 import glob
 import importlib
 from importlib.machinery import SourceFileLoader
+from pathlib import Path
 from types import ModuleType
 from typing import List, Set, Union
 from hwcomponents.model_wrapper import EnergyAreaModelWrapper
@@ -62,7 +63,7 @@ def get_models_in_module(
 
 def get_models(
     *paths_or_packages: Union[str, List[str], List[List[str]]], 
-    include_installed: bool = None
+    include_installed: bool = True
 ) -> List[EnergyAreaModelWrapper]:
     """
     Instantiate a list of model model objects for later queries.
@@ -75,13 +76,15 @@ def get_models(
 
     flattened = []
     for path_or_package in paths_or_packages:
-        if isinstance(path_or_package, list):
-            flattened.extend(path_or_package)
-        else:
-            flattened.append(path_or_package)
+        if not isinstance(path_or_package, list):
+            path_or_package = [path_or_package]
+        for p in path_or_package:
+            if isinstance(p, (str, Path)):
+                globbed = glob.glob(p, recursive=True)
+                flattened.extend(globbed)
+            else:
+                flattened.append(p)
 
-    if include_installed is None:
-        include_installed = not flattened
     models = installed_models() if include_installed else []
 
     for path_or_package in flattened:
@@ -89,7 +92,7 @@ def get_models(
         try:
             importlib.import_module(path_or_package)
             packages.append(path_or_package)
-        except ImportError:
+        except (ImportError, TypeError):
             # If not, check if it's a file
             if os.path.isfile(path_or_package):
                 assert path_or_package.endswith(
