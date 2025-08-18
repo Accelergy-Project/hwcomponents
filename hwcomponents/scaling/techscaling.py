@@ -101,8 +101,8 @@ def tech_node_energy(
     """Returns the scaling factor for energy from the technology node
     `from_node` to the technology node `to_node`. Interpolates if necessary."""
     # Based on IRDS 2022, energy stops scaling after 1nm
-    from_node = max(from_node, 1)
-    to_node = max(to_node, 1)
+    from_node = max(from_node, 1e-9)
+    to_node = max(to_node, 1e-9)
 
     from_node, x = constrain_to_tech_nodes(from_node)
     to_node, y = constrain_to_tech_nodes(to_node)
