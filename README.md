@@ -65,7 +65,7 @@ models as submodules.
 
 ```bash
 # Install the main package
-git clone --recurse-submodules <this-repo>
+git clone --recurse-submodules https://github.com/Accelergy-Project/hwcomponents.git
 pip install ./hwcomponents
 
 # Install model packages
