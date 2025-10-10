@@ -46,13 +46,20 @@ def actionDynamicEnergy(func: Callable=None, bits_per_action: str = None) -> Cal
 class EnergyAreaModel(ListLoggable, ABC):
     """
     EnergyAreaModel base class. EnergyAreaModel class must have "name"
-    attribute, "percent_accuracy_0_to_100" attribute, and "get_area" method.
+    attribute, "priority" attribute, and "get_area" method.
     EnergyAreaModels may have any number of methods that are decorated with
     @actionDynamicEnergy.
     """
 
     component_name: Union[str, List[str]] = None
-    percent_accuracy_0_to_100: Number = None
+    """ Name of the component. Must be a string or list/tuple of strings. """
+
+    priority: Number = None
+    """
+    Priority determines which model is used when multiple models are available for a
+    given component. Higher priority models are used first. Must be a number between 0
+    and 1.
+    """
 
     @abstractmethod
     def __init__(self, leak_power: float, area: float):

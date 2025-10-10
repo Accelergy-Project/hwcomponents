@@ -341,7 +341,9 @@ class EnergyAreaModelWrapper(ListLoggable):
         self.component_name = [c.lower() for c in cls_component_name]
         super().__init__(name=self.get_name())
 
-        self.percent_accuracy = model_cls.percent_accuracy_0_to_100
+        self.priority = model_cls.priority
+        if self.priority < 0 or self.priority > 1:
+            raise ValueError(f"Priority must be between 0 and 1, not {self.priority}")
         self.init_function = CallableFunction(model_cls, self.logger, is_init=True)
 
         self.actions = [
@@ -495,20 +497,20 @@ def check_for_valid_model_attrs(model: EnergyAreaModel):
             f"EnergyAreaModel {model} component_name must be a string or list/tuple of strings"
         )
 
-    # Check for valid percent_accuracy. Must be a number between 0 and 100
-    if getattr(model, "percent_accuracy_0_to_100", None) is None:
+    # Check for valid priority. Must be a number between 0 and 100
+    if getattr(model, "priority", None) is None:
         raise AttributeError(
-            f'EnergyAreaModel for {component_name} must have a "percent_accuracy_0_to_100" '
+            f'EnergyAreaModel for {component_name} must have a "priority" '
             f"attribute."
         )
-    percent_accuracy = model.percent_accuracy_0_to_100
-    if not isinstance(percent_accuracy, Number):
+    priority = model.priority
+    if not isinstance(priority, Number):
         raise AttributeError(
-            f"EnergyAreaModel for {component_name} percent_accuracy_0_to_100 must be a "
-            f"number. It is currently a {type(percent_accuracy)}"
+            f"EnergyAreaModel for {component_name} priority must be a "
+            f"number. It is currently a {type(priority)}"
         )
-    if percent_accuracy < 0 or percent_accuracy > 100:
+    if priority < 0 or priority > 1:
         raise AttributeError(
-            f"EnergyAreaModel for {component_name} percent_accuracy_0_to_100 must be "
-            f"between 0 and 100 inclusive."
+            f"EnergyAreaModel for {component_name} priority must be "
+            f"between 0 and 1 inclusive."
         )

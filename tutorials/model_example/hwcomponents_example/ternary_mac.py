@@ -5,7 +5,7 @@ class TernaryMAC(EnergyAreaModel):
     # REQUIRED: Give the name of the components supported by this Model.
     component_name: str | list[str] = 'ternary_mac'
     # REQUIRED: Give the percent accuracy of the Model.
-    percent_accuracy_0_to_100 = 80
+    priority = 0.8
 
     def __init__(self, accum_datawidth: int, tech_node: int):
         # Provide an area and leakage power for the component. All units are in 

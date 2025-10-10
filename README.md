@@ -28,8 +28,15 @@ from hwcomponents import EnergyAreaModel, actionDynamicEnergy
 from hwcomponents.scaling import nlog2n, tech_node_area, tech_node_energy, tech_node_leak
 
 class Adder(EnergyAreaModel):
-    component_name = "adder"
-    percent_accuracy_0_to_100 = 80
+    component_name: str | list[str] = 'ternary_mac'
+    """ Name of the component. Must be a string or list/tuple of strings. """
+
+    priority = 0.8
+    """
+    Priority determines which model is used when multiple models are available for a
+    given component. Higher priority models are used first. Must be a number between 0
+    and 1.
+    """
 
     def __init__(self, width: int, tech_node: float):
         super().__init__(area=10e-12, leak_power=width * 1e-6)

@@ -46,16 +46,13 @@ def _call_model(
     estimation.add_messages(pop_all_messages(model.logger))
     estimation.model_name = model.get_name()
 
-    # See if this estimation matches user requested model and min accuracy
+    # See if this estimation matches user requested model and min priority
     attrs = query.component_attributes
     prefix = f"Model {estimation.model_name} did not"
     if attrs.get("model", estimation.model_name) != estimation.model_name:
         estimation.fail(f"{prefix} match requested model {attrs['model']}")
-    if (
-        attrs.get("min_accuracy", -float("inf"))
-        > model.model_cls.percent_accuracy_0_to_100
-    ):
-        estimation.fail(f"{prefix} meet min_accuracy {attrs['min_accuracy']}")
+    if (attrs.get("min_priority", -float("inf")) > model.model_cls.priority):
+        estimation.fail(f"{prefix} meet min_priority {attrs['min_priority']}")
     return estimation
 
 
@@ -140,9 +137,6 @@ def _get_best_estimate(
                 del drop_from[to_drop]
 
     estimations = []
-    supported_models = sorted(
-        models, key=lambda x: x.percent_accuracy, reverse=True
-    )
     supported_models = []
     init_errors = []
     for model in models:
@@ -181,13 +175,13 @@ def _get_best_estimate(
         logger = get_logger(model.get_name())
         if not estimation.success:
             estimation.add_messages(pop_all_messages(logger))
-            estimations.append((model.percent_accuracy, estimation))
+            estimations.append((model.priority, estimation))
         else:
             log_all_lines(
                 f"HWComponents",
                 "info",
                 f"{estimation.model_name} returned "
-                f"{estimation} with accuracy {model.percent_accuracy}. "
+                f"{estimation} with priority {model.priority}. "
                 + _indent_list_text_block("Messages:", estimation.messages),
             )
             break
