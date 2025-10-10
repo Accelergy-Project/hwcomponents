@@ -188,12 +188,12 @@ def _get_best_estimate(
 
     full_logs = [
         _indent_list_text_block(
-            f"{e.model_name} with accuracy {a} estimating value: ", e.messages
+            f"{e.model_name} with priority {a} estimating value: ", e.messages
         )
         for a, e in estimations
     ]
     fail_reasons = [
-        f"{e.model_name} with accuracy {a} estimating value: " f"{e.lastmessage()}"
+        f"{e.model_name} with priority {a} estimating value: " f"{e.lastmessage()}"
         for a, e in estimations
     ]
 
