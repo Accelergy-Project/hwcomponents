@@ -331,7 +331,7 @@ class EnergyAreaModelWrapper(ListLoggable):
         check_for_valid_model_attrs(model_cls)
         self.model_cls = model_cls
         self.model_name = component_name
-        cls_component_name = model_cls.component_name
+        cls_component_name = model_cls._component_name()
         if isinstance(cls_component_name, str):
             cls_component_name = [cls_component_name]
         if not isinstance(cls_component_name, list):
@@ -369,7 +369,7 @@ class EnergyAreaModelWrapper(ListLoggable):
         )
 
     def is_component_supported(
-        self, 
+        self,
         query: EnergyAreaQuery, 
         relaxed_component_name_selection: bool = False
     ) -> bool:
@@ -504,7 +504,7 @@ def check_for_valid_model_attrs(model: EnergyAreaModel):
         raise AttributeError(
             f"EnergyAreaModel {model} must have a component_name attribute"
         )
-    component_name = model.component_name
+    component_name = model._component_name()
     if not isinstance(component_name, str) and not (
         isinstance(component_name, (list, tuple))
         and all(isinstance(n, str) for n in component_name)
