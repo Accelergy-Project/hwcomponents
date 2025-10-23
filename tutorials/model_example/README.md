@@ -19,5 +19,5 @@ To install the model, run the following command:
 pip3 install .
 
 # Check that the model is installed
-hwc --list | grep ternary_mac
+hwc --list | grep TernaryMAC
 ```

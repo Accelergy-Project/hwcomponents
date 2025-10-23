@@ -1,1 +1,1 @@
-from .ternary_mac import TernaryMAC
+from .TernaryMAC import TernaryMAC

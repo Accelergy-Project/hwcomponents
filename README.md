@@ -27,9 +27,12 @@ Full examples of how to use the package are available in the `tutorials` directo
 from hwcomponents import EnergyAreaModel, actionDynamicEnergy
 from hwcomponents.scaling import nlog2n, tech_node_area, tech_node_energy, tech_node_leak
 
-class Adder(EnergyAreaModel):
-    component_name: str | list[str] = 'ternary_mac'
-    """ Name of the component. Must be a string or list/tuple of strings. """
+class TernaryMAC(EnergyAreaModel):
+    component_name: str | list[str] = 'TernaryMAC'
+    """ 
+    Name of the component. Must be a string or list/tuple of strings. Can be omitted if
+    the component name is the same as the class name.
+    """
 
     priority = 0.8
     """

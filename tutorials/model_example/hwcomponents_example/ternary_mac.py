@@ -3,7 +3,7 @@ from hwcomponents.scaling import tech_node_area, tech_node_energy, tech_node_lea
 
 class TernaryMAC(EnergyAreaModel):
     # REQUIRED: Give the name of the components supported by this Model.
-    component_name: str | list[str] = 'ternary_mac'
+    component_name: str | list[str] = 'TernaryMAC'
     # REQUIRED: Give the percent accuracy of the Model.
     priority = 0.8
 

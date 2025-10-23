@@ -52,7 +52,10 @@ class EnergyAreaModel(ListLoggable, ABC):
     """
 
     component_name: Union[str, List[str]] = None
-    """ Name of the component. Must be a string or list/tuple of strings. """
+    """
+    Name of the component. Must be a string or list/tuple of strings. Can be omitted if
+    the component name is the same as the class name.
+    """
 
     priority: Number = None
     """
@@ -85,6 +88,11 @@ class EnergyAreaModel(ListLoggable, ABC):
         """Returns the energy leakage of the component over a given time period in Joules."""
         return self.leak_power * global_cycle_period
 
+    def _component_name(self) -> str:
+        if self.__class__.component_name is None:
+            return self.__class__.__name__
+        return self.__class__.component_name
+
     def scale(
         self,
         key: str,
@@ -94,7 +102,7 @@ class EnergyAreaModel(ListLoggable, ABC):
         area_scale_function: Callable[[float, float], float],
         leak_scale_function: Callable[[float, float], float],
     ) -> float:
-        super()._init_logger(f"{self.__class__.component_name}")
+        super()._init_logger(f"{self._component_name()}")
         if target == default:
             return target
 
@@ -112,10 +120,10 @@ class EnergyAreaModel(ListLoggable, ABC):
                 )
             except:
                 target_float = parse_float(
-                    target, f"{self.__class__.component_name}.{key}"
+                    target, f"{self._component_name()}.{key}"
                 )
                 default_float = parse_float(
-                    default, f"{self.__class__.component_name}.{key}"
+                    default, f"{self._component_name()}.{key}"
                 )
                 scale = callfunc(target_float, default_float)
                 setattr(self, attr, prev_val * scale)
