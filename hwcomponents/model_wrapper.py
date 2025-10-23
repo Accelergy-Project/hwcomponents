@@ -368,13 +368,29 @@ class EnergyAreaModelWrapper(ListLoggable):
             f"Primitive component {self.component_name} " f"must have {missing}"
         )
 
-    def is_component_supported(self, query: EnergyAreaQuery) -> bool:
-        if not query.component_name.lower() in self.component_name:
+    def is_component_supported(
+        self, 
+        query: EnergyAreaQuery, 
+        relaxed_component_name_selection: bool = False
+    ) -> bool:
+        if query.component_name.lower() in self.component_name:
+            pass
+        elif query.component_name.lower().replace("_", "") in self.component_name:
+            if relaxed_component_name_selection:
+                pass
+            else:
+                self.logger.error(
+                    f"Component name is similar to supported component names, but not "
+                    f"supported. Did you mean {self.component_name}?"
+                )
+                return False
+        else:
             self.logger.error(
-                f"Class name {query.component_name} is not supported. Supported class "
-                f"names: {self.component_name}"
+                f"Component name {query.component_name} is not supported. "
+                f"Supported component names: {self.component_name}"
             )
             return False
+
         init_error = self.init_function.get_call_error_message(
             "__init__", query.component_attributes, self.component_name
         )

@@ -1,6 +1,6 @@
 import logging
 import copy
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 from hwcomponents.model import EnergyAreaModel
 from hwcomponents.logging import get_logger, pop_all_messages, log_all_lines, clear_logs
 from hwcomponents.model_wrapper import (
@@ -114,6 +114,7 @@ def _get_best_estimate(
     query: EnergyAreaQuery,
     target: str,
     models: List[EnergyAreaModelWrapper] = None,
+    _relaxed_component_name_selection: bool = False,
 ) -> FloatEstimation | EnergyAreaModel:
     if models is None:
         models = installed_models()
@@ -137,15 +138,24 @@ def _get_best_estimate(
                 del drop_from[to_drop]
 
     estimations = []
-    supported_models = []
-    init_errors = []
-    for model in models:
-        try:
-            if not model.is_component_supported(query):
-                continue
-            supported_models.append(model)
-        except Exception as e:
-            init_errors.append((model, e))
+    def _get_supported_models(relaxed_component_name_selection: bool):
+        supported_models = []
+        init_errors = []
+        for model in models:
+            try:
+                if not model.is_component_supported(
+                    query,
+                    relaxed_component_name_selection
+                ):
+                    continue
+                supported_models.append(model)
+            except Exception as e:
+                init_errors.append((model, e))
+        return supported_models, init_errors
+
+    supported_models, init_errors = _get_supported_models(
+        _relaxed_component_name_selection
+    )
 
     if not supported_models:
         if not models:
@@ -155,19 +165,35 @@ def _get_best_estimate(
         supported_classes = set.union(
             *[set(p.get_component_names()) for p in models]
         )
+        
+        err_str = []
+        if not _relaxed_component_name_selection:
+            near_supported, _ = _get_supported_models(True)
+            if near_supported:
+                err_str.append(
+                    f"Some component models have similar names to the given component "
+                    f"name. Did you mean any of the following?\n\t"
+                )
+                for model in near_supported:
+                    err_str.append(f"\t{model.get_name()}")
+        
         if init_errors:
-            err_str = [
+            err_str.append(
                 f"Component {query.component_name} is supported by models, but the "
                 f"following models could could not be initialized."
-            ]
+            )
             for model, err in init_errors:
                 err_str.append(f"\t{model.get_name()}")
-                err_str.append(f"\t" + str(err).replace("\n", "\n\t"))
+                err_str.append(f"\t{str(err).replace("\n", "\n\t")}")
             raise EstimatorError("\n".join(err_str))
-        raise EstimatorError(
+
+        e = (
             f"Component {query.component_name} is not supported by any models. "
             f"Supported components: " + ", ".join(sorted(supported_classes))
         )
+        if err_str:
+            e += "\n" + "\n".join(err_str)
+        raise EstimatorError(e)
 
     estimation = None
     for model in supported_models:
@@ -237,29 +263,32 @@ def get_energy(
     action_name: str,
     action_arguments: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
+    _relaxed_component_name_selection: bool = False,
 ) -> Estimation:
     query = EnergyAreaQuery(
         component_name.lower(), component_attributes, action_name, action_arguments
     )
-    return _get_best_estimate(query, "energy", models)
+    return _get_best_estimate(query, "energy", models, _relaxed_component_name_selection)
 
 
 def get_area(
     component_name: str,
     component_attributes: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
+    _relaxed_component_name_selection: bool = False,
 ) -> Estimation:
     query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
-    return _get_best_estimate(query, "area", models)
+    return _get_best_estimate(query, "area", models, _relaxed_component_name_selection)
 
 
 def get_leak_power(
     component_name: str,
     component_attributes: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
+    _relaxed_component_name_selection: bool = False,
 ) -> Estimation:
     query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
-    return _get_best_estimate(query, "leak_power", models)
+    return _get_best_estimate(query, "leak_power", models, _relaxed_component_name_selection)
 
 
 def get_model(
@@ -267,8 +296,9 @@ def get_model(
     component_attributes: Dict[str, Any],
     required_actions: List[str] = (),
     models: List[EnergyAreaModelWrapper] = None,
+    _relaxed_component_name_selection: bool = False,
 ) -> EnergyAreaModelWrapper:
     query = EnergyAreaQuery(
         component_name.lower(), component_attributes, None, None, required_actions
     )
-    return _get_best_estimate(query, "model", models)
+    return _get_best_estimate(query, "model", models, _relaxed_component_name_selection)
