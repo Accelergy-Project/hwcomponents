@@ -51,7 +51,7 @@ class EnergyAreaModel(ListLoggable, ABC):
     @actionDynamicEnergy.
     """
 
-    component_name: Union[str, List[str]] = None
+    component_name: Union[str, List[str], None] = None
     """
     Name of the component. Must be a string or list/tuple of strings. Can be omitted if
     the component name is the same as the class name.
@@ -88,10 +88,11 @@ class EnergyAreaModel(ListLoggable, ABC):
         """Returns the energy leakage of the component over a given time period in Joules."""
         return self.leak_power * global_cycle_period
 
-    def _component_name(self) -> str:
-        if self.__class__.component_name is None:
-            return self.__class__.__name__
-        return self.__class__.component_name
+    @classmethod
+    def _component_name(cls) -> str:
+        if cls.component_name is None:
+            return cls.__name__
+        return cls.component_name
 
     def scale(
         self,

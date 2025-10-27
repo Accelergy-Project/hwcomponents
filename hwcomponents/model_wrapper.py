@@ -500,10 +500,6 @@ class EnergyAreaModelWrapper(ListLoggable):
 
 def check_for_valid_model_attrs(model: EnergyAreaModel):
     # Check for valid component_name. Must be a string or list of strings
-    if getattr(model, "component_name", None) is None:
-        raise AttributeError(
-            f"EnergyAreaModel {model} must have a component_name attribute"
-        )
     component_name = model._component_name()
     if not isinstance(component_name, str) and not (
         isinstance(component_name, (list, tuple))
