@@ -20,7 +20,7 @@ jobs:
         run: |
           cd docs
           LC_ALL=C.UTF-8 LANG=C.UTF-8 sphinx-apidoc -o ./source ../hwcomponents -f
-          LC_ALL=C.UTF-8 LANG=C.UTF-8 sphinx-build -b html ./source ./build
+          LC_ALL=C.UTF-8 LANG=C.UTF-8 sphinx-build -b html ./source ./build/html
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
