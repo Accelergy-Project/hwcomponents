@@ -2,15 +2,26 @@ from abc import ABC, abstractmethod
 from numbers import Number
 from typing import Callable, List, Union
 import warnings
-from hwcomponents.logging import ListLoggable
-from hwcomponents.util import parse_float
+from hwcomponents._logging import ListLoggable
+from hwcomponents._util import parse_float
 
 
-def actionDynamicEnergy(func: Callable=None, bits_per_action: str = None) -> Callable:
+def actionDynamicEnergy(
+    func: Callable[[], float] = None, bits_per_action: str = None
+) -> Callable[[], float]:
     """
     Decorator that adds an action to an energy/area model. Actions are
-    expected to return an energy value in Juoles or an Estimation object with
-    the energy and units.
+    expected to return an energy value in Joules.
+
+    Args:
+        func: The function to decorate.
+        bits_per_action: The attribute of the model that contains the number of bits per
+            action. If this is set and a bits_per_action is passed to the function, the
+            energy will be scaled by the number of bits. For example, if bits_per_action
+            is set to "width", the function is called with bits_per_action=10, and the
+            model has a width attribute of 5, then the energy will be scaled by 2.
+    Returns:
+        The decorated function.
     """
     if func is None:
         return lambda func: actionDynamicEnergy(func, bits_per_action)
@@ -49,6 +60,17 @@ class EnergyAreaModel(ListLoggable, ABC):
     attribute, "priority" attribute, and "get_area" method.
     EnergyAreaModels may have any number of methods that are decorated with
     @actionDynamicEnergy.
+
+    Args:
+        component_name: The name of the component. Must be a string or list/tuple of
+            strings. Can be omitted if the component name is the same as the class name.
+        priority: The priority of the model. Higher priority models are used first.
+            Must be a number between 0 and 1.
+        leak_power: The leakage power of the component in Watts.
+        area: The area of the component in m^2.
+        energy_scale: A scale factor for the energy.
+        area_scale: A scale factor for the area.
+        leak_scale: A scale factor for the leakage power.
     """
 
     component_name: Union[str, List[str], None] = None
@@ -82,11 +104,6 @@ class EnergyAreaModel(ListLoggable, ABC):
     def area(self) -> Number:
         """Returns the area in m^2 of the component."""
         return self._area * self.area_scale
-
-    @actionDynamicEnergy
-    def leak(self, global_cycle_period: float) -> Number:
-        """Returns the energy leakage of the component over a given time period in Joules."""
-        return self.leak_power * global_cycle_period
 
     @classmethod
     def _component_name(cls) -> str:

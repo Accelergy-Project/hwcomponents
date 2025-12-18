@@ -2,8 +2,8 @@ import logging
 import copy
 from typing import Any, Callable, Dict, List, Tuple
 from hwcomponents.model import EnergyAreaModel
-from hwcomponents.logging import get_logger, pop_all_messages, log_all_lines, clear_logs
-from hwcomponents.model_wrapper import (
+from hwcomponents._logging import get_logger, pop_all_messages, log_all_lines, clear_logs
+from hwcomponents._model_wrapper import (
     EnergyAreaModelWrapper,
     EnergyAreaQuery,
     Estimation,
@@ -165,7 +165,7 @@ def _get_best_estimate(
         supported_classes = set.union(
             *[set(p.get_component_names()) for p in models]
         )
-        
+
         err_str = []
         if not _relaxed_component_name_selection:
             near_supported, _ = _get_supported_models(True)
@@ -176,7 +176,7 @@ def _get_best_estimate(
                 )
                 for model in near_supported:
                     err_str.append(f"\t{model.get_name()}")
-        
+
         if init_errors:
             err_str.append(
                 f"Component {query.component_name} is supported by models, but the "
@@ -257,6 +257,7 @@ def _get_best_estimate(
         f'\n.\n.\nTo see a list of available component models, run "hwc --list".'
     )
 
+
 def get_energy(
     component_name: str,
     component_attributes: Dict[str, Any],
@@ -264,7 +265,24 @@ def get_energy(
     action_arguments: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
     _relaxed_component_name_selection: bool = False,
-) -> Estimation:
+) -> float:
+    """
+    Finds the energy using the best-matching model. "Best" is defined as the
+    highest-priority model that has all required attributes specified in
+    component_attributes and a matching action with all required arguments specified
+    in action_arguments.
+
+    Args:
+        component_name: The name of the component.
+        component_attributes: The attributes of the component.
+        action_name: The name of the action.
+        action_arguments: The arguments of the action.
+        models: The models to use.
+        _relaxed_component_name_selection: Whether to relax the component name
+            selection. Relaxed selection ignores underscores in the component name.
+    Returns:
+        The energy in Joules.
+    """
     query = EnergyAreaQuery(
         component_name.lower(), component_attributes, action_name, action_arguments
     )
@@ -276,7 +294,21 @@ def get_area(
     component_attributes: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
     _relaxed_component_name_selection: bool = False,
-) -> Estimation:
+) -> float:
+    """
+    Finds the area using the best-matching model. "Best" is defined as the
+    highest-priority model that has all required attributes specified in
+    component_attributes.
+
+    Args:
+        component_name: The name of the component.
+        component_attributes: The attributes of the component.
+        models: The models to use.
+        _relaxed_component_name_selection: Whether to relax the component name
+            selection. Relaxed selection ignores underscores in the component name.
+    Returns:
+        The area in m^2.
+    """
     query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
     return _get_best_estimate(query, "area", models, _relaxed_component_name_selection)
 
@@ -286,7 +318,21 @@ def get_leak_power(
     component_attributes: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
     _relaxed_component_name_selection: bool = False,
-) -> Estimation:
+) -> EnergyAreaModelWrapper:
+    """
+    Finds the leak power using the best-matching model. "Best" is defined as the
+    highest-priority model that has all required attributes specified in
+    component_attributes.
+
+    Args:
+        component_name: The name of the component.
+        component_attributes: The attributes of the component.
+        models: The models to use.
+        _relaxed_component_name_selection: Whether to relax the component name
+            selection. Relaxed selection ignores underscores in the component name.
+    Returns:
+        The leak power in Watts.
+    """
     query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
     return _get_best_estimate(query, "leak_power", models, _relaxed_component_name_selection)
 
@@ -298,6 +344,21 @@ def get_model(
     models: List[EnergyAreaModelWrapper] = None,
     _relaxed_component_name_selection: bool = False,
 ) -> EnergyAreaModelWrapper:
+    """
+    Finds the best model for the given component. "Best" is defined as the
+    highest-priority model that has all required attributes specified in
+    component_attributes, and has actions for all of required_actions.
+
+    Args:
+        component_name: The name of the component.
+        component_attributes: The attributes of the component.
+        required_actions: The actions that are required for the component.
+        models: The models to use.
+        _relaxed_component_name_selection: Whether to relax the component name
+            selection. Relaxed selection ignores underscores in the component name.
+    Returns:
+        The best model wrapper.
+    """
     query = EnergyAreaQuery(
         component_name.lower(), component_attributes, None, None, required_actions
     )

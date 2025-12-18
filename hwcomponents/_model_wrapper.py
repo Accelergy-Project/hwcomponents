@@ -4,7 +4,7 @@ from numbers import Number
 from types import ModuleType
 from typing import Any, Callable, Dict, List, Optional, Set, Union
 from .model import EnergyAreaModel
-from .logging import move_queue_from_one_logger_to_another, ListLoggable
+from ._logging import move_queue_from_one_logger_to_another, ListLoggable
 
 
 class EstimatorError(Exception):
@@ -370,7 +370,7 @@ class EnergyAreaModelWrapper(ListLoggable):
 
     def is_component_supported(
         self,
-        query: EnergyAreaQuery, 
+        query: EnergyAreaQuery,
         relaxed_component_name_selection: bool = False
     ) -> bool:
         if query.component_name.lower() in self.component_name:

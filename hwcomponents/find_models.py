@@ -4,7 +4,7 @@ from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from types import ModuleType
 from typing import List, Set, Union
-from hwcomponents.model_wrapper import EnergyAreaModelWrapper
+from hwcomponents._model_wrapper import EnergyAreaModelWrapper
 import inspect
 import logging
 import copy
@@ -16,6 +16,14 @@ _ALL_ESTIMATORS = None
 
 
 def installed_models() -> List[EnergyAreaModelWrapper]:
+    """
+    Lists all Python packages installed that are prefixed with "hwcomponents_". Finds
+    EnergyAreaModel subclasses in these packages and returns them as
+    EnergyAreaModelWrapper objects.
+
+    Returns:
+        A list of EnergyAreaModelWrapper objects.
+    """
     # List all Python packages installed that are prefixed with "hwcomponents_"
     global _ALL_ESTIMATORS
     if _ALL_ESTIMATORS is not None:
@@ -42,6 +50,16 @@ def installed_models() -> List[EnergyAreaModelWrapper]:
 def get_models_in_module(
     module: ModuleType, model_ids: Set
 ) -> List[EnergyAreaModelWrapper]:
+    """
+    Finds all EnergyAreaModel subclasses in a module and returns them as
+    EnergyAreaModelWrapper objects.
+
+    Args:
+        module: The module to search for EnergyAreaModel subclasses.
+        model_ids: A set of model IDs to avoid duplicates.
+    Returns:
+        A list of EnergyAreaModelWrapper objects.
+    """
     logging.info(f"Getting models in module: {module.__name__}")
     classes = [
         (x, name) for name in dir(module) if inspect.isclass(x := getattr(module, name))
@@ -62,11 +80,18 @@ def get_models_in_module(
 
 
 def get_models(
-    *paths_or_packages: Union[str, List[str], List[List[str]]], 
+    *paths_or_packages: Union[str, List[str], List[List[str]]],
     include_installed: bool = True
 ) -> List[EnergyAreaModelWrapper]:
     """
-    Instantiate a list of model model objects for later queries.
+    Instantiate a list of model objects for later queries. Searches for models in the
+    given paths and packages.
+
+    Args:
+        paths_or_packages: A list of paths or packages to search for models.
+        include_installed: Whether to include models from installed packages.
+    Returns:
+        A list of EnergyAreaModelWrapper objects.
     """
     model_ids = set()
     n_models = 0

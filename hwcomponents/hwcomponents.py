@@ -1,9 +1,17 @@
 import argparse
-from hwcomponents.model_wrapper import EnergyAreaModelWrapper
+from hwcomponents._model_wrapper import EnergyAreaModelWrapper
 from hwcomponents.find_models import get_models
 
 
 def list_components(printfunc=print):
+    """
+    Lists all available components.
+
+    Args:
+        printfunc: The function to use to print the components.
+    Returns:
+        None
+    """
     printfunc("\n")
     printfunc("Supported Components:")
 
@@ -51,7 +59,7 @@ def list_components(printfunc=print):
         printfunc(entry[1])
 
 
-def main():
+def _main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--list", action="store_true", help="List all available components"
@@ -63,4 +71,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    _main()

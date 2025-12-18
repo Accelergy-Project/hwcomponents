@@ -40,7 +40,7 @@ ENERGY_SCALING = [
 ]
 
 
-def get_technology_node_index(tech_node: float) -> float:
+def _get_technology_node_index(tech_node: float) -> float:
     """Returns the index of the technology node in the TECH_NODES array.
     Interpolates if necessary."""
     larger_idx, smaller_idx = None, None
@@ -64,7 +64,7 @@ def get_technology_node_index(tech_node: float) -> float:
     return larger_idx + (smaller_idx - larger_idx) * interp
 
 
-def constrain_to_tech_nodes(tech_node: float):
+def _constrain_to_tech_nodes(tech_node: float):
     if tech_node < min(TECH_NODES):
         return min(TECH_NODES), tech_node / min(TECH_NODES)
     if tech_node > max(TECH_NODES):
@@ -73,14 +73,22 @@ def constrain_to_tech_nodes(tech_node: float):
 
 
 def tech_node_area(to_node: float, from_node: float) -> float:
-    """Returns the scaling factor for area from the technology node
-    `from_node` to the technology node `to_node`. Interpolates if necessary."""
-    from_node, x = constrain_to_tech_nodes(from_node)
-    to_node, y = constrain_to_tech_nodes(to_node)
+    """
+    Returns the scaling factor for area from the technology node
+    `from_node` to the technology node `to_node`. Interpolates if necessary.
+
+    Args:
+        to_node: The technology node to scale to.
+        from_node: The technology node to scale from.
+    Returns:
+        The scaling factor for area.
+    """
+    from_node, x = _constrain_to_tech_nodes(from_node)
+    to_node, y = _constrain_to_tech_nodes(to_node)
     scale = y / x
 
-    x = get_technology_node_index(from_node)
-    y = get_technology_node_index(to_node)
+    x = _get_technology_node_index(from_node)
+    y = _get_technology_node_index(to_node)
 
     # Any unaccounted for scaling with "scale" variable is assumed to scale
     # linearly with tech node based on IDRS 2016 and 2017 predicted estimated
@@ -99,17 +107,25 @@ def tech_node_energy(
     to_node: float, from_node: float, vdd: Union[float, None] = None
 ) -> float:
     """Returns the scaling factor for energy from the technology node
-    `from_node` to the technology node `to_node`. Interpolates if necessary."""
+    `from_node` to the technology node `to_node`. Interpolates if necessary.
+
+    Args:
+        to_node: The technology node to scale to.
+        from_node: The technology node to scale from.
+        vdd: The voltage to scale by. If not provided, 0.8V is used.
+    Returns:
+        The scaling factor for energy.
+    """
     # Based on IRDS 2022, energy stops scaling after 1nm
     from_node = max(from_node, 1e-9)
     to_node = max(to_node, 1e-9)
 
-    from_node, x = constrain_to_tech_nodes(from_node)
-    to_node, y = constrain_to_tech_nodes(to_node)
+    from_node, x = _constrain_to_tech_nodes(from_node)
+    to_node, y = _constrain_to_tech_nodes(to_node)
     scale = (y / x) ** 0.5
 
-    x = get_technology_node_index(from_node)
-    y = get_technology_node_index(to_node)
+    x = _get_technology_node_index(from_node)
+    y = _get_technology_node_index(to_node)
 
     if vdd is None:
         vdd = 0.8
@@ -143,4 +159,14 @@ def tech_node_energy(
 def tech_node_leak(
     to_node: float, from_node: float, vdd: Union[float, None] = None
 ) -> float:
+    """Returns the scaling factor for leakage power from the technology node
+    `from_node` to the technology node `to_node`. Interpolates if necessary.
+
+    Args:
+        to_node: The technology node to scale to.
+        from_node: The technology node to scale from.
+        vdd: The voltage to scale by. If not provided, 0.8V is used.
+    Returns:
+        The scaling factor for leakage power.
+    """
     return tech_node_energy(to_node, from_node, vdd)
