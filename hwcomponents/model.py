@@ -111,6 +111,12 @@ class EnergyAreaModel(ListLoggable, ABC):
             return cls.__name__
         return cls.component_name
 
+    def leak(self, time_period: float) -> float:
+        """
+        Returns the leakage energy for a given time period.
+        """
+        return self.leak_power * time_period
+
     def scale(
         self,
         key: str,
