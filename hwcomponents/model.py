@@ -13,14 +13,19 @@ def actionDynamicEnergy(
     Decorator that adds an action to an energy/area model. Actions are
     expected to return an energy value in Joules.
 
-    Args:
-        func: The function to decorate.
-        bits_per_action: The attribute of the model that contains the number of bits per
+    Parameters
+    ----------
+        func : Callable[[], float] | None
+            The function to decorate.
+        bits_per_action : str
+            The attribute of the model that contains the number of bits per
             action. If this is set and a bits_per_action is passed to the function, the
             energy will be scaled by the number of bits. For example, if bits_per_action
             is set to "width", the function is called with bits_per_action=10, and the
             model has a width attribute of 5, then the energy will be scaled by 2.
-    Returns:
+
+    Returns
+    -------
         The decorated function.
     """
     if func is None:
@@ -61,7 +66,8 @@ class EnergyAreaModel(ListLoggable, ABC):
     EnergyAreaModels may have any number of methods that are decorated with
     @actionDynamicEnergy.
 
-    Args:
+    Parameters
+    ----------
         component_name: The name of the component. Must be a string or list/tuple of
             strings. Can be omitted if the component name is the same as the class name.
         priority: The priority of the model. Higher priority models are used first.
@@ -71,6 +77,19 @@ class EnergyAreaModel(ListLoggable, ABC):
         energy_scale: A scale factor for the energy.
         area_scale: A scale factor for the area.
         leak_scale: A scale factor for the leakage power.
+
+    Attributes
+    ----------
+        component_name: The name of the component. Must be a string or list/tuple of
+            strings. Can be omitted if the component name is the same as the class name.
+        priority: The priority of the model. Higher priority models are used first.
+            Must be a number between 0 and 1.
+        energy_scale: A scale factor for the energy. All calls to actionDynamicEnergy
+            will be scaled by this factor.
+        area_scale: A scale factor for the area. All calls to area
+            will be scaled by this factor.
+        leak_scale: A scale factor for the leakage power. All calls to leak_power
+            will be scaled by this factor.
     """
 
     component_name: Union[str, List[str], None] = None
@@ -97,12 +116,24 @@ class EnergyAreaModel(ListLoggable, ABC):
 
     @property
     def leak_power(self) -> Number:
-        """Returns the leakage power of the component in Watts."""
+        """
+        Returns the leakage power of the component in Watts.
+
+        Returns
+        -------
+            The leakage power in Watts.
+        """
         return self._leak_power * self.leak_scale
 
     @property
     def area(self) -> Number:
-        """Returns the area in m^2 of the component."""
+        """
+        Returns the area in m^2 of the component.
+
+        Returns
+        -------
+            The area in m^2 of the component.
+        """
         return self._area * self.area_scale
 
     @classmethod
@@ -114,6 +145,15 @@ class EnergyAreaModel(ListLoggable, ABC):
     def leak(self, time_period: float) -> float:
         """
         Returns the leakage energy for a given time period.
+
+        Parameters
+        ----------
+            time_period : float
+                The time period in seconds.
+
+        Returns
+        -------
+            The leakage energy in Joules.
         """
         return self.leak_power * time_period
 
@@ -156,3 +196,44 @@ class EnergyAreaModel(ListLoggable, ABC):
                 )
 
         return target
+
+    def get_action_names(self) -> List[str]:
+        """
+        Returns the names of the actions supported by the model.
+
+        Returns
+        -------
+        List[str]
+            The names of the actions supported by the model.
+        """
+        return [
+            name
+            for name, func in self.__dict__.items()
+            if getattr(func, "_is_component_energy_action", False)
+        ]
+
+    def required_arguments(self, action_name: str | None = None) -> List[str]:
+        """
+        Returns the required arguments for the given action. If no action is given,
+        returns the required arguments for the __init__ method.
+
+        Parameters
+        ----------
+            action_name : str | None
+                The name of the action to get the required arguments for.
+                If None, returns the required arguments for the __init__ method.
+
+        Returns
+        -------
+            list[str]
+                The required arguments for the given action.
+        """
+        action_name = "__init__" if action_name is None else action_name
+        try:
+            action_func = getattr(self, action_name)
+        except:
+            raise ValueError(
+                f"{self.__class__.__name__} has no action {action_name}. "
+                f"Supported actions are: {self.get_action_names()}"
+            )
+        return inspect.signature(action_func).parameters.keys()

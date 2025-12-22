@@ -4,7 +4,7 @@ from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from types import ModuleType
 from typing import List, Set, Union
-from hwcomponents._model_wrapper import EnergyAreaModelWrapper
+from hwcomponents._model_wrapper import EnergyAreaModelWrapper, EnergyAreaModel
 import inspect
 import logging
 import copy
@@ -15,14 +15,23 @@ from pkgutil import iter_modules
 _ALL_ESTIMATORS = None
 
 
-def installed_models() -> List[EnergyAreaModelWrapper]:
+def installed_models(
+    _return_wrappers: bool = False,
+) -> List[EnergyAreaModelWrapper] | List[EnergyAreaModel]:
     """
     Lists all Python packages installed that are prefixed with "hwcomponents_". Finds
     EnergyAreaModel subclasses in these packages and returns them as
-    EnergyAreaModelWrapper objects.
+    EnergyAreaModel or EnergyAreaModelWrapper objects.
 
-    Returns:
-        A list of EnergyAreaModelWrapper objects.
+    Parameters
+    ----------
+        _return_wrappers : bool
+            Whether to return EnergyAreaModelWrapper objects or
+            EnergyAreaModel objects.
+
+    Returns
+    -------
+        A list of EnergyAreaModel or EnergyAreaModelWrapper objects.
     """
     # List all Python packages installed that are prefixed with "hwcomponents_"
     global _ALL_ESTIMATORS
@@ -39,7 +48,11 @@ def installed_models() -> List[EnergyAreaModelWrapper]:
     # Handle the packages
     for module in modules:
         models.extend(
-            get_models_in_module(importlib.import_module(module), model_ids)
+            get_models_in_module(
+                importlib.import_module(module),
+                model_ids,
+                _return_wrappers,
+            )
         )
 
     _ALL_ESTIMATORS = models
@@ -48,23 +61,34 @@ def installed_models() -> List[EnergyAreaModelWrapper]:
 
 
 def get_models_in_module(
-    module: ModuleType, model_ids: Set
-) -> List[EnergyAreaModelWrapper]:
+    module: ModuleType,
+    model_ids: Set,
+    _return_wrappers: bool = False,
+) -> List[EnergyAreaModelWrapper] | List[EnergyAreaModel]:
     """
     Finds all EnergyAreaModel subclasses in a module and returns them as
-    EnergyAreaModelWrapper objects.
+    EnergyAreaModelWrapper objects. Ignores underscore-prefixed classes.
 
-    Args:
-        module: The module to search for EnergyAreaModel subclasses.
-        model_ids: A set of model IDs to avoid duplicates.
-    Returns:
+    Parameters
+    ----------
+        model_ids : set
+            A set of model IDs to avoid duplicates.
+        _return_wrappers : bool
+            Whether to return EnergyAreaModelWrapper objects or
+            EnergyAreaModel objects.
+
+    Returns
+    -------
         A list of EnergyAreaModelWrapper objects.
+
     """
     logging.info(f"Getting models in module: {module.__name__}")
     classes = [
         (x, name) for name in dir(module) if inspect.isclass(x := getattr(module, name))
     ]
-    # classes = [(x, name) for x, name in classes if x.__module__ == module.__name__]
+    classes = [
+        (x, name) for x, name in classes if not name.startswith("_")
+    ]
     found = []
     for x, name in classes:
         superclasses = [c.__name__ for c in inspect.getmro(x)]
@@ -75,23 +99,35 @@ def get_models_in_module(
             and id(x) not in model_ids
         ):
             model_ids.add(id(x))
-            found.append(EnergyAreaModelWrapper(x, name))
+            if _return_wrappers:
+                found.append(EnergyAreaModelWrapper(x, name))
+            else:
+                found.append(x)
     return found
 
 
 def get_models(
     *paths_or_packages: Union[str, List[str], List[List[str]]],
-    include_installed: bool = True
-) -> List[EnergyAreaModelWrapper]:
+    include_installed: bool = True,
+    _return_wrappers: bool = False,
+) -> List[EnergyAreaModelWrapper] | List[EnergyAreaModel]:
     """
     Instantiate a list of model objects for later queries. Searches for models in the
     given paths and packages.
 
-    Args:
-        paths_or_packages: A list of paths or packages to search for models.
-        include_installed: Whether to include models from installed packages.
-    Returns:
-        A list of EnergyAreaModelWrapper objects.
+    Parameters
+    ----------
+        paths_or_packages : list
+            A list of paths or packages to search for models.
+        include_installed : bool
+            Whether to include models from installed packages.
+        _return_wrappers : bool
+            Whether to return EnergyAreaModelWrapper objects or
+            EnergyAreaModel objects.
+
+    Returns
+    -------
+        A list of EnergyAreaModelWrapper objects or EnergyAreaModel objects.
     """
     model_ids = set()
     n_models = 0
@@ -131,7 +167,11 @@ def get_models(
 
     for package in packages:
         models.extend(
-            get_models_in_module(importlib.import_module(package), model_ids)
+            get_models_in_module(
+                importlib.import_module(package),
+                model_ids,
+                _return_wrappers,
+            )
         )
 
     # Handle the paths
@@ -172,10 +212,10 @@ def get_models(
             )
             prev_sys_path = copy.deepcopy(sys.path)
             sys.path.append(os.path.dirname(os.path.abspath(path)))
-            python_module = SourceFileLoader(
-                f"model{n_models}", path
-            ).load_module()
-            new_models += get_models_in_module(python_module, model_ids)
+            python_module = SourceFileLoader(f"model{n_models}", path).load_module()
+            new_models += get_models_in_module(
+                python_module, model_ids, _return_wrappers
+            )
             sys.path = prev_sys_path
             n_models += 1
 

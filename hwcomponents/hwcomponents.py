@@ -1,5 +1,4 @@
 import argparse
-from hwcomponents._model_wrapper import EnergyAreaModelWrapper
 from hwcomponents.find_models import get_models
 
 
@@ -7,9 +6,13 @@ def list_components(printfunc=print):
     """
     Lists all available components.
 
-    Args:
-        printfunc: The function to use to print the components.
-    Returns:
+    Parameters
+    ----------
+        printfunc : Callable[[str], None]
+            The function to use to print the components.
+
+    Returns
+    -------
         None
     """
     printfunc("\n")
@@ -35,7 +38,7 @@ def list_components(printfunc=print):
             )
 
     entries = []
-    for model in get_models():
+    for model in get_models(_return_wrappers=True):
 
         def add_entry(name, class_names, init_func, actions):
             class_names = [class_names] if isinstance(class_names, str) else class_names

@@ -110,14 +110,24 @@ def _select_model(
     return _call_model(model, query, callfunc)
 
 
+def _wrap_model(
+    model: EnergyAreaModel | EnergyAreaModelWrapper,
+) -> EnergyAreaModelWrapper:
+    if isinstance(model, EnergyAreaModelWrapper):
+        return model
+    return EnergyAreaModelWrapper(model, model.__class__.__name__)
+
+
 def _get_best_estimate(
     query: EnergyAreaQuery,
     target: str,
-    models: List[EnergyAreaModelWrapper] = None,
+    models: List[EnergyAreaModelWrapper] | List[EnergyAreaModel] = None,
     _relaxed_component_name_selection: bool = False,
 ) -> FloatEstimation | EnergyAreaModel:
     if models is None:
-        models = installed_models()
+        models = installed_models(_return_wrappers=True)
+
+    models = [_wrap_model(m) for m in models]
 
     if target == "energy":
         est_func = _get_energy_estimation
@@ -272,7 +282,8 @@ def get_energy(
     component_attributes and a matching action with all required arguments specified
     in action_arguments.
 
-    Args:
+    Parameters
+    ----------
         component_name: The name of the component.
         component_attributes: The attributes of the component.
         action_name: The name of the action.
@@ -280,7 +291,9 @@ def get_energy(
         models: The models to use.
         _relaxed_component_name_selection: Whether to relax the component name
             selection. Relaxed selection ignores underscores in the component name.
-    Returns:
+
+    Returns
+    -------
         The energy in Joules.
     """
     query = EnergyAreaQuery(
@@ -300,13 +313,16 @@ def get_area(
     highest-priority model that has all required attributes specified in
     component_attributes.
 
-    Args:
+    Parameters
+    ----------
         component_name: The name of the component.
         component_attributes: The attributes of the component.
         models: The models to use.
         _relaxed_component_name_selection: Whether to relax the component name
             selection. Relaxed selection ignores underscores in the component name.
-    Returns:
+
+    Returns
+    -------
         The area in m^2.
     """
     query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
@@ -324,13 +340,16 @@ def get_leak_power(
     highest-priority model that has all required attributes specified in
     component_attributes.
 
-    Args:
+    Parameters
+    ----------
         component_name: The name of the component.
         component_attributes: The attributes of the component.
         models: The models to use.
         _relaxed_component_name_selection: Whether to relax the component name
             selection. Relaxed selection ignores underscores in the component name.
-    Returns:
+
+    Returns
+    -------
         The leak power in Watts.
     """
     query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
@@ -349,14 +368,17 @@ def get_model(
     highest-priority model that has all required attributes specified in
     component_attributes, and has actions for all of required_actions.
 
-    Args:
+    Parameters
+    ----------
         component_name: The name of the component.
         component_attributes: The attributes of the component.
         required_actions: The actions that are required for the component.
         models: The models to use.
         _relaxed_component_name_selection: Whether to relax the component name
             selection. Relaxed selection ignores underscores in the component name.
-    Returns:
+
+    Returns
+    -------
         The best model wrapper.
     """
     query = EnergyAreaQuery(
