@@ -1,28 +1,33 @@
 from abc import ABC, abstractmethod
 from numbers import Number
-from typing import Callable, List, Union
-import warnings
+from functools import wraps
+from typing import Callable, List, Type, Union, TypeVar
 from hwcomponents._logging import ListLoggable
 from hwcomponents._util import parse_float
 
+T = TypeVar("T", bound="EnergyAreaModel")
 
 def actionDynamicEnergy(
     func: Callable[[], float] = None, bits_per_action: str = None
 ) -> Callable[[], float]:
     """
-    Decorator that adds an action to an energy/area model. Actions are
-    expected to return an energy value in Joules.
+    Decorator that adds an action to an energy/area model. If the component has no
+    subcomponents, then the action is expected to return an energy value in Joules. If
+    the component has subcomponents, then None return values are assumed to be 0, and
+    subcomponent actions that occur during the component's action will be added to the
+    component's energy. The energy of the subcomponents will NOT be scaled by the
+    component's energy_scale.
 
     Parameters
     ----------
         func : Callable[[], float] | None
             The function to decorate.
         bits_per_action : str
-            The attribute of the model that contains the number of bits per
-            action. If this is set and a bits_per_action is passed to the function, the
-            energy will be scaled by the number of bits. For example, if bits_per_action
-            is set to "width", the function is called with bits_per_action=10, and the
-            model has a width attribute of 5, then the energy will be scaled by 2.
+            The attribute of the model that contains the number of bits per action. If
+            this is set and a bits_per_action is passed to the function, the energy will
+            be scaled by the number of bits. For example, if bits_per_action is set to
+            "width", the function is called with bits_per_action=10, and the model has a
+            width attribute of 5, then the energy will be scaled by 2.
 
     Returns
     -------
@@ -35,7 +40,10 @@ def actionDynamicEnergy(
     if bits_per_action is not None:
         additional_kwargs.add("bits_per_action")
 
+    @wraps(func)
     def wrapper(self: "EnergyAreaModel", *args, **kwargs):
+        for subcomponent in self.subcomponents:
+            subcomponent._energy_used = 0
         scale = 1
         if bits_per_action is not None and "bits_per_action" in kwargs:
             nominal_bits = None
@@ -51,7 +59,21 @@ def actionDynamicEnergy(
                 )
             scale = kwargs["bits_per_action"] / nominal_bits
         kwargs = {k: v for k, v in kwargs.items() if k not in additional_kwargs}
-        return func(self, *args, **kwargs) * self.energy_scale * scale
+        value = func(self, *args, **kwargs)
+        if value is None:
+            if not self._subcomponents_set and not self.subcomponents:
+                raise ValueError(
+                    f"actionDynamicEnergy function {func.__name__} did not return a "
+                    f"value. This is permitted if and only if the component has no "
+                    f"subcomponents. Please either initialize subcomponents or ensure "
+                    f"that the actionDynamicEnergy function returns a value."
+                )
+            value = 0
+        value *= self.energy_scale * scale
+        for subcomponent in self.subcomponents:
+            value += subcomponent._energy_used
+        self._energy_used += value
+        return value
 
     wrapper._is_component_energy_action = True
     wrapper._original_function = func
@@ -61,22 +83,41 @@ def actionDynamicEnergy(
 
 class EnergyAreaModel(ListLoggable, ABC):
     """
-    EnergyAreaModel base class. EnergyAreaModel class must have "name"
-    attribute, "priority" attribute, and "get_area" method.
-    EnergyAreaModels may have any number of methods that are decorated with
-    @actionDynamicEnergy.
+    EnergyAreaModel base class. EnergyAreaModel class must have "name" attribute,
+    "priority" attribute, and "get_area" method. EnergyAreaModels may have any number of
+    methods that are decorated with @actionDynamicEnergy.
 
     Parameters
     ----------
-        component_name: The name of the component. Must be a string or list/tuple of
-            strings. Can be omitted if the component name is the same as the class name.
-        priority: The priority of the model. Higher priority models are used first.
-            Must be a number between 0 and 1.
-        leak_power: The leakage power of the component in Watts.
-        area: The area of the component in m^2.
-        energy_scale: A scale factor for the energy.
-        area_scale: A scale factor for the area.
-        leak_scale: A scale factor for the leakage power.
+        component_name: str | list[str] | None
+            The name of the component. Must be a string or list/tuple of strings. Can be
+            omitted if the component name is the same as the class name.
+        priority: float
+            The priority of the model. Higher priority models are used first. Must be a
+            number between 0 and 1.
+        leak_power: float | None
+            The leakage power of the component in Watts. Must be set if subcomponents is
+            not set.
+        area: float | None
+            The area of the component in m^2. Must be set if subcomponents is not set.
+        energy_scale: float
+            A scale factor for the energy. All calls to @actionDynamicEnergy will be
+            scaled by this factor.
+        area_scale: float
+            A scale factor for the area. All calls to area will be scaled by this
+            factor.
+        leak_scale: float
+            A scale factor for the leakage power. All calls to leak_power will be scaled
+            by this factor.
+        subcomponents: list[EnergyAreaModel] | None
+            A list of subcomponents. If set, the area and leak power of the
+            subcomponents will be added to the area and leak power of the component. All
+            calls to @actionDynamicEnergy functions will be added to the energy of the
+            component if they occur during one of the component's actions. The area,
+            energy, and leak power of subcomponents WILL NOT BE scaled by the
+            component's energy_scale, area_scale, or leak_scale; if you want to scale
+            the subcomponents, multiply their energy_scale, area_scale, or leak_scale by
+            the desired scale factor.
 
     Attributes
     ----------
@@ -90,6 +131,11 @@ class EnergyAreaModel(ListLoggable, ABC):
             will be scaled by this factor.
         leak_scale: A scale factor for the leakage power. All calls to leak_power
             will be scaled by this factor.
+        subcomponents: A list of subcomponents. If set, the area and leak power of the
+            subcomponents will be added to the area and leak power of the component. All
+            calls to @actionDynamicEnergy functions will be added to the energy of the
+            component if they occur during one of the component's actions, and will be
+            scaled by the component's energy_scale.
     """
 
     component_name: Union[str, List[str], None] = None
@@ -106,13 +152,27 @@ class EnergyAreaModel(ListLoggable, ABC):
     """
 
     @abstractmethod
-    def __init__(self, leak_power: float, area: float):
+    def __init__(
+            self,
+            leak_power: float | None = None,
+            area: float | None = None,
+            subcomponents: list["EnergyAreaModel"] | None = None,
+        ):
+        if subcomponents is None:
+            if leak_power is None or area is None:
+                raise ValueError(
+                    f"Either subcomponents must be set, or BOTH leak_power and area"
+                    f"must be set."
+                )
         super().__init__()
-        self.energy_scale = 1
-        self.area_scale = 1
-        self.leak_scale = 1
-        self._leak_power = leak_power
-        self._area = area
+        self.energy_scale: float = 1
+        self.area_scale: float = 1
+        self.leak_scale: float = 1
+        self._leak_power: float = leak_power if leak_power is not None else 0
+        self._area: float = area if area is not None else 0
+        self.subcomponents: list["EnergyAreaModel"] = [] if subcomponents is None else subcomponents
+        self._subcomponents_set = subcomponents is not None
+        self._energy_used: float = 0
 
     @property
     def leak_power(self) -> Number:
@@ -123,7 +183,9 @@ class EnergyAreaModel(ListLoggable, ABC):
         -------
             The leakage power in Watts.
         """
-        return self._leak_power * self.leak_scale
+        return self._leak_power * self.leak_scale + sum(
+            s.leak_power for s in self.subcomponents
+        )
 
     @property
     def area(self) -> Number:
@@ -134,7 +196,9 @@ class EnergyAreaModel(ListLoggable, ABC):
         -------
             The area in m^2 of the component.
         """
-        return self._area * self.area_scale
+        return self._area * self.area_scale + sum(
+            s.area for s in self.subcomponents
+        )
 
     @classmethod
     def _component_name(cls) -> str:
@@ -237,3 +301,49 @@ class EnergyAreaModel(ListLoggable, ABC):
                 f"Supported actions are: {self.get_action_names()}"
             )
         return inspect.signature(action_func).parameters.keys()
+
+    @classmethod
+    def try_init_arbitrary_args(cls: Type[T], **kwargs) -> T:
+        """
+        Tries to initialize the model with the given arguments.
+
+        Parameters
+        ----------
+            **kwargs : dict
+                The arguments with which to initialize the model.
+
+        Returns
+        -------
+            The initialized model. If the model cannot be initialized with the given
+            arguments, an exception is raised.
+        """
+        from hwcomponents._model_wrapper import EnergyAreaQuery, EnergyAreaModelWrapper
+        wrapper = EnergyAreaModelWrapper(cls, cls.component_name)
+        cname = cls.component_name
+        query = EnergyAreaQuery(
+            component_name=cname if isinstance(cname, str) else cname[0],
+            component_attributes=kwargs,
+        )
+        return wrapper.get_initialized_subclass(query)
+
+
+    def try_call_arbitrary_action(self: T, action_name: str, **kwargs) -> T:
+        """
+        Tries to call the given action with the given arguments.
+
+        Parameters
+        ----------
+            action_name : str
+                The name of the action to call.
+            **kwargs : dict
+                The arguments with which to call the action.
+        """
+        wrapper = EnergyAreaModelWrapper(type(self), self.component_name)
+        from hwcomponents._model_wrapper import EnergyAreaQuery, EnergyAreaModelWrapper
+        query = EnergyAreaQuery(
+            component_name=self.component_name,
+            component_attributes={},
+            action_name=action_name,
+            action_arguments=kwargs,
+        )
+        return wrapper.estimate_energy(query, initalized_obj=self)

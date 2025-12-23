@@ -74,8 +74,7 @@ def get_models_in_module(
         model_ids : set
             A set of model IDs to avoid duplicates.
         _return_wrappers : bool
-            Whether to return EnergyAreaModelWrapper objects or
-            EnergyAreaModel objects.
+            Whether to return EnergyAreaModelWrapper objects or EnergyAreaModel objects.
 
     Returns
     -------
@@ -86,9 +85,7 @@ def get_models_in_module(
     classes = [
         (x, name) for name in dir(module) if inspect.isclass(x := getattr(module, name))
     ]
-    classes = [
-        (x, name) for x, name in classes if not name.startswith("_")
-    ]
+    classes = [(x, name) for x, name in classes if not name.startswith("_")]
     found = []
     for x, name in classes:
         superclasses = [c.__name__ for c in inspect.getmro(x)]
@@ -107,8 +104,11 @@ def get_models_in_module(
 
 
 def get_models(
-    *paths_or_packages: Union[str, List[str], List[List[str]]],
+    *paths_or_packages_or_models: Union[
+        str, List[str], List[List[str]], EnergyAreaModel
+    ],
     include_installed: bool = True,
+    name_must_include: str = "",
     _return_wrappers: bool = False,
 ) -> List[EnergyAreaModelWrapper] | List[EnergyAreaModel]:
     """
@@ -117,10 +117,13 @@ def get_models(
 
     Parameters
     ----------
-        paths_or_packages : list
+        paths_or_packages_or_models : list
             A list of paths or packages to search for models.
         include_installed : bool
             Whether to include models from installed packages.
+        name_must_include : str
+            If provided, a model will only be returned if its name includes this string.
+            Non-case-sensitive.
         _return_wrappers : bool
             Whether to return EnergyAreaModelWrapper objects or
             EnergyAreaModel objects.
@@ -134,19 +137,30 @@ def get_models(
 
     packages = []
     paths = []
+    models = []
 
     flattened = []
-    for path_or_package in paths_or_packages:
-        if not isinstance(path_or_package, list):
-            path_or_package = [path_or_package]
-        for p in path_or_package:
-            if isinstance(p, (str, Path)):
-                globbed = glob.glob(p, recursive=True)
-                flattened.extend(globbed)
-            else:
-                flattened.append(p)
 
-    models = installed_models() if include_installed else []
+    to_check = list(paths_or_packages_or_models)
+
+    i = 0
+    while i < len(to_check):
+        path_or_package = to_check[i]
+        i += 1
+        if isinstance(path_or_package, (list, tuple)):
+            to_check.extend(path_or_package)
+        elif issubclass(path_or_package, EnergyAreaModel):
+            models.append(path_or_package)
+        elif isinstance(path_or_package, (str, Path)):
+            globbed = glob.glob(path_or_package, recursive=True)
+            flattened.extend(globbed)
+        else:
+            raise ValueError(f'Invalid type: {type(path_or_package)}')
+
+    if _return_wrappers:
+        models = [EnergyAreaModelWrapper(m, m.__name__) for m in models]
+
+    models.extend(installed_models(_return_wrappers) if include_installed else [])
 
     for path_or_package in flattened:
         # Check if it's a package first
@@ -214,7 +228,7 @@ def get_models(
             sys.path.append(os.path.dirname(os.path.abspath(path)))
             python_module = SourceFileLoader(f"model{n_models}", path).load_module()
             new_models += get_models_in_module(
-                python_module, model_ids, _return_wrappers
+                python_module, model_ids, name_must_include, _return_wrappers
             )
             sys.path = prev_sys_path
             n_models += 1
@@ -224,4 +238,8 @@ def get_models(
 
         models.extend(new_models)
 
-    return models
+    if _return_wrappers:
+        models = [m for m in models if name_must_include.lower() in m.name.lower()]
+        return sorted(models, key=lambda x: x.name)
+    models = [m for m in models if name_must_include.lower() in m.__name__.lower()]
+    return sorted(models, key=lambda x: x.__name__)

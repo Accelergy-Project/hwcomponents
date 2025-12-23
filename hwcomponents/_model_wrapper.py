@@ -300,13 +300,18 @@ class CallableFunction:
         kwags_included = {
             k: v
             for k, v in kwargs.items()
-            if k in self.non_default_args or k in self.default_args or k in self.additional_kwargs
+            if k in self.non_default_args
+            or k in self.default_args
+            or k in self.additional_kwargs
         }
+        self.logger.info(
+            f"Calling {self.function_name} with arguments {kwags_included}"
+        )
         unneeded_args = [k for k in kwargs.keys() if k not in kwags_included]
         if unneeded_args:
             self.logger.warn(
-                f'Unused arguments for {component_name}.{self.function_name}: '
-                f'({", ".join(unneeded_args)})'
+                f"Unused arguments for {component_name}.{self.function_name}: "
+                f'({", ".join(unneeded_args)}) '
                 f'Arguments used: ({", ".join(kwags_included.keys())})'
             )
 
@@ -369,9 +374,7 @@ class EnergyAreaModelWrapper(ListLoggable):
         )
 
     def is_component_supported(
-        self,
-        query: EnergyAreaQuery,
-        relaxed_component_name_selection: bool = False
+        self, query: EnergyAreaQuery, relaxed_component_name_selection: bool = False
     ) -> bool:
         if query.component_name.lower() in self.component_name:
             pass
@@ -400,6 +403,9 @@ class EnergyAreaModelWrapper(ListLoggable):
         return True
 
     def get_initialized_subclass(self, query: EnergyAreaQuery) -> EnergyAreaModel:
+        self.logger.info(
+            f"Initializing {self.model_cls.__name__} from {self.model_cls.__module__}"
+        )
         subclass = self.init_function.call(
             query.component_attributes, self.component_name
         )
@@ -438,22 +444,26 @@ class EnergyAreaModelWrapper(ListLoggable):
                 query.action_arguments.keys() if query.action_arguments else ["<none>"]
             )
             raise AttributeError(
-                f"Action with name {query.action_name} found in {self.component_name}, but provided "
-                f"arguments do not match.\n\t"
+                f"Action with name {query.action_name} found in {self.component_name}, "
+                f"but provided arguments do not match.\n\t"
                 f'Arguments provided: {", ".join(args_provided)}\n\t'
                 f"Possible actions:\n\t\t" + "\n\t\t".join(matching_func_strings)
             )
         return matching_name_and_arg_actions
 
-    def estimate_energy(self, query: EnergyAreaQuery) -> Estimation:
+    def estimate_energy(
+        self, query: EnergyAreaQuery, initalized_obj: EnergyAreaModel = None
+    ) -> Estimation:
         """Returns the energy estimation for the given action."""
-        initialized_obj = self.get_initialized_subclass(query)
-        move_queue_from_one_logger_to_another(initialized_obj.logger, self.logger)
+        if initalized_obj is None:
+            initialized_obj = self.get_initialized_subclass(query)
+            move_queue_from_one_logger_to_another(initialized_obj.logger, self.logger)
         supported_actions = self.get_matching_actions(query)
         if len(supported_actions) == 0:
             raise AttributeError(
-                f"No action with name {query.action_name} found in {self.component_name}. "
-                f'Actions supported: {", ".join(self.get_action_names())}'
+                f"No action with name {query.action_name} found in "
+                f"{self.component_name}. Actions supported: "
+                f"{', '.join(self.get_action_names())}"
             )
         try:
             estimation = FloatEstimation.get_estimation(

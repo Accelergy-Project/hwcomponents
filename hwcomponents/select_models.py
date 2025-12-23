@@ -2,7 +2,12 @@ import logging
 import copy
 from typing import Any, Callable, Dict, List, Tuple
 from hwcomponents.model import EnergyAreaModel
-from hwcomponents._logging import get_logger, pop_all_messages, log_all_lines, clear_logs
+from hwcomponents._logging import (
+    get_logger,
+    pop_all_messages,
+    log_all_lines,
+    clear_logs,
+)
 from hwcomponents._model_wrapper import (
     EnergyAreaModelWrapper,
     EnergyAreaQuery,
@@ -51,7 +56,7 @@ def _call_model(
     prefix = f"Model {estimation.model_name} did not"
     if attrs.get("model", estimation.model_name) != estimation.model_name:
         estimation.fail(f"{prefix} match requested model {attrs['model']}")
-    if (attrs.get("min_priority", -float("inf")) > model.model_cls.priority):
+    if attrs.get("min_priority", -float("inf")) > model.model_cls.priority:
         estimation.fail(f"{prefix} meet min_priority {attrs['min_priority']}")
     return estimation
 
@@ -122,6 +127,7 @@ def _get_best_estimate(
     query: EnergyAreaQuery,
     target: str,
     models: List[EnergyAreaModelWrapper] | List[EnergyAreaModel] = None,
+    return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
 ) -> FloatEstimation | EnergyAreaModel:
     if models is None:
@@ -148,14 +154,14 @@ def _get_best_estimate(
                 del drop_from[to_drop]
 
     estimations = []
+
     def _get_supported_models(relaxed_component_name_selection: bool):
         supported_models = []
         init_errors = []
         for model in models:
             try:
                 if not model.is_component_supported(
-                    query,
-                    relaxed_component_name_selection
+                    query, relaxed_component_name_selection
                 ):
                     continue
                 supported_models.append(model)
@@ -172,9 +178,7 @@ def _get_best_estimate(
             raise EstimatorError(
                 f"No models found. Please install hwcomponents models."
             )
-        supported_classes = set.union(
-            *[set(p.get_component_names()) for p in models]
-        )
+        supported_classes = set.union(*[set(p.get_component_names()) for p in models])
 
         err_str = []
         if not _relaxed_component_name_selection:
@@ -254,6 +258,8 @@ def _get_best_estimate(
                 fail_reasons,
             ),
         )
+    if return_estimation_object:
+        return estimation
 
     if estimation is not None and estimation.success:
         return estimation.value if target == "model" else estimation
@@ -274,8 +280,9 @@ def get_energy(
     action_name: str,
     action_arguments: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
+    return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
-) -> float:
+) -> float | Estimation:
     """
     Finds the energy using the best-matching model. "Best" is defined as the
     highest-priority model that has all required attributes specified in
@@ -289,6 +296,8 @@ def get_energy(
         action_name: The name of the action.
         action_arguments: The arguments of the action.
         models: The models to use.
+        return_estimation_object: Whether to return the estimation object instead of
+            the energy value.
         _relaxed_component_name_selection: Whether to relax the component name
             selection. Relaxed selection ignores underscores in the component name.
 
@@ -299,15 +308,22 @@ def get_energy(
     query = EnergyAreaQuery(
         component_name.lower(), component_attributes, action_name, action_arguments
     )
-    return _get_best_estimate(query, "energy", models, _relaxed_component_name_selection)
+    return _get_best_estimate(
+        query,
+        "energy",
+        models,
+        return_estimation_object,
+        _relaxed_component_name_selection,
+    )
 
 
 def get_area(
     component_name: str,
     component_attributes: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
+    return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
-) -> float:
+) -> float | Estimation:
     """
     Finds the area using the best-matching model. "Best" is defined as the
     highest-priority model that has all required attributes specified in
@@ -318,6 +334,8 @@ def get_area(
         component_name: The name of the component.
         component_attributes: The attributes of the component.
         models: The models to use.
+        return_estimation_object: Whether to return the estimation object instead of
+            the area value.
         _relaxed_component_name_selection: Whether to relax the component name
             selection. Relaxed selection ignores underscores in the component name.
 
@@ -326,15 +344,22 @@ def get_area(
         The area in m^2.
     """
     query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
-    return _get_best_estimate(query, "area", models, _relaxed_component_name_selection)
+    return _get_best_estimate(
+        query,
+        "area",
+        models,
+        return_estimation_object,
+        _relaxed_component_name_selection,
+    )
 
 
 def get_leak_power(
     component_name: str,
     component_attributes: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
+    return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
-) -> EnergyAreaModelWrapper:
+) -> float | Estimation:
     """
     Finds the leak power using the best-matching model. "Best" is defined as the
     highest-priority model that has all required attributes specified in
@@ -353,7 +378,13 @@ def get_leak_power(
         The leak power in Watts.
     """
     query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
-    return _get_best_estimate(query, "leak_power", models, _relaxed_component_name_selection)
+    return _get_best_estimate(
+        query,
+        "leak_power",
+        models,
+        return_estimation_object,
+        _relaxed_component_name_selection,
+    )
 
 
 def get_model(
