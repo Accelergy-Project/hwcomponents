@@ -81,8 +81,7 @@ class TernaryMAC(EnergyAreaModel):
             The energy to perform a ternary MAC operation in Joules.
         """
 
-        self.logger.info(f'TernaryMAC Model is estimating '
-                         f'energy for mac_random.')
+        self.logger.info(f'TernaryMAC Model is modeling energy for mac.')
         if clock_gated:
             return 0.0
         return 0.002e-12 * (self.accum_datawidth + 0.25)
