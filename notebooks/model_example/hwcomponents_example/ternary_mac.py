@@ -1,21 +1,48 @@
 from hwcomponents import EnergyAreaModel, actionDynamicEnergy
 from hwcomponents.scaling import tech_node_area, tech_node_energy, tech_node_leak
 
+from hwcomponents import EnergyAreaModel, actionDynamicEnergy
+from hwcomponents.scaling import tech_node_area, tech_node_energy, tech_node_leak
+
 class TernaryMAC(EnergyAreaModel):
-    # REQUIRED: Give the name of the components supported by this Model.
+    """
+
+    A ternary MAC unit, which multiplies two ternary values and accumulates the result.
+
+    Parameters
+    ----------
+    accum_datawidth : int
+        The width of the accumulator in bits.
+    tech_node : int
+        The technology node in meters.
+
+    Attributes
+    ----------
+    accum_datawidth : int
+        The width of the accumulator in bits.
+    tech_node : int
+        The technology node in meters.
+    """
+
     component_name: str | list[str] = 'TernaryMAC'
-    # REQUIRED: Give the percent accuracy of the Model.
+    """ Name of the component. Must be a string or list/tuple of strings. """
+
     priority = 0.8
+    """
+    Priority determines which model is used when multiple models are available for a
+    given component. Higher priority models are used first. Must be a number between 0
+    and 1.
+    """
 
     def __init__(self, accum_datawidth: int, tech_node: int):
-        # Provide an area and leakage power for the component. All units are in 
+        # Provide an area and leakage power for the component. All units are in
         # standard units without any prefixes (Joules, Watts, meters, etc.).
         super().__init__(
-            area=5e-12 * accum_datawidth, 
+            area=5e-12 * accum_datawidth,
             leak_power=1e-3 * accum_datawidth
         )
 
-        # The following scales the tech_node to the given tech_node node from 40nm. 
+        # The following scales the tech_node to the given tech_node node from 40nm.
         # The scaling functions for area, energy, and leakage are defined in
         # hwcomponents.scaling. The energy scalingw will affect the functions decorated
         # with @actionDynamicEnergy.
@@ -40,6 +67,20 @@ class TernaryMAC(EnergyAreaModel):
     # function should return an energy in Joules.
     @actionDynamicEnergy
     def mac(self, clock_gated: bool = False) -> float:
+        """
+        Returns the energy to perform a ternary MAC operation.
+
+        Parameters
+        ----------
+        clock_gated : bool
+            Whether the MAC is clock gated during this operation.
+
+        Returns
+        -------
+        float
+            The energy to perform a ternary MAC operation in Joules.
+        """
+
         self.logger.info(f'TernaryMAC Model is estimating '
                          f'energy for mac_random.')
         if clock_gated:
