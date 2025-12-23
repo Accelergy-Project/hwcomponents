@@ -1,5 +1,5 @@
-Finding Components
-==================
+Finding and Using Models
+========================
 
 This document follows the ``1_finding_and_using_models.ipynb`` tutorial.
 
@@ -9,7 +9,7 @@ returns a list of :py:class:`hwcomponents.EnergyAreaModel` subclasses.
 
 You may also use the ``hwcomponents --list`` command from the shell.
 
-.. include-notebook:: ../../tutorials/1_finding_and_using_models.ipynb
+.. include-notebook:: ../../notebooks/1_finding_and_using_models.ipynb
    :name: listing_available_models
    :language: python
 
@@ -21,14 +21,14 @@ For example, we can use the ``hwcomponents_cacti`` package to model an SRAM. Onc
 found the model, we can use the ``help`` function to see its documentation and supported
 actions.
 
-.. include-notebook:: ../../tutorials/1_finding_and_using_models.ipynb
+.. include-notebook:: ../../notebooks/1_finding_and_using_models.ipynb
    :name: finding_components_2
    :language: python
 
 Once we know the model we'd like to use, we can import the model directly and
 instantiate components.
 
-.. include-notebook:: ../../tutorials/1_finding_and_using_models.ipynb
+.. include-notebook:: ../../notebooks/1_finding_and_using_models.ipynb
    :name: importing_models
    :language: python
 
@@ -42,6 +42,6 @@ invoke a model. There are three ways to find a component model:
 3. Ask for specific properties from hwcomponents. This is similar to the second method,
    but you can ask for the energy, area, or leakage power of a component directly.
 
-.. include-notebook:: ../../tutorials/1_finding_and_using_models.ipynb
+.. include-notebook:: ../../notebooks/1_finding_and_using_models.ipynb
    :name: ways_to_find_components
    :language: python

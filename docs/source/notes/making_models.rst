@@ -40,7 +40,7 @@ model. The ``self.scale`` function takes the following arguments:
 Many different scaling functions are defined and available in
 :py:mod:`hwcomponents.scaling`.
 
-.. include-notebook:: ../../tutorials/2_making_models.ipynb
+.. include-notebook:: ../../notebooks/2_making_models.ipynb
    :name: example_mac
    :language: python
 
@@ -55,12 +55,12 @@ For example, we can scale the energy of a DRAM read by the number of bits being 
 this example, the DRAM yields ``width`` bits per read, so energy is scaled by
 ``bits_per_action / width``.
 
-.. include-notebook:: ../../tutorials/2_making_models.ipynb
+.. include-notebook:: ../../notebooks/2_making_models.ipynb
    :name: scaling_by_number_of_bits
    :language: python
 
 Compound Models
-------------------
+---------------
 
 We can create compound models by combining multiple component models. Here, we'll show
 the ``SmartBufferSRAM`` model from the ``hwcomponents-library`` package.This is an SRAM
@@ -81,6 +81,29 @@ The area, energy, and leak power of subcomponents will NOT be scaled by the comp
 subcomponents, multiply their ``energy_scale``, ``area_scale``, or ``leak_scale`` by the
 desired scale factor.
 
-.. include-notebook:: ../../tutorials/2_making_models.ipynb
+.. include-notebook:: ../../notebooks/2_making_models.ipynb
    :name: smartbuffer_sram
    :language: python
+
+Installing Models and Making them Globally Visible
+--------------------------------------------------
+
+An example model is provided in the ``notebooks/model_example`` directory, which can be
+installed with the following command:
+
+.. code-block:: bash
+
+    cd notebooks/model_example
+    pip3 install .
+
+The ``README.md`` file in the ``notebooks/model_example`` directory contains information
+on how to make models installable. Keep the following in mind while you're changing the
+model:
+
+- The model name should be prefixed with ``hwcomponents_``. This allows HWComponents
+  to find the model when it is installed.
+- The ``__init__.py`` file should import all Model classes that you'd like to be
+  visible to HWComponents.
+- If you're iterating on an model, you can use the ``pip3 install -e .`` command to
+  install the model in editable mode. This allows you to make changes to the
+  model without having to reinstall it.

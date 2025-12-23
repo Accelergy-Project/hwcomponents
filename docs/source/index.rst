@@ -31,9 +31,9 @@ Example Usage
 The following example shows an adder component written in HWComponents. It uses scaling
 to scale the width and technology node of the adder.
 
-Full examples of how to use the package are available in the `tutorials` directory.
+Full examples of how to use the package are available in the ``notebooks`` directory.
 
-.. include-notebook:: ../../tutorials/tutorial.ipynb
+.. include-notebook:: ../../notebooks/1_finding_and_using_models.ipynb
    :name: example_mac
    :language: python
 
@@ -59,7 +59,13 @@ Tutorials
 ---------
 
 See the `tutorials` directory for examples of how to use the package and to create
-models.
+models. Additional documentation and tutorials are available on this site:
+
+.. toctree::
+   :maxdepth: 2
+
+   notes/finding_and_using_models
+   notes/making_models
 
 Contributing
 ------------
