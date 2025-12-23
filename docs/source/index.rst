@@ -28,12 +28,12 @@ hwcomponents API
 Example Usage
 -------------
 
-The following example shows an adder component written in HWComponents. It uses scaling
-to scale the width and technology node of the adder.
+The following example shows a ternary MAC component written in HWComponents. It uses
+scaling to scale the width and technology node of the MAC.
 
 Full examples of how to use the package are available in the ``notebooks`` directory.
 
-.. include-notebook:: ../../notebooks/1_finding_and_using_models.ipynb
+.. include-notebook:: ../../notebooks/model_example/2_making_models.ipynb
    :name: example_mac
    :language: python
 
