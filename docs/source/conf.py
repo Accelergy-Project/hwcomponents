@@ -48,7 +48,7 @@ autodoc_class_signature = "separated"
 #     white-space: pre-wrap !important;
 #     word-break: break-word;
 # }
-html_static_path = ["_static"]
+# html_static_path = ["_static"]
 # html_css_files = ["custom.css"]
 # html_js_files = ["custom.js"]
 

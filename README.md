@@ -1,7 +1,8 @@
 # HWComponents
-The HWComponents (Hardware Components) package provides an interface for the estimation
-of energy, area, and leakage power of hardware components in hardware architectures. It
-is part of the [CiMLoop](https://github.com/mit-emze/cimloop) project.
+The HWComponents (Hardware Components) package, part of the
+[CiMLoop](https://github.com/mit-emze/cimloop) project, provides an interface for the
+estimation of energy, area, and leakage power of hardware components in hardware
+architectures. Key features in HWComponents include:
 
 [Information about the package is available on the hwcomponents website](https://accelergy-project.github.io/hwcomponents/).
 

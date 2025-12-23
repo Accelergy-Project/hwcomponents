@@ -4,8 +4,8 @@ Finding and Using Models
 This document follows the ``1_finding_and_using_models.ipynb`` tutorial.
 
 ``hwcomponents`` supports many different component models. We can list available
-component models with the :py:func:`hwcomponents.get_models` function. This function
-returns a list of :py:class:`hwcomponents.EnergyAreaModel` subclasses.
+component models with the :py:func:`~hwcomponents.find_models.get_models` function. This
+function returns a list of :py:class:`~hwcomponents.model.EnergyAreaModel` subclasses.
 
 You may also use the ``hwcomponents --list`` command from the shell.
 
@@ -14,8 +14,8 @@ You may also use the ``hwcomponents --list`` command from the shell.
    :language: python
 
 If we know what type of component we would like to model, we can use the
-``name_must_include`` argument to :py:func:`hwcomponents.get_models` to find all models
-that match a given class name.
+``name_must_include`` argument to :py:func:`~hwcomponents.find_models.get_models` to
+find all models that match a given class name.
 
 For example, we can use the ``hwcomponents_cacti`` package to model an SRAM. Once we've
 found the model, we can use the ``help`` function to see its documentation and supported

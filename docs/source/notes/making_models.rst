@@ -6,9 +6,9 @@ This document follows the ``2_making_models.ipynb`` tutorial.
 Basic Components
 ----------------
 
-Models can be created by subclassing the :py:class:`hwcomponents.EnergyAreaModel` class.
-Models estimate the energy, area, and leakage power of a component. Each model requires
-the following:
+Models can be created by subclassing the :py:class:`~hwcomponents.model.EnergyAreaModel`
+class. Models estimate the energy, area, and leakage power of a component. Each model
+requires the following:
 
 - ``component_name``: The name of the component. This may also be a list of components if
   multiple aliases are used.
@@ -19,14 +19,15 @@ the following:
 
 Models can also have actions. Actions are functions that return an energy of a specific
 action. For the TernaryMAC model, we have an action called ``mac`` that returns the
-energy of a ternary MAC operation. The :py:func:`hwcomponents.actionDynamicEnergy`
-decorator makes this function visible as an action. The function should return an energy
-in Joules.
+energy of a ternary MAC operation. The
+:py:func:`~hwcomponents.model.actionDynamicEnergy` decorator makes this function visible
+as an action. The function should return an energy in Joules.
 
 Models can also be scaled to support a range of different parameters. For example,
 the TernaryMAC model can be scaled to support a range of different technology nodes.
 This is done by calling the ``self.scale`` function in the ``__init__`` method of the
 model. The ``self.scale`` function takes the following arguments:
+
 - ``parameter_name``: The name of the parameter to scale.
 - ``parameter_value``: The value of the parameter to scale.
 - ``reference_value``: The reference value of the parameter.
@@ -49,7 +50,7 @@ Scaling by Number of Bits
 
 Some actions may depend on the number of bits being accessesed. For example, you may
 want to charge for the energy per bit of a DRAM read. To do this, you can use the
-``bits_per_action`` argument of the :py:func:`hwcomponents.actionDynamicEnergy`
+``bits_per_action`` argument of the :py:func:`~hwcomponents.model.actionDynamicEnergy`
 decorator. This decorator takes a string that is the name of the parameter to scale by.
 For example, we can scale the energy of a DRAM read by the number of bits being read. In
 this example, the DRAM yields ``width`` bits per read, so energy is scaled by
@@ -74,7 +75,8 @@ We'll use the following components:
 - An adder that adds the increment value to the current address.
 
 One new functionality is used here. The ``subcomponents`` argument to the
-:py:class:`hwcomponents.EnergyAreaModel` constructor is used to register subcomponents.
+:py:class:`~hwcomponents.model.EnergyAreaModel` constructor is used to register
+subcomponents.
 
 The area, energy, and leak power of subcomponents will NOT be scaled by the component's
 ``energy_scale``, ``area_scale``, or ``leak_scale``; if you want to scale the

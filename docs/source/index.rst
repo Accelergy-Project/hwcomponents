@@ -1,9 +1,10 @@
-HWComponents
-============
-The HWComponents (Hardware Components) package provides an interface for the estimation
-of energy, area, and leakage power of hardware components in hardware architectures. It
-is part of the `CiMLoop <https://github.com/mit-emze/cimloop>`_ project. Key features in
-HWComponents include:
+CiMLoop HWComponents
+====================
+
+The HWComponents (Hardware Components) package, part of the `CiMLoop
+<https://github.com/mit-emze/cimloop>`_ project, provides an interface for the
+estimation of energy, area, and leakage power of hardware components in hardware
+architectures. Key features in HWComponents include:
 
 - A simple Python API for writing energy, area, and leakage power models. New
   models can be written in minutes.
@@ -17,25 +18,6 @@ HWComponents include:
 Components are also compatible with
 `Accelergy <https://github.com/accelergy-project/accelergy>`_.
 
-hwcomponents API
-----------------
-.. toctree::
-   :maxdepth: 2
-
-   modules
-
-
-Example Usage
--------------
-
-The following example shows a ternary MAC component written in HWComponents. It uses
-scaling to scale the width and technology node of the MAC.
-
-Full examples of how to use the package are available in the ``notebooks`` directory.
-
-.. include-notebook:: ../../notebooks/model_example/2_making_models.ipynb
-   :name: example_mac
-   :language: python
 
 Installation
 ------------
@@ -55,6 +37,15 @@ models as submodules.
     # List available models
     hwc --list # or hwcomponents --list
 
+hwcomponents API
+----------------
+
+.. toctree::
+   :maxdepth: 2
+
+   modules
+`Code <https://github.com/Accelergy-Project/hwcomponents>`_
+
 Tutorials
 ---------
 
@@ -66,6 +57,18 @@ models. Additional documentation and tutorials are available on this site:
 
    notes/finding_and_using_models
    notes/making_models
+
+Example Usage
+-------------
+
+The following example shows a ternary MAC component written in HWComponents. It uses
+scaling to scale the width and technology node of the MAC.
+
+Full examples of how to use the package are available in the ``notebooks`` directory.
+
+.. include-notebook:: ../../notebooks/2_making_models.ipynb
+   :name: example_mac
+   :language: python
 
 Contributing
 ------------
