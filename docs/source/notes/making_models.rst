@@ -63,7 +63,7 @@ Compound Models
 ------------------
 
 We can create compound models by combining multiple component models. Here, we'll show
-the ``SmartbufferSRAM`` model from the ``hwcomponents-library`` package.This is an SRAM
+the ``SmartBufferSRAM`` model from the ``hwcomponents-library`` package.This is an SRAM
 with an address generator that sequentially reads addresses in the SRAM.
 
 We'll use the following components:
