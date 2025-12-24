@@ -66,13 +66,19 @@ class ListLoggable:
         if self.logger is not None:
             return
         if name is None:
-            name = self.__class__.__name__
+            if hasattr(self, "__name__"):
+                name = self.__name__
+            else:
+                name = self.__class__.__name__
         self.logger = get_logger(name)
 
     @property
     def logger(self) -> logging.Logger:
         if getattr(self, "_logger", None) is None:
-            self._logger = get_logger(self.__class__.__name__)
+            if hasattr(self, "__name__"):
+                self._logger = get_logger(self.__name__)
+            else:
+                self._logger = get_logger(self.__class__.__name__)
         self._logger.setLevel(logging.INFO)
         return self._logger
 

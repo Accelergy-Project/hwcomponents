@@ -120,7 +120,7 @@ def _wrap_model(
 ) -> EnergyAreaModelWrapper:
     if isinstance(model, EnergyAreaModelWrapper):
         return model
-    return EnergyAreaModelWrapper(model, model.__class__.__name__)
+    return EnergyAreaModelWrapper(model, model.__name__)
 
 
 def _get_best_estimate(
@@ -225,6 +225,8 @@ def _get_best_estimate(
                 + _indent_list_text_block("Messages:", estimation.messages),
             )
             break
+    else:
+        estimation = None
 
     full_logs = [
         _indent_list_text_block(
@@ -258,7 +260,10 @@ def _get_best_estimate(
                 fail_reasons,
             ),
         )
-    if return_estimation_object:
+
+    clear_logs()
+
+    if return_estimation_object and estimation is not None:
         return estimation
 
     if estimation is not None and estimation.success:
