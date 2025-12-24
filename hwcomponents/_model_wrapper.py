@@ -452,10 +452,10 @@ class EnergyAreaModelWrapper(ListLoggable):
         return matching_name_and_arg_actions
 
     def estimate_energy(
-        self, query: EnergyAreaQuery, initalized_obj: EnergyAreaModel = None
+        self, query: EnergyAreaQuery, initialized_obj: EnergyAreaModel = None
     ) -> Estimation:
         """Returns the energy estimation for the given action."""
-        if initalized_obj is None:
+        if initialized_obj is None:
             initialized_obj = self.get_initialized_subclass(query)
             move_queue_from_one_logger_to_another(initialized_obj.logger, self.logger)
         supported_actions = self.get_matching_actions(query)

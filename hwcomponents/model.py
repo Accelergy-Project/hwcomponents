@@ -338,12 +338,12 @@ class EnergyAreaModel(ListLoggable, ABC):
             **kwargs : dict
                 The arguments with which to call the action.
         """
-        wrapper = EnergyAreaModelWrapper(type(self), self.component_name)
         from hwcomponents._model_wrapper import EnergyAreaQuery, EnergyAreaModelWrapper
+        wrapper = EnergyAreaModelWrapper(type(self), self.component_name)
         query = EnergyAreaQuery(
             component_name=self.component_name,
             component_attributes={},
             action_name=action_name,
             action_arguments=kwargs,
         )
-        return wrapper.estimate_energy(query, initalized_obj=self)
+        return wrapper.estimate_energy(query, initialized_obj=self)
