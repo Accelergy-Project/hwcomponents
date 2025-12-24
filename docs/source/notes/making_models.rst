@@ -71,8 +71,8 @@ We'll use the following components:
 
 - A SRAM buffer
 - Two registers: one that that holds the current address, and one that holds the
-  increment value.
-- An adder that adds the increment value to the current address.
+  increment value
+- An adder that adds the increment value to the current address
 
 One new functionality is used here. The ``subcomponents`` argument to the
 :py:class:`~hwcomponents.model.EnergyAreaModel` constructor is used to register
