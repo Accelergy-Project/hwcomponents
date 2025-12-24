@@ -239,7 +239,7 @@ def get_models(
         models.extend(new_models)
 
     if _return_wrappers:
-        models = [m for m in models if name_must_include.lower() in m.name.lower()]
-        return sorted(models, key=lambda x: x.name)
+        models = [m for m in models if name_must_include.lower() in m.model_name.lower()]
+        return sorted(models, key=lambda x: x.model_name)
     models = [m for m in models if name_must_include.lower() in m.__name__.lower()]
     return sorted(models, key=lambda x: x.__name__)
