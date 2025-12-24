@@ -53,7 +53,7 @@ def actionDynamicEnergy(
                 pass
             if nominal_bits is None:
                 raise ValueError(
-                    f"{self.__class__.__name__} has no attribute {bits_per_action}. "
+                    f"{self.__name__} has no attribute {bits_per_action}. "
                     f"Ensure that the attributes referenced in actionDynamicEnergy "
                     f"are defined in the class."
                 )
