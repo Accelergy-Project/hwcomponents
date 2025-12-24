@@ -22,8 +22,8 @@ setup(
     include_package_data=True,
     entry_points={
         "console_scripts": [
-            "hwcomponents=hwcomponents.hwcomponents:main",
-            "hwc=hwcomponents.hwcomponents:main",
+            "hwcomponents=hwcomponents.hwcomponents:_main",
+            "hwc=hwcomponents.hwcomponents_:main",
         ],
     },
     zip_safe=True,
