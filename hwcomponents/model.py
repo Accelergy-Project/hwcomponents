@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import inspect
 from numbers import Number
 from functools import wraps
 from typing import Callable, List, Type, Union, TypeVar
@@ -261,7 +262,8 @@ class EnergyAreaModel(ListLoggable, ABC):
 
         return target
 
-    def get_action_names(self) -> List[str]:
+    @classmethod
+    def get_action_names(cls) -> List[str]:
         """
         Returns the names of the actions supported by the model.
 
@@ -270,11 +272,12 @@ class EnergyAreaModel(ListLoggable, ABC):
         List[str]
             The names of the actions supported by the model.
         """
-        return [
-            name
-            for name, func in self.__dict__.items()
-            if getattr(func, "_is_component_energy_action", False)
-        ]
+        names = set()
+        for base in cls.__mro__:
+            for name, func in base.__dict__.items():
+                if getattr(func, "_is_component_energy_action", False):
+                    names.add(name)
+        return sorted(names)
 
     def required_arguments(self, action_name: str | None = None) -> List[str]:
         """

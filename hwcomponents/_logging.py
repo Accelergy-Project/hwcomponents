@@ -79,7 +79,7 @@ class ListLoggable:
                 self._logger = get_logger(self.__name__)
             else:
                 self._logger = get_logger(self.__class__.__name__)
-        self._logger.setLevel(logging.INFO)
+            self._logger.setLevel(logging.INFO)
         return self._logger
 
 

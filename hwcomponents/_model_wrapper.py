@@ -4,7 +4,7 @@ from numbers import Number
 from types import ModuleType
 from typing import Any, Callable, Dict, List, Optional, Set, Union
 from .model import EnergyAreaModel
-from ._logging import move_queue_from_one_logger_to_another, ListLoggable
+from ._logging import move_queue_from_one_logger_to_another, ListLoggable, pop_all_messages
 
 
 class EstimatorError(Exception):
@@ -117,7 +117,7 @@ class FloatEstimation(Estimation, float):
         newval = super().__new__(cls, value)
         newval.value = value
         newval.success = success
-        newval.messages = messages
+        newval.messages = list(messages)
         newval.model_name = model_name
         return newval
 
@@ -474,23 +474,28 @@ class EnergyAreaModelWrapper(ListLoggable):
         except Exception as e:
             move_queue_from_one_logger_to_another(initialized_obj.logger, self.logger)
             raise e
-        move_queue_from_one_logger_to_another(initialized_obj.logger, self.logger)
+        estimation.add_messages(pop_all_messages(initialized_obj.logger))
+        estimation.model_name = self.model_name
         return estimation
 
     def estimate_area(self, query: EnergyAreaQuery) -> Estimation:
         """Returns the area estimation for the given action."""
+        subclass = self.get_initialized_subclass(query)
         return FloatEstimation.get_estimation(
-            value=self.get_initialized_subclass(query).area,
+            value=subclass.area,
             success=True,
             model_name=self.model_name,
+            messages=pop_all_messages(subclass.logger),
         )
 
     def estimate_leak_power(self, query: EnergyAreaQuery) -> Estimation:
         """Returns the leak power estimation for the given action."""
+        subclass = self.get_initialized_subclass(query)
         return FloatEstimation.get_estimation(
-            value=self.get_initialized_subclass(query).leak_power,
+            value=subclass.leak_power,
             success=True,
             model_name=self.model_name,
+            messages=pop_all_messages(subclass.logger),
         )
 
     def get_name(self) -> str:
