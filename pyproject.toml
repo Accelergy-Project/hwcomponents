@@ -17,7 +17,7 @@ classifiers = []
 
 [project.scripts]
 hwcomponents = "hwcomponents.hwcomponents:_main"
-hwc = "hwcomponents.hwcomponents_:main"
+hwc = "hwcomponents.hwcomponents:_main"
 
 [tool.setuptools]
 packages = ["hwcomponents", "hwcomponents.scaling"]
@@ -27,5 +27,5 @@ zip-safe = true
 [tool.setuptools_scm]
 write_to = "hwcomponents/_version.py"
 fallback_version = "1.0"
-version_scheme = "setup_scm_version:post_version"
-local_scheme = "setup_scm_version:no_local"
+version_scheme = "hwcomponents._version_scheme:post_version"
+local_scheme = "hwcomponents._version_scheme:no_local"
