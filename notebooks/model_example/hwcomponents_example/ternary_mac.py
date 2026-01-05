@@ -27,7 +27,7 @@ class TernaryMAC(EnergyAreaModel):
     component_name: str | list[str] = 'TernaryMAC'
     """ Name of the component. Must be a string or list/tuple of strings. """
 
-    priority = 0.8
+    priority = 0.3
     """
     Priority determines which model is used when multiple models are available for a
     given component. Higher priority models are used first. Must be a number between 0
