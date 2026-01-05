@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0", "wheel", "setuptools-scm>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "hwcomponents"
-version = "0.5"
+dynamic = ["version"]
 description = "Hardware Component Energy+Area Models"
 readme = "README.md"
 requires-python = ">=3.12"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Tanner Andrulis", email = "andrulis@mit.edu"}
 ]
@@ -23,3 +23,9 @@ hwc = "hwcomponents.hwcomponents_:main"
 packages = ["hwcomponents", "hwcomponents.scaling"]
 include-package-data = true
 zip-safe = true
+
+[tool.setuptools_scm]
+write_to = "hwcomponents/_version.py"
+fallback_version = "1.0.0"
+version_scheme = "setup_scm_version:post_version"
+local_scheme = "setup_scm_version:no_local"
