@@ -26,13 +26,14 @@ models as submodules.
 
 .. code-block:: bash
 
-    # Install the main package
-    git clone --recurse-submodules https://github.com/Accelergy-Project/hwcomponents.git
-    pip install ./hwcomponents
+   # Install the main package
+   pip install hwcomponents
 
-    # Install model packages
-    cd hwcomponents/models
-    pip3 install ./hwcomponents/models/*
+   # Install model packages
+   pip install hwcomponents-cacti
+   pip install hwcomponents-neurosim
+   pip install hwcomponents-adc
+   pip install hwcomponents-library
 
     # List available models
     hwc --list # or hwcomponents --list
