@@ -70,9 +70,12 @@ def actionDynamicEnergy(
                     f"that the actionDynamicEnergy function returns a value."
                 )
             value = 0
-        value *= self.energy_scale * scale
+        value *= self.energy_scale
+
         for subcomponent in self.subcomponents:
             value += subcomponent._energy_used
+            subcomponent._energy_used = 0
+        value *= scale
         self._energy_used += value
         return value
 
