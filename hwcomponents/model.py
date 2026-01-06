@@ -8,6 +8,7 @@ from hwcomponents._util import parse_float
 
 T = TypeVar("T", bound="EnergyAreaModel")
 
+
 def actionDynamicEnergy(
     func: Callable[[], float] = None, bits_per_action: str = None
 ) -> Callable[[], float]:
@@ -157,11 +158,11 @@ class EnergyAreaModel(ListLoggable, ABC):
 
     @abstractmethod
     def __init__(
-            self,
-            leak_power: float | None = None,
-            area: float | None = None,
-            subcomponents: list["EnergyAreaModel"] | None = None,
-        ):
+        self,
+        leak_power: float | None = None,
+        area: float | None = None,
+        subcomponents: list["EnergyAreaModel"] | None = None,
+    ):
         if subcomponents is None:
             if leak_power is None or area is None:
                 raise ValueError(
@@ -174,7 +175,9 @@ class EnergyAreaModel(ListLoggable, ABC):
         self.leak_scale: float = 1
         self._leak_power: float = leak_power if leak_power is not None else 0
         self._area: float = area if area is not None else 0
-        self.subcomponents: list["EnergyAreaModel"] = [] if subcomponents is None else subcomponents
+        self.subcomponents: list["EnergyAreaModel"] = (
+            [] if subcomponents is None else subcomponents
+        )
         self._subcomponents_set = subcomponents is not None
         self._energy_used: float = 0
 
@@ -200,9 +203,7 @@ class EnergyAreaModel(ListLoggable, ABC):
         -------
             The area in m^2 of the component.
         """
-        return self._area * self.area_scale + sum(
-            s.area for s in self.subcomponents
-        )
+        return self._area * self.area_scale + sum(s.area for s in self.subcomponents)
 
     @classmethod
     def _component_name(cls) -> str:
@@ -251,12 +252,8 @@ class EnergyAreaModel(ListLoggable, ABC):
                     f"Scaled {key} from {default} to {target}: {attr} multiplied by {scale}"
                 )
             except:
-                target_float = parse_float(
-                    target, f"{self._component_name()}.{key}"
-                )
-                default_float = parse_float(
-                    default, f"{self._component_name()}.{key}"
-                )
+                target_float = parse_float(target, f"{self._component_name()}.{key}")
+                default_float = parse_float(default, f"{self._component_name()}.{key}")
                 scale = callfunc(target_float, default_float)
                 setattr(self, attr, prev_val * scale)
                 self.logger.info(
@@ -292,7 +289,6 @@ class EnergyAreaModel(ListLoggable, ABC):
             action_name : str | None
                 The name of the action to get the required arguments for.
                 If None, returns the required arguments for the __init__ method.
-
         Returns
         -------
             list[str]
@@ -309,7 +305,9 @@ class EnergyAreaModel(ListLoggable, ABC):
         return inspect.signature(action_func).parameters.keys()
 
     @classmethod
-    def try_init_arbitrary_args(cls: Type[T], **kwargs) -> T:
+    def try_init_arbitrary_args(
+        cls: Type[T], _return_estimation_object: bool = False, **kwargs
+    ) -> T:
         """
         Tries to initialize the model with the given arguments.
 
@@ -317,23 +315,29 @@ class EnergyAreaModel(ListLoggable, ABC):
         ----------
             **kwargs : dict
                 The arguments with which to initialize the model.
-
+            _return_estimation_object : bool
+                Whether to return the Estimation object instead of the model.
         Returns
         -------
             The initialized model. If the model cannot be initialized with the given
             arguments, an exception is raised.
         """
         from hwcomponents._model_wrapper import EnergyAreaQuery, EnergyAreaModelWrapper
+
         wrapper = EnergyAreaModelWrapper(cls, cls.component_name)
         cname = cls.component_name
         query = EnergyAreaQuery(
             component_name=cname if isinstance(cname, str) else cname[0],
             component_attributes=kwargs,
         )
-        return wrapper.get_initialized_subclass(query)
+        value = wrapper.get_initialized_subclass(query)
+        if _return_estimation_object:
+            return value
+        return value.value
 
-
-    def try_call_arbitrary_action(self: T, action_name: str, **kwargs) -> T:
+    def try_call_arbitrary_action(
+        self: T, action_name: str, _return_estimation_object: bool = False, **kwargs
+    ) -> T:
         """
         Tries to call the given action with the given arguments.
 
@@ -345,6 +349,7 @@ class EnergyAreaModel(ListLoggable, ABC):
                 The arguments with which to call the action.
         """
         from hwcomponents._model_wrapper import EnergyAreaQuery, EnergyAreaModelWrapper
+
         wrapper = EnergyAreaModelWrapper(type(self), self.component_name)
         query = EnergyAreaQuery(
             component_name=self.component_name,
@@ -352,4 +357,7 @@ class EnergyAreaModel(ListLoggable, ABC):
             action_name=action_name,
             action_arguments=kwargs,
         )
-        return wrapper.estimate_energy(query, initialized_obj=self)
+        value = wrapper.estimate_energy(query, initialized_obj=self)
+        if _return_estimation_object:
+            return value
+        return value.value

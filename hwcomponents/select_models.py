@@ -127,7 +127,7 @@ def _get_best_estimate(
     query: EnergyAreaQuery,
     target: str,
     models: List[EnergyAreaModelWrapper] | List[EnergyAreaModel] = None,
-    return_estimation_object: bool = False,
+    _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
 ) -> FloatEstimation | EnergyAreaModel:
     if models is None:
@@ -263,7 +263,7 @@ def _get_best_estimate(
 
     clear_logs()
 
-    if return_estimation_object and estimation is not None:
+    if _return_estimation_object and estimation is not None:
         return estimation
 
     if estimation is not None and estimation.success:
@@ -285,7 +285,7 @@ def get_energy(
     action_name: str,
     action_arguments: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
-    return_estimation_object: bool = False,
+    _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
 ) -> float | Estimation:
     """
@@ -301,7 +301,7 @@ def get_energy(
         action_name: The name of the action.
         action_arguments: The arguments of the action.
         models: The models to use.
-        return_estimation_object: Whether to return the estimation object instead of
+        _return_estimation_object: Whether to return the estimation object instead of
             the energy value.
         _relaxed_component_name_selection: Whether to relax the component name
             selection. Relaxed selection ignores underscores in the component name.
@@ -317,7 +317,7 @@ def get_energy(
         query,
         "energy",
         models,
-        return_estimation_object,
+        _return_estimation_object,
         _relaxed_component_name_selection,
     )
 
@@ -326,7 +326,7 @@ def get_area(
     component_name: str,
     component_attributes: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
-    return_estimation_object: bool = False,
+    _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
 ) -> float | Estimation:
     """
@@ -339,7 +339,7 @@ def get_area(
         component_name: The name of the component.
         component_attributes: The attributes of the component.
         models: The models to use.
-        return_estimation_object: Whether to return the estimation object instead of
+        _return_estimation_object: Whether to return the estimation object instead of
             the area value.
         _relaxed_component_name_selection: Whether to relax the component name
             selection. Relaxed selection ignores underscores in the component name.
@@ -353,7 +353,7 @@ def get_area(
         query,
         "area",
         models,
-        return_estimation_object,
+        _return_estimation_object,
         _relaxed_component_name_selection,
     )
 
@@ -362,7 +362,7 @@ def get_leak_power(
     component_name: str,
     component_attributes: Dict[str, Any],
     models: List[EnergyAreaModelWrapper] = None,
-    return_estimation_object: bool = False,
+    _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
 ) -> float | Estimation:
     """
@@ -387,7 +387,7 @@ def get_leak_power(
         query,
         "leak_power",
         models,
-        return_estimation_object,
+        _return_estimation_object,
         _relaxed_component_name_selection,
     )
 
@@ -397,7 +397,7 @@ def get_model(
     component_attributes: Dict[str, Any],
     required_actions: List[str] = (),
     models: List[EnergyAreaModelWrapper] = None,
-    return_estimation_object: bool = False,
+    _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
 ) -> EnergyAreaModelWrapper:
     """
@@ -411,7 +411,7 @@ def get_model(
         component_attributes: The attributes of the component.
         required_actions: The actions that are required for the component.
         models: The models to use.
-        return_estimation_object: Whether to return the estimation object instead of
+        _return_estimation_object: Whether to return the estimation object instead of
             the model wrapper.
         _relaxed_component_name_selection: Whether to relax the component name
             selection. Relaxed selection ignores underscores in the component name.
@@ -423,4 +423,10 @@ def get_model(
     query = EnergyAreaQuery(
         component_name.lower(), component_attributes, None, None, required_actions
     )
-    return _get_best_estimate(query, "model", models, return_estimation_object, _relaxed_component_name_selection)
+    return _get_best_estimate(
+        query,
+        "model",
+        models,
+        _return_estimation_object,
+        _relaxed_component_name_selection,
+    )

@@ -4,7 +4,11 @@ from numbers import Number
 from types import ModuleType
 from typing import Any, Callable, Dict, List, Optional, Set, Union
 from .model import EnergyAreaModel
-from ._logging import move_queue_from_one_logger_to_another, ListLoggable, pop_all_messages
+from ._logging import (
+    move_queue_from_one_logger_to_another,
+    ListLoggable,
+    pop_all_messages,
+)
 
 
 class EstimatorError(Exception):

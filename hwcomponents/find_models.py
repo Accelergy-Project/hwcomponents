@@ -155,7 +155,7 @@ def get_models(
             globbed = glob.glob(path_or_package, recursive=True)
             flattened.extend(globbed)
         else:
-            raise ValueError(f'Invalid type: {type(path_or_package)}')
+            raise ValueError(f"Invalid type: {type(path_or_package)}")
 
     if _return_wrappers:
         models = [EnergyAreaModelWrapper(m, m.__name__) for m in models]
@@ -239,7 +239,9 @@ def get_models(
         models.extend(new_models)
 
     if _return_wrappers:
-        models = [m for m in models if name_must_include.lower() in m.model_name.lower()]
+        models = [
+            m for m in models if name_must_include.lower() in m.model_name.lower()
+        ]
         return sorted(models, key=lambda x: x.model_name)
     models = [m for m in models if name_must_include.lower() in m.__name__.lower()]
     return sorted(models, key=lambda x: x.__name__)
