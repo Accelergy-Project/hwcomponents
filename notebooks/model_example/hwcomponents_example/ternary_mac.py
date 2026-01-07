@@ -1,10 +1,8 @@
-from hwcomponents import EnergyAreaModel, actionDynamicEnergy
-from hwcomponents.scaling import tech_node_area, tech_node_energy, tech_node_leak
+from hwcomponents import ComponentModel, action
+from hwcomponents.scaling import tech_node_area, tech_node_energy, tech_node_leak, noscale
 
-from hwcomponents import EnergyAreaModel, actionDynamicEnergy
-from hwcomponents.scaling import tech_node_area, tech_node_energy, tech_node_leak
 
-class TernaryMAC(EnergyAreaModel):
+class TernaryMAC(ComponentModel):
     """
 
     A ternary MAC unit, which multiplies two ternary values and accumulates the result.
@@ -44,14 +42,15 @@ class TernaryMAC(EnergyAreaModel):
 
         # The following scales the tech_node to the given tech_node node from 40nm.
         # The scaling functions for area, energy, and leakage are defined in
-        # hwcomponents.scaling. The energy scalingw will affect the functions decorated
-        # with @actionDynamicEnergy.
+        # hwcomponents.scaling. The energy scaling will affect the functions decorated
+        # with @action.
         self.tech_node = self.scale(
             "tech_node",
             tech_node,
             40e-9,
             tech_node_area,
             tech_node_energy,
+            noscale,
             tech_node_leak,
         )
         self.accum_datawidth = accum_datawidth
@@ -63,12 +62,12 @@ class TernaryMAC(EnergyAreaModel):
             f'Accumulation datawidth {accum_datawidth} outside supported ' \
             f'range [4, 8]!'
 
-    # The actionDynamicEnergy decorator makes this function visible as an action. The
-    # function should return an energy in Joules.
-    @actionDynamicEnergy
-    def mac(self, clock_gated: bool = False) -> float:
+    # The action decorator makes this function visible as an action. The
+    # function should return a tuple of (energy, latency).
+    @action
+    def mac(self, clock_gated: bool = False):
         """
-        Returns the energy to perform a ternary MAC operation.
+        Returns the energy and latency to perform a ternary MAC operation.
 
         Parameters
         ----------
@@ -77,11 +76,12 @@ class TernaryMAC(EnergyAreaModel):
 
         Returns
         -------
-        float
-            The energy to perform a ternary MAC operation in Joules.
+        (energy, latency)
+            The energy in Joules and latency in seconds for a ternary MAC operation.
         """
 
-        self.logger.info(f'TernaryMAC Model is modeling energy for mac.')
+        self.logger.info(f'TernaryMAC Model is modeling energy and latency for mac.')
         if clock_gated:
-            return 0.0
-        return 0.002e-12 * (self.accum_datawidth + 0.25)
+            return 0.0, 1e-9
+        # .002pJ, 1ns
+        return 0.002e-12 * (self.accum_datawidth + 0.25), 1e-9

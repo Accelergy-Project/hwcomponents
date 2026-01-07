@@ -170,3 +170,16 @@ def tech_node_leak(
         The scaling factor for leakage power.
     """
     return tech_node_energy(to_node, from_node, vdd)
+
+
+def tech_node_latency(to_node: float, from_node: float) -> float:
+    """Returns the scaling factor for latency from the technology node
+    `from_node` to the technology node `to_node`. Interpolates if necessary.
+
+    Args:
+        to_node: The technology node to scale to.
+        from_node: The technology node to scale from.
+    Returns:
+        The scaling factor for latency.
+    """
+    return to_node / from_node

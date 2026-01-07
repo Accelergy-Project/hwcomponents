@@ -5,7 +5,7 @@ This document follows the ``1_finding_and_using_models.ipynb`` tutorial.
 
 ``hwcomponents`` supports many different component models. We can list available
 component models with the :py:func:`~hwcomponents.find_models.get_models` function. This
-function returns a list of :py:class:`~hwcomponents.model.EnergyAreaModel` subclasses.
+function returns a list of :py:class:`~hwcomponents.model.ComponentModel` subclasses.
 
 You may also use the ``hwcomponents --list`` command from the shell.
 
@@ -40,7 +40,8 @@ invoke a model. There are three ways to find a component model:
    select the best model for a given component name and attributes, and raise an error
    if no model can be instantiated with the given attributes.
 3. Ask for specific properties from hwcomponents. This is similar to the second method,
-   but you can ask for the energy, area, or leakage power of a component directly.
+   but you can ask for the area, energy, latency, or leak power of an action of a
+   component directly.
 
 .. include-notebook:: ../../notebooks/1_finding_and_using_models.ipynb
    :name: ways_to_find_components

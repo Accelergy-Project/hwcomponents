@@ -32,7 +32,7 @@ def pow_base(power: float) -> Callable[[float, float], float]:
 
 
 def quadratic(target: float, scalefrom: float) -> float:
-    """ Quadratic scaling function. Returns (target / scalefrom) ** 2. """
+    """Quadratic scaling function. Returns (target / scalefrom) ** 2."""
     return (target / scalefrom) ** 2
 
 

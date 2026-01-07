@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hwcomponents"
 dynamic = ["version"]
-description = "Hardware Component Energy+Area Models"
+description = "Hardware Component Area, Energy, Latency, and Leak Power Models"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"

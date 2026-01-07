@@ -1,7 +1,7 @@
 import logging
 import copy
 from typing import Any, Callable, Dict, List, Tuple
-from hwcomponents.model import EnergyAreaModel
+from hwcomponents.model import ComponentModel
 from hwcomponents._logging import (
     get_logger,
     pop_all_messages,
@@ -9,11 +9,11 @@ from hwcomponents._logging import (
     clear_logs,
 )
 from hwcomponents._model_wrapper import (
-    EnergyAreaModelWrapper,
-    EnergyAreaQuery,
+    ComponentModelWrapper,
+    ModelQuery,
     Estimation,
     EstimatorError,
-    EstimatorEstimation,
+    ModelEstimation,
     FloatEstimation,
 )
 from hwcomponents.find_models import installed_models
@@ -28,8 +28,8 @@ def _indent_list_text_block(prefix: str, list_to_print: List[str]):
 
 
 def _call_model(
-    model: EnergyAreaModelWrapper,
-    query: EnergyAreaQuery,
+    model: ComponentModelWrapper,
+    query: ModelQuery,
     target_func: Callable,
 ) -> Estimation:
     # Clear the logger
@@ -37,9 +37,7 @@ def _call_model(
     try:
         estimation = target_func(query)
     except Exception as e:
-        estimation = FloatEstimation.get_estimation(
-            0, success=False, model_name=model.get_name()
-        )
+        estimation = FloatEstimation(0, success=False, model_name=model.get_name())
         model.logger.error(f"{type(e).__name__}: {e}")
         # Add the full traceback
         import traceback
@@ -62,52 +60,49 @@ def _call_model(
 
 
 def _get_energy_estimation(
-    model: EnergyAreaModelWrapper, query: EnergyAreaQuery
+    model: ComponentModelWrapper, query: ModelQuery
 ) -> FloatEstimation:
-    e = _call_model(model, query, model.estimate_energy)
-    if e and e.success and query.action_name == "leak":
-        n_instances = query.component_attributes.get("n_instances", 1)
-        e.add_messages(f"Multiplying by n_instances {n_instances}")
-        e *= n_instances
+    e = _call_model(model, query, model.get_action_energy_latency)
+    if e.success:
+        e.value = e.value[0]
+    return e
+
+
+def _get_latency_estimation(
+    model: ComponentModelWrapper, query: ModelQuery
+) -> FloatEstimation:
+    e = _call_model(model, query, model.get_action_energy_latency)
+    if e.success:
+        e.value = e.value[1]
     return e
 
 
 def _get_area_estimation(
-    model: EnergyAreaModelWrapper, query: EnergyAreaQuery
+    model: ComponentModelWrapper, query: ModelQuery
 ) -> FloatEstimation:
-    e = _call_model(model, query, model.estimate_area)
-    if e and e.success:
-        n_instances = query.component_attributes.get("n_instances", 1)
-        e.add_messages(f"Multiplying by n_instances {n_instances}")
-        e *= n_instances
+    e = _call_model(model, query, model.get_area)
     return e
 
 
 def _get_leak_power_estimation(
-    model: EnergyAreaModelWrapper, query: EnergyAreaQuery
+    model: ComponentModelWrapper, query: ModelQuery
 ) -> FloatEstimation:
-    e = _call_model(model, query, model.estimate_leak_power)
-    if e and e.success:
-        n_instances = query.component_attributes.get("n_instances", 1)
-        e.add_messages(f"Multiplying by n_instances {n_instances}")
-        e *= n_instances
+    e = _call_model(model, query, model.get_leak_power)
     return e
 
 
 def _select_model(
-    model: EnergyAreaModelWrapper,
-    query: EnergyAreaQuery,
-) -> EstimatorEstimation:
+    model: ComponentModelWrapper,
+    query: ModelQuery,
+) -> ModelEstimation:
     for required_action in query.required_actions:
         if required_action not in model.get_action_names():
-            e = EstimatorEstimation.get_estimation(
-                0, success=False, model_name=model.get_name()
-            )
+            e = ModelEstimation(0, success=False, model_name=model.get_name())
             e.fail(
                 f"Model {model.get_name()} does not support action {required_action}"
             )
             return e
-    callfunc = lambda x: EstimatorEstimation.get_estimation(
+    callfunc = lambda x: ModelEstimation(
         model.get_initialized_subclass(x),
         success=True,
         model_name=model.get_name(),
@@ -116,20 +111,20 @@ def _select_model(
 
 
 def _wrap_model(
-    model: EnergyAreaModel | EnergyAreaModelWrapper,
-) -> EnergyAreaModelWrapper:
-    if isinstance(model, EnergyAreaModelWrapper):
+    model: ComponentModel | ComponentModelWrapper,
+) -> ComponentModelWrapper:
+    if isinstance(model, ComponentModelWrapper):
         return model
-    return EnergyAreaModelWrapper(model, model.__name__)
+    return ComponentModelWrapper(model, model.__name__)
 
 
 def _get_best_estimate(
-    query: EnergyAreaQuery,
+    query: ModelQuery,
     target: str,
-    models: List[EnergyAreaModelWrapper] | List[EnergyAreaModel] = None,
+    models: List[ComponentModelWrapper] | List[ComponentModel] = None,
     _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
-) -> FloatEstimation | EnergyAreaModel:
+) -> FloatEstimation | ComponentModel:
     if models is None:
         models = installed_models(_return_wrappers=True)
 
@@ -137,6 +132,8 @@ def _get_best_estimate(
 
     if target == "energy":
         est_func = _get_energy_estimation
+    elif target == "latency":
+        est_func = _get_latency_estimation
     elif target == "area":
         est_func = _get_area_estimation
     elif target == "model":
@@ -147,11 +144,6 @@ def _get_best_estimate(
         raise ValueError(f"Invalid target: {target}")
 
     logging.getLogger("").info(f"{target} estimation for {query}")
-
-    for to_drop in ["area", "energy", "area_scale", "energy_scale"]:
-        for drop_from in [query.component_attributes, query.action_arguments]:
-            if to_drop in drop_from:
-                del drop_from[to_drop]
 
     estimations = []
 
@@ -263,11 +255,10 @@ def _get_best_estimate(
 
     clear_logs()
 
-    if _return_estimation_object and estimation is not None:
-        return estimation
-
     if estimation is not None and estimation.success:
-        return estimation.value if target == "model" else estimation
+        if _return_estimation_object:
+            return estimation
+        return estimation.value
 
     clear_logs()
 
@@ -284,7 +275,7 @@ def get_energy(
     component_attributes: Dict[str, Any],
     action_name: str,
     action_arguments: Dict[str, Any],
-    models: List[EnergyAreaModelWrapper] = None,
+    models: List[ComponentModelWrapper] = None,
     _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
 ) -> float | Estimation:
@@ -310,7 +301,7 @@ def get_energy(
     -------
         The energy in Joules.
     """
-    query = EnergyAreaQuery(
+    query = ModelQuery(
         component_name.lower(), component_attributes, action_name, action_arguments
     )
     return _get_best_estimate(
@@ -322,10 +313,53 @@ def get_energy(
     )
 
 
+def get_latency(
+    component_name: str,
+    component_attributes: Dict[str, Any],
+    action_name: str,
+    action_arguments: Dict[str, Any],
+    models: List[ComponentModelWrapper] = None,
+    _return_estimation_object: bool = False,
+    _relaxed_component_name_selection: bool = False,
+) -> float | Estimation:
+    """
+    Finds the latency using the best-matching model. "Best" is defined as the
+    highest-priority model that has all required attributes specified in
+    component_attributes and a matching action with all required arguments specified
+    in action_arguments.
+
+    Parameters
+    ----------
+        component_name: The name of the component.
+        component_attributes: The attributes of the component.
+        action_name: The name of the action.
+        action_arguments: The arguments of the action.
+        models: The models to use.
+        _return_estimation_object: Whether to return the estimation object instead of
+            the latency value.
+        _relaxed_component_name_selection: Whether to relax the component name
+            selection. Relaxed selection ignores underscores in the component name.
+
+    Returns
+    -------
+        The latency in seconds.
+    """
+    query = ModelQuery(
+        component_name.lower(), component_attributes, action_name, action_arguments
+    )
+    return _get_best_estimate(
+        query,
+        "latency",
+        models,
+        _return_estimation_object,
+        _relaxed_component_name_selection,
+    )
+
+
 def get_area(
     component_name: str,
     component_attributes: Dict[str, Any],
-    models: List[EnergyAreaModelWrapper] = None,
+    models: List[ComponentModelWrapper] = None,
     _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
 ) -> float | Estimation:
@@ -348,7 +382,7 @@ def get_area(
     -------
         The area in m^2.
     """
-    query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
+    query = ModelQuery(component_name.lower(), component_attributes, None, None)
     return _get_best_estimate(
         query,
         "area",
@@ -361,7 +395,7 @@ def get_area(
 def get_leak_power(
     component_name: str,
     component_attributes: Dict[str, Any],
-    models: List[EnergyAreaModelWrapper] = None,
+    models: List[ComponentModelWrapper] = None,
     _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
 ) -> float | Estimation:
@@ -382,7 +416,7 @@ def get_leak_power(
     -------
         The leak power in Watts.
     """
-    query = EnergyAreaQuery(component_name.lower(), component_attributes, None, None)
+    query = ModelQuery(component_name.lower(), component_attributes, None, None)
     return _get_best_estimate(
         query,
         "leak_power",
@@ -396,10 +430,10 @@ def get_model(
     component_name: str,
     component_attributes: Dict[str, Any],
     required_actions: List[str] = (),
-    models: List[EnergyAreaModelWrapper] = None,
+    models: List[ComponentModelWrapper] = None,
     _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
-) -> EnergyAreaModelWrapper:
+) -> ComponentModelWrapper:
     """
     Finds the best model for the given component. "Best" is defined as the
     highest-priority model that has all required attributes specified in
@@ -420,7 +454,7 @@ def get_model(
     -------
         The best model wrapper.
     """
-    query = EnergyAreaQuery(
+    query = ModelQuery(
         component_name.lower(), component_attributes, None, None, required_actions
     )
     return _get_best_estimate(

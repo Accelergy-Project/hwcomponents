@@ -4,7 +4,7 @@ from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from types import ModuleType
 from typing import List, Set, Union
-from hwcomponents._model_wrapper import EnergyAreaModelWrapper, EnergyAreaModel
+from hwcomponents._model_wrapper import ComponentModelWrapper, ComponentModel
 import inspect
 import logging
 import copy
@@ -17,21 +17,21 @@ _ALL_ESTIMATORS = None
 
 def installed_models(
     _return_wrappers: bool = False,
-) -> List[EnergyAreaModelWrapper] | List[EnergyAreaModel]:
+) -> List[ComponentModelWrapper] | List[ComponentModel]:
     """
     Lists all Python packages installed that are prefixed with "hwcomponents_". Finds
-    EnergyAreaModel subclasses in these packages and returns them as
-    EnergyAreaModel or EnergyAreaModelWrapper objects.
+    ComponentModel subclasses in these packages and returns them as
+    ComponentModel or ComponentModelWrapper objects.
 
     Parameters
     ----------
         _return_wrappers : bool
-            Whether to return EnergyAreaModelWrapper objects or
-            EnergyAreaModel objects.
+            Whether to return ComponentModelWrapper objects or
+            ComponentModel objects.
 
     Returns
     -------
-        A list of EnergyAreaModel or EnergyAreaModelWrapper objects.
+        A list of ComponentModel or ComponentModelWrapper objects.
     """
     # List all Python packages installed that are prefixed with "hwcomponents_"
     global _ALL_ESTIMATORS
@@ -64,21 +64,21 @@ def get_models_in_module(
     module: ModuleType,
     model_ids: Set,
     _return_wrappers: bool = False,
-) -> List[EnergyAreaModelWrapper] | List[EnergyAreaModel]:
+) -> List[ComponentModelWrapper] | List[ComponentModel]:
     """
-    Finds all EnergyAreaModel subclasses in a module and returns them as
-    EnergyAreaModelWrapper objects. Ignores underscore-prefixed classes.
+    Finds all ComponentModel subclasses in a module and returns them as
+    ComponentModelWrapper objects. Ignores underscore-prefixed classes.
 
     Parameters
     ----------
         model_ids : set
             A set of model IDs to avoid duplicates.
         _return_wrappers : bool
-            Whether to return EnergyAreaModelWrapper objects or EnergyAreaModel objects.
+            Whether to return ComponentModelWrapper objects or ComponentModel objects.
 
     Returns
     -------
-        A list of EnergyAreaModelWrapper objects.
+        A list of ComponentModelWrapper objects.
 
     """
     logging.info(f"Getting models in module: {module.__name__}")
@@ -91,13 +91,13 @@ def get_models_in_module(
         superclasses = [c.__name__ for c in inspect.getmro(x)]
 
         if (
-            any(base in superclasses for base in ["EnergyAreaModel", "Model"])
+            any(base in superclasses for base in ["ComponentModel", "Model"])
             and not inspect.isabstract(x)
             and id(x) not in model_ids
         ):
             model_ids.add(id(x))
             if _return_wrappers:
-                found.append(EnergyAreaModelWrapper(x, name))
+                found.append(ComponentModelWrapper(x, name))
             else:
                 found.append(x)
     return found
@@ -105,12 +105,12 @@ def get_models_in_module(
 
 def get_models(
     *paths_or_packages_or_models: Union[
-        str, List[str], List[List[str]], EnergyAreaModel
+        str, List[str], List[List[str]], ComponentModel
     ],
     include_installed: bool = True,
     name_must_include: str = "",
     _return_wrappers: bool = False,
-) -> List[EnergyAreaModelWrapper] | List[EnergyAreaModel]:
+) -> List[ComponentModelWrapper] | List[ComponentModel]:
     """
     Instantiate a list of model objects for later queries. Searches for models in the
     given paths and packages.
@@ -125,12 +125,12 @@ def get_models(
             If provided, a model will only be returned if its name includes this string.
             Non-case-sensitive.
         _return_wrappers : bool
-            Whether to return EnergyAreaModelWrapper objects or
-            EnergyAreaModel objects.
+            Whether to return ComponentModelWrapper objects or
+            ComponentModel objects.
 
     Returns
     -------
-        A list of EnergyAreaModelWrapper objects or EnergyAreaModel objects.
+        A list of ComponentModelWrapper objects or ComponentModel objects.
     """
     model_ids = set()
     n_models = 0
@@ -149,7 +149,7 @@ def get_models(
         i += 1
         if isinstance(path_or_package, (list, tuple)):
             to_check.extend(path_or_package)
-        elif issubclass(path_or_package, EnergyAreaModel):
+        elif issubclass(path_or_package, ComponentModel):
             models.append(path_or_package)
         elif isinstance(path_or_package, (str, Path)):
             globbed = glob.glob(path_or_package, recursive=True)
@@ -158,7 +158,7 @@ def get_models(
             raise ValueError(f"Invalid type: {type(path_or_package)}")
 
     if _return_wrappers:
-        models = [EnergyAreaModelWrapper(m, m.__name__) for m in models]
+        models = [ComponentModelWrapper(m, m.__name__) for m in models]
 
     models.extend(installed_models(_return_wrappers) if include_installed else [])
 

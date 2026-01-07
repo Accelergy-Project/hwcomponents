@@ -3,10 +3,10 @@ CiMLoop HWComponents
 
 The HWComponents (Hardware Components) package, part of the `CiMLoop
 <https://github.com/mit-emze/cimloop>`_ project, provides an interface for the
-estimation of energy, area, and leakage power of hardware components in hardware
-architectures. Key features in HWComponents include:
+estimation of area, energy, latency, and leak power of hardware components in
+hardware architectures. Key features in HWComponents include:
 
-- A simple Python API for writing energy, area, and leakage power models. New
+- A simple Python API for writing area, energy, latency, and leak power models. New
   models can be written in minutes.
 - Automatic scaling of parameters to different configurations, including scaling to
   different technology nodes.
@@ -14,9 +14,6 @@ architectures. Key features in HWComponents include:
   request, and more.
 - Automatic gathering of components from available Python packages. This includes
   support for different models in virtual environments.
-
-Components are also compatible with
-`Accelergy <https://github.com/accelergy-project/accelergy>`_.
 
 
 Installation
@@ -83,7 +80,7 @@ If you use this package in your work, please cite the CiMLoop project:
 
 .. code-block:: bibtex
 
-    @INPROCEEDINGS{10590023,
+    @INPROCEEDINGS{cimloop,
     author={Andrulis, Tanner and Emer, Joel S. and Sze, Vivienne},
     booktitle={2024 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS)},
     title={CiMLoop: A Flexible, Accurate, and Fast Compute-In-Memory Modeling Tool},
@@ -93,15 +90,4 @@ If you use this package in your work, please cite the CiMLoop project:
     pages={10-23},
     keywords={Performance evaluation;Accuracy;Computational modeling;Computer architecture;Artificial neural networks;In-memory computing;Data models;Compute-In-Memory;Processing-In-Memory;Analog;Deep Neural Networks;Systems;Hardware;Modeling;Open-Source},
     doi={10.1109/ISPASS61541.2024.00012}
-    }
-    @INPROCEEDINGS{8942149,
-    author={Wu, Yannan Nellie and Emer, Joel S. and Sze, Vivienne},
-    booktitle={2019 IEEE/ACM International Conference on Computer-Aided Design (ICCAD)},
-    title={Accelergy: An Architecture-Level Energy Estimation Methodology for Accelerator Designs},
-    year={2019},
-    volume={},
-    number={},
-    pages={1-8},
-    keywords={Program processors;Electric breakdown;Neural networks;Estimation;Hardware;Energy efficiency;Compounds},
-    doi={10.1109/ICCAD45719.2019.8942149}
     }
