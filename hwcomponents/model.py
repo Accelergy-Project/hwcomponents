@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import inspect
 from numbers import Number
 from functools import wraps
-from typing import Callable, List, Type, Union, TypeVar
+from typing import Any, Callable, List, Type, Union, TypeVar
 from hwcomponents._logging import ListLoggable
 from hwcomponents._util import parse_float
 
@@ -412,3 +412,136 @@ class ComponentModel(ListLoggable, ABC):
         if _return_estimation_object:
             return value
         return value.value
+
+    def assert_int(self, name: str, value: int | float | Any) -> int:
+        """
+        Checks that the value is an integer, and if so, returns it as an integer.
+        Otherwise, raises a ValueError.
+
+        Parameters
+        ----------
+            name: str
+                The name of the attribute to check. Used for error messages.
+            value: int | float | Any
+                The value to check.
+        Returns
+        -------
+            int
+                The value as an integer.
+        """
+
+        if isinstance(value, int):
+            return value
+        if isinstance(value, float) and value.is_integer():
+            return int(value)
+        if isinstance(value, str):
+            try:
+                value = int(value)
+            except:
+                pass
+        raise ValueError(f"{name} must be an integer. Got {value}.")
+
+    def assert_match(
+        self,
+        value_a: int | float | Any | None,
+        value_b: int | float | Any | None,
+        name_a: str,
+        name_b: str,
+    ) -> int:
+        """
+        Checks that the two values are equal, and if so, returns the matched value. If
+        one value is None, returns the other value. Raise an error if the two values are
+        not equal, or if both are None.
+
+        Parameters
+        ----------
+            value_a: int | float | Any
+                The first value to check.
+            value_b: int | float | Any
+                The second value to check.
+            name_a: str
+                The name of the first value. Used for error messages.
+            name_b: str
+                The name of the second value. Used for error messages.
+
+        Returns
+        -------
+            int
+                The matched value.
+        """
+        if value_a is None and value_b is None:
+            raise ValueError(
+                f"Both {name_a} and {name_b} are None. At least one must be provided."
+            )
+        if value_a is None:
+            return value_b
+        if value_b is None:
+            return value_a
+
+        if value_a != value_b:
+            raise ValueError(
+                f"Mismatch between {name_a} and {name_b}. Got {value_a} and {value_b}."
+            )
+
+        return value_a
+
+    def resolve_multiple_ways_to_calculate_value(
+        self, name: str, *args: tuple[str, Callable[[Any], Any], dict[str, Any]]
+    ) -> Any:
+        """
+        Parses multiple possible ways to set an attribute, raising errors if the values
+        are not consistent.
+
+        Each possible argument is a tuple containing a function and a dictionary of
+        keyword arguments. A function fails if any keyword arguments are None, if the
+        function raises an error, or if the function returns None.
+
+        The outputs of all non-failing functions are compared, and an error is raised if
+        they are not equal.
+
+        Parameters
+        ----------
+            name: str
+                The name of the attribute to set.
+            *args: tuple[str, Callable[[Any], Any], dict[str, Any]]
+                The possible ways to set the attribute. Each tuple contains a name, a
+                function that takes the current value and returns the new value, and a
+                dictionary of keyword arguments to pass to the function.
+        Returns
+        -------
+            The value of the attribute.
+        """
+
+        error_messages = []
+
+        success_values = []
+
+        for fname, func, kwargs in args:
+            for key, value in kwargs.items():
+                fname = f"{fname}({', '.join(f'{k}={v}' for k, v in kwargs.items())})"
+                if value is None:
+                    error_messages.append(f"{fname}: {key} is None.")
+            try:
+                new_value = func(**kwargs)
+            except Exception as e:
+                error_messages.append(f"{fname} raised {e}")
+            if new_value is None:
+                error_messages.append(f"{fname} returned None.")
+            else:
+                success_values.append((fname, new_value))
+
+        values = set(v[-1] for v in success_values)
+
+        if len(values) == 0:
+            raise ValueError(
+                f"Could not set {name} with any of the following options:\n\t"
+                + "\n\t".join(error_messages)
+            )
+
+        if len(values) > 1:
+            raise ValueError(
+                f"Different ways to set {name} returned conflicting values:\n\t"
+                + "\n\t".join(f"{fname}: {value}" for fname, value in success_values)
+            )
+
+        return next(iter(values))
