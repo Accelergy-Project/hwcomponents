@@ -9,14 +9,14 @@ class TernaryMAC(ComponentModel):
 
     Parameters
     ----------
-    accum_datawidth : int
+    accum_n_bits : int
         The width of the accumulator in bits.
     tech_node : int
         The technology node in meters.
 
     Attributes
     ----------
-    accum_datawidth : int
+    accum_n_bits : int
         The width of the accumulator in bits.
     tech_node : int
         The technology node in meters.
@@ -32,12 +32,12 @@ class TernaryMAC(ComponentModel):
     and 1.
     """
 
-    def __init__(self, accum_datawidth: int, tech_node: int):
+    def __init__(self, accum_n_bits: int, tech_node: int):
         # Provide an area and leakage power for the component. All units are in
         # standard units without any prefixes (Joules, Watts, meters, etc.).
         super().__init__(
-            area=5e-12 * accum_datawidth,
-            leak_power=1e-3 * accum_datawidth
+            area=5e-12 * accum_n_bits,
+            leak_power=1e-3 * accum_n_bits
         )
 
         # The following scales the tech_node to the given tech_node node from 40nm.
@@ -53,14 +53,13 @@ class TernaryMAC(ComponentModel):
             noscale,
             tech_node_leak,
         )
-        self.accum_datawidth = accum_datawidth
+        self.accum_n_bits = accum_n_bits
 
         # Raising an error says that this model can't estimate and other models instead
         # should be used instead. Good error messages are essential for users debugging
         # their designs.
-        assert 4 <= accum_datawidth <= 8, \
-            f'Accumulation datawidth {accum_datawidth} outside supported ' \
-            f'range [4, 8]!'
+        assert 4 <= accum_n_bits <= 8, \
+            f'Accumulation number of bits {accum_n_bits} outside supported range [4, 8]'
 
     # The action decorator makes this function visible as an action. The
     # function should return a tuple of (energy, latency).
@@ -84,4 +83,4 @@ class TernaryMAC(ComponentModel):
         if clock_gated:
             return 0.0, 1e-9
         # .002pJ, 1ns
-        return 0.002e-12 * (self.accum_datawidth + 0.25), 1e-9
+        return 0.002e-12 * (self.accum_n_bits + 0.25), 1e-9
