@@ -18,6 +18,19 @@ def linear(target: float, scalefrom: float) -> float:
     return target / scalefrom
 
 
+def reciprocal(target: float, scalefrom: float) -> float:
+    """
+    Reciprocal scaling function. Returns 1 / (target / scalefrom).
+
+    Args:
+        target: The target value.
+        scalefrom: The value to scale from.
+    Returns:
+        The scaled value.
+    """
+    return 1 / (target / scalefrom)
+
+
 def pow_base(power: float) -> Callable[[float, float], float]:
     """
     Power scaling function. Returns a lambda that computes (target - scalefrom) **
