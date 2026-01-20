@@ -149,7 +149,9 @@ def get_models(
         i += 1
         if isinstance(path_or_package, (list, tuple)):
             to_check.extend(path_or_package)
-        elif issubclass(path_or_package, ComponentModel):
+        elif isinstance(path_or_package, type) and issubclass(
+            path_or_package, ComponentModel
+        ):
             models.append(path_or_package)
         elif isinstance(path_or_package, (str, Path)):
             globbed = glob.glob(path_or_package, recursive=True)
@@ -209,7 +211,8 @@ def get_models(
         paths_globbed.extend(newpaths)
         if not newpaths:
             raise ValueError(
-                f"Path {p} does not have any Python files. Please check the path and try again."
+                f"Path {p} does not have any Python files. Please check the path and "
+                f"try again."
             )
 
         newpaths = [p.rstrip("/") for p in newpaths]
@@ -228,7 +231,7 @@ def get_models(
             sys.path.append(os.path.dirname(os.path.abspath(path)))
             python_module = SourceFileLoader(f"model{n_models}", path).load_module()
             new_models += get_models_in_module(
-                python_module, model_ids, name_must_include, _return_wrappers
+                python_module, model_ids, _return_wrappers
             )
             sys.path = prev_sys_path
             n_models += 1
