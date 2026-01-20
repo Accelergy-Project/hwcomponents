@@ -140,7 +140,7 @@ class ComponentModel(ListLoggable, ABC):
         latency_scale: float
             A scale factor for the latency. All calls to @action will be scaled by this
             factor.
-        leak_scale: float
+        leak_power_scale: float
             A scale factor for the leakage power. All calls to leak_power will be scaled
             by this factor.
         subcomponents: list[ComponentModel] | None
@@ -149,9 +149,9 @@ class ComponentModel(ListLoggable, ABC):
             calls to @action functions will be added to the energy and latency of the
             component if they occur during one of the component's actions. The area,
             energy, latency, and leak power of subcomponents WILL NOT BE scaled by the
-            component's energy_scale, area_scale, or leak_scale; if you want to scale
-            the subcomponents, multiply their energy_scale, area_scale, latency_scale,
-            or leak_scale by the desired scale factor.
+            component's energy_scale, area_scale, or leak_power_scale; if you want to
+            scale the subcomponents, multiply their energy_scale, area_scale,
+            latency_scale, or leak_power_scale by the desired scale factor.
 
     Attributes
     ----------
@@ -165,16 +165,16 @@ class ComponentModel(ListLoggable, ABC):
             will be scaled by this factor.
         latency_scale: A scale factor for the latency. All calls to @action
             will be scaled by this factor.
-        leak_scale: A scale factor for the leakage power. All calls to leak_power
+        leak_power_scale: A scale factor for the leakage power. All calls to leak_power
             will be scaled by this factor.
         subcomponents: A list of subcomponents. If set, the area and leak power of the
             subcomponents will be added to the area and leak power of the component. All
             calls to @action functions will be added to the energy and latency of the
             component if they occur during one of the component's actions. The area,
             energy, latency, and leak power of subcomponents WILL NOT BE scaled by the
-            component's energy_scale, area_scale, or leak_scale; if you want to scale
-            the subcomponents, multiply their energy_scale, area_scale, latency_scale,
-            or leak_scale by the desired scale factor.
+            component's energy_scale, area_scale, or leak_power_scale; if you want to
+            scale the subcomponents, multiply their energy_scale, area_scale,
+            latency_scale, or leak_power_scale by the desired scale factor.
     """
 
     component_name: Union[str, List[str], None] = None
@@ -207,7 +207,7 @@ class ComponentModel(ListLoggable, ABC):
         self.area_scale: float = 1
         self.energy_scale: float = 1
         self.latency_scale: float = 1
-        self.leak_scale: float = 1
+        self.leak_power_scale: float = 1
         self._leak_power: float = leak_power if leak_power is not None else 0
         self._area: float = area if area is not None else 0
         self.subcomponents: list["ComponentModel"] = (
@@ -226,7 +226,7 @@ class ComponentModel(ListLoggable, ABC):
         -------
             The leakage power in Watts.
         """
-        return self._leak_power * self.leak_scale + sum(
+        return self._leak_power * self.leak_power_scale + sum(
             s.leak_power for s in self.subcomponents
         )
 
@@ -255,7 +255,7 @@ class ComponentModel(ListLoggable, ABC):
         area_scale_function: Callable[[float, float], float] | None = None,
         energy_scale_function: Callable[[float, float], float] | None = None,
         latency_scale_function: Callable[[float, float], float] | None = None,
-        leak_scale_function: Callable[[float, float], float] | None = None,
+        leak_power_scale_function: Callable[[float, float], float] | None = None,
     ) -> float:
         """
         Scales this model's area, energy, latency, and leak power to the given target.
@@ -279,7 +279,7 @@ class ComponentModel(ListLoggable, ABC):
             latency_scale_function: Callable[[float, float], float]
                 The function to use to scale the latency. None if no scaling should be
                 done.
-            leak_scale_function: Callable[[float, float], float]
+            leak_power_scale_function: Callable[[float, float], float]
                 The function to use to scale the leak power. None if no scaling should
                 be done.
         """
@@ -291,7 +291,7 @@ class ComponentModel(ListLoggable, ABC):
             ("area_scale", area_scale_function),
             ("energy_scale", energy_scale_function),
             ("latency_scale", latency_scale_function),
-            ("leak_scale", leak_scale_function),
+            ("leak_power_scale", leak_power_scale_function),
         ]:
             try:
                 if callfunc is None:
