@@ -3,7 +3,7 @@ import inspect
 from numbers import Number
 from functools import wraps
 from typing import Any, Callable, List, Type, Union, TypeVar
-from hwcomponents._logging import ListLoggable, pop_all_messages
+from hwcomponents._logging import ListLoggable, messages_from_logger, pop_all_messages
 from hwcomponents._util import parse_float
 
 T = TypeVar("T", bound="ComponentModel")
@@ -578,3 +578,25 @@ class ComponentModel(ListLoggable, ABC):
             )
 
         return next(iter(values))
+
+    def get_log_messages(self) -> List[str]:
+        """
+        Returns the log messages for the component.
+
+        Returns
+        -------
+            List[str]
+                The log messages for the component.
+        """
+        return messages_from_logger(self.logger)
+
+    def pop_log_messages(self) -> List[str]:
+        """
+        Pops the log messages for the component.
+
+        Returns
+        -------
+            List[str]
+                The log messages for the component.
+        """
+        return pop_all_messages(self.logger)
