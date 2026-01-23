@@ -323,10 +323,24 @@ class ComponentModelWrapper(ListLoggable):
         self.logger.info(
             f"Initializing {self.model_cls.__name__} from {self.model_cls.__module__}"
         )
-        subclass = self.init_function.call(
-            query.component_attributes, self.component_name
-        )
-        subclass._init_logger()
+        try:
+            self.model_cls._hwcomponents_logger = self.logger
+            subclass = self.init_function.call(
+                query.component_attributes, self.component_name
+            )
+        except Exception:
+            raise
+        finally:
+            self.model_cls._hwcomponents_logger = None
+
+        for message in pop_all_messages(subclass.logger):
+            self.logger.info(f"{message}")
+
+        for subcomponent in subclass.subcomponents:
+            self.logger.info(f"Log for subcomponent {subcomponent.__class__.__name__}:")
+            for message in pop_all_messages(subcomponent.logger):
+                if message:
+                    self.logger.info(f"\t{message}")
         return subclass
 
     def get_matching_actions(self, query: ModelQuery) -> List[CallableFunction]:

@@ -3,7 +3,7 @@ import inspect
 from numbers import Number
 from functools import wraps
 from typing import Any, Callable, List, Type, Union, TypeVar
-from hwcomponents._logging import ListLoggable
+from hwcomponents._logging import ListLoggable, pop_all_messages
 from hwcomponents._util import parse_float
 
 T = TypeVar("T", bound="ComponentModel")
@@ -52,10 +52,15 @@ def action(
 
     @wraps(func)
     def wrapper(self: "ComponentModel", *args, **kwargs):
+        self.logger.info("")
+        self.logger.info(
+            f"Calling action {self.__class__.__name__}.{func.__name__} with arguments {args} and {kwargs}"
+        )
         for subcomponent in self.subcomponents:
             subcomponent._energy_used = 0
             subcomponent._latency_used = 0
         scale = 1
+        scalestr = None
         if bits_per_action is not None and "bits_per_action" in kwargs:
             nominal_bits = None
             try:
@@ -69,6 +74,7 @@ def action(
                     f"are defined in the class."
                 )
             scale = kwargs["bits_per_action"] / nominal_bits
+            scalestr = f"Scaling by {kwargs['bits_per_action']=} / {nominal_bits=}"
         kwargs = {k: v for k, v in kwargs.items() if k not in additional_kwargs}
         returned_value = func(self, *args, **kwargs)
         # Normalize return to (energy, latency)
@@ -89,20 +95,47 @@ def action(
                 f"Expected a tuple of (energy, latency), got {returned_value}."
             )
 
+        self.logger.info(
+            f"Function {func.__name__} returned energy {energy_val} and latency {latency_val}"
+        )
+        if scalestr is not None:
+            self.logger.info(scalestr)
+
         energy_val *= self.energy_scale
+        if self.energy_scale != 1:
+            self.logger.info(f"Scaling energy by {self.energy_scale=}")
         for subcomponent in self.subcomponents:
+            self.logger.info(
+                f"Adding subcomponent {subcomponent.__class__.__name__} energy {subcomponent._energy_used}"
+            )
             energy_val += subcomponent._energy_used
             subcomponent._energy_used = 0
         energy_val *= scale
         self._energy_used += energy_val
 
         latency_val *= self.latency_scale
+        if self.latency_scale != 1:
+            self.logger.info(f"Scaling latency by {self.latency_scale=}")
         target_func = max if pipelined_subcomponents else sum
+        x = "Max" if pipelined_subcomponents else "Summ"
         for subcomponent in self.subcomponents:
+            self.logger.info(
+                f"{x}ing subcomponent {subcomponent.__class__.__name__} latency {subcomponent._latency_used}"
+            )
             latency_val = target_func((latency_val, subcomponent._latency_used))
             subcomponent._latency_used = 0
         latency_val *= scale
         self._latency_used += latency_val
+
+        for subcomponent in self.subcomponents:
+            self.logger.info(f"Log for subcomponent {subcomponent.__class__.__name__}:")
+            for message in pop_all_messages(subcomponent.logger):
+                if message:
+                    self.logger.info(f"\t{message}")
+
+        self.logger.info(
+            f"** Final return value for {self.__class__.__name__}.{func.__name__}: energy {energy_val} and latency {latency_val}"
+        )
 
         return energy_val, latency_val
 

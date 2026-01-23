@@ -74,6 +74,8 @@ class ListLoggable:
 
     @property
     def logger(self) -> logging.Logger:
+        if getattr(self.__class__, "_hwcomponents_logger", None) is not None:
+            return self.__class__._hwcomponents_logger
         if getattr(self, "_logger", None) is None:
             if hasattr(self, "__name__"):
                 self._logger = get_logger(self.__name__)

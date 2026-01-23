@@ -42,6 +42,8 @@ def _call_model(
         # Add the full traceback
         import traceback
 
+        estimation.add_messages(pop_all_messages(model.logger))
+
         estimation.add_messages(traceback.format_exc().split("\n"))
         return estimation
 
