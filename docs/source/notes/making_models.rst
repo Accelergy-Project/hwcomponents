@@ -83,9 +83,10 @@ One new functionality is used here. The ``subcomponents`` argument to the
 subcomponents.
 
 The area, energy, latency, and leak power of subcomponents will NOT be scaled by the
-component's ``area_scale``, ``energy_scale``, ``latency_scale``, and ``leak_scale``; if
-you want to scale the subcomponents, multiply the subcomponents' ``area_scale``,
-``energy_scale``, ``latency_scale``, and ``leak_scale`` by the desired scale factor.
+component's ``area_scale``, ``energy_scale``, ``latency_scale``, and
+``leak_power_scale``; if you want to scale the subcomponents, multiply the
+subcomponents' ``area_scale``, ``energy_scale``, ``latency_scale``, and
+``leak_power_scale`` by the desired scale factor.
 
 .. include-notebook:: ../../notebooks/2_making_models.ipynb
    :name: smartbuffer_sram
