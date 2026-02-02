@@ -1,0 +1,1359 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hwcomponents package &mdash; HWComponents 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="hwcomponents.scaling package" href="hwcomponents.scaling.html" />
+    <link rel="prev" title="hwcomponents" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            HWComponents
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">hwcomponents</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">hwcomponents package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="hwcomponents.scaling.html">hwcomponents.scaling package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-hwcomponents.find_models">hwcomponents.find_models module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.find_models.get_models"><code class="docutils literal notranslate"><span class="pre">get_models()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.find_models.get_models_in_module"><code class="docutils literal notranslate"><span class="pre">get_models_in_module()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.find_models.installed_models"><code class="docutils literal notranslate"><span class="pre">installed_models()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-hwcomponents.hwcomponents">hwcomponents.hwcomponents module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.hwcomponents.list_components"><code class="docutils literal notranslate"><span class="pre">list_components()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-hwcomponents.model">hwcomponents.model module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.model.ComponentModel"><code class="docutils literal notranslate"><span class="pre">ComponentModel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.model.EnergyLatency"><code class="docutils literal notranslate"><span class="pre">EnergyLatency</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.model.action"><code class="docutils literal notranslate"><span class="pre">action()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-hwcomponents.select_models">hwcomponents.select_models module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.select_models.get_area"><code class="docutils literal notranslate"><span class="pre">get_area()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.select_models.get_energy"><code class="docutils literal notranslate"><span class="pre">get_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.select_models.get_latency"><code class="docutils literal notranslate"><span class="pre">get_latency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.select_models.get_leak_power"><code class="docutils literal notranslate"><span class="pre">get_leak_power()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.select_models.get_model"><code class="docutils literal notranslate"><span class="pre">get_model()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-hwcomponents">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.ComponentModel"><code class="docutils literal notranslate"><span class="pre">ComponentModel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.EnergyLatency"><code class="docutils literal notranslate"><span class="pre">EnergyLatency</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.action"><code class="docutils literal notranslate"><span class="pre">action()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.get_area"><code class="docutils literal notranslate"><span class="pre">get_area()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.get_energy"><code class="docutils literal notranslate"><span class="pre">get_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.get_latency"><code class="docutils literal notranslate"><span class="pre">get_latency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.get_leak_power"><code class="docutils literal notranslate"><span class="pre">get_leak_power()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.get_model"><code class="docutils literal notranslate"><span class="pre">get_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hwcomponents.get_models"><code class="docutils literal notranslate"><span class="pre">get_models()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notes/finding_and_using_models.html">Finding and Using Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notes/making_models.html">Making Models</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HWComponents</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">hwcomponents</a></li>
+      <li class="breadcrumb-item active">hwcomponents package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/hwcomponents.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hwcomponents-package">
+<h1>hwcomponents package<a class="headerlink" href="#hwcomponents-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="hwcomponents.scaling.html">hwcomponents.scaling package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hwcomponents.scaling.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hwcomponents.scaling.html#module-hwcomponents.scaling.scalefuncs">hwcomponents.scaling.scalefuncs module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.cacti_depth_area"><code class="docutils literal notranslate"><span class="pre">cacti_depth_area()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.cacti_depth_energy"><code class="docutils literal notranslate"><span class="pre">cacti_depth_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.cacti_depth_leak"><code class="docutils literal notranslate"><span class="pre">cacti_depth_leak()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.linear"><code class="docutils literal notranslate"><span class="pre">linear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.nlog2n"><code class="docutils literal notranslate"><span class="pre">nlog2n()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.nlog_base"><code class="docutils literal notranslate"><span class="pre">nlog_base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.noscale"><code class="docutils literal notranslate"><span class="pre">noscale()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.pow_base"><code class="docutils literal notranslate"><span class="pre">pow_base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.quadratic"><code class="docutils literal notranslate"><span class="pre">quadratic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.reciprocal"><code class="docutils literal notranslate"><span class="pre">reciprocal()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hwcomponents.scaling.html#module-hwcomponents.scaling.techscaling">hwcomponents.scaling.techscaling module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.techscaling.tech_node_area"><code class="docutils literal notranslate"><span class="pre">tech_node_area()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.techscaling.tech_node_energy"><code class="docutils literal notranslate"><span class="pre">tech_node_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.techscaling.tech_node_latency"><code class="docutils literal notranslate"><span class="pre">tech_node_latency()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.techscaling.tech_node_leak"><code class="docutils literal notranslate"><span class="pre">tech_node_leak()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hwcomponents.scaling.html#module-hwcomponents.scaling">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.cacti_depth_area"><code class="docutils literal notranslate"><span class="pre">cacti_depth_area()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.cacti_depth_energy"><code class="docutils literal notranslate"><span class="pre">cacti_depth_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.cacti_depth_leak"><code class="docutils literal notranslate"><span class="pre">cacti_depth_leak()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.linear"><code class="docutils literal notranslate"><span class="pre">linear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.nlog2n"><code class="docutils literal notranslate"><span class="pre">nlog2n()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.nlog_base"><code class="docutils literal notranslate"><span class="pre">nlog_base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.noscale"><code class="docutils literal notranslate"><span class="pre">noscale()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.pow_base"><code class="docutils literal notranslate"><span class="pre">pow_base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.quadratic"><code class="docutils literal notranslate"><span class="pre">quadratic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.reciprocal"><code class="docutils literal notranslate"><span class="pre">reciprocal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.tech_node_area"><code class="docutils literal notranslate"><span class="pre">tech_node_area()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.tech_node_energy"><code class="docutils literal notranslate"><span class="pre">tech_node_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.tech_node_latency"><code class="docutils literal notranslate"><span class="pre">tech_node_latency()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="hwcomponents.scaling.html#hwcomponents.scaling.tech_node_leak"><code class="docutils literal notranslate"><span class="pre">tech_node_leak()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-hwcomponents.find_models">
+<span id="hwcomponents-find-models-module"></span><h2>hwcomponents.find_models module<a class="headerlink" href="#module-hwcomponents.find_models" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.find_models.get_models">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.find_models.</span></span><span class="sig-name descname"><span class="pre">get_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">paths_or_packages_or_models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_installed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_must_include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_wrappers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/find_models.html#get_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.find_models.get_models" title="Link to this definition"></a></dt>
+<dd><p>Instantiate a list of model objects for later queries. Searches for models in the
+given paths and packages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>paths_or_packages_or_models</strong> (<em>list</em>) – A list of paths or packages to search for models.</p></li>
+<li><p><strong>include_installed</strong> (<em>bool</em>) – Whether to include models from installed packages.</p></li>
+<li><p><strong>name_must_include</strong> (<em>str</em>) – If provided, a model will only be returned if its name includes this string.
+Non-case-sensitive.</p></li>
+<li><p><strong>_return_wrappers</strong> (<em>bool</em>) – Whether to return ComponentModelWrapper objects or
+ComponentModel objects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentModelWrapper</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#hwcomponents.model.ComponentModel" title="hwcomponents.model.ComponentModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentModel</span></code></a>]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of ComponentModelWrapper objects or ComponentModel objects.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.find_models.get_models_in_module">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.find_models.</span></span><span class="sig-name descname"><span class="pre">get_models_in_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_wrappers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/find_models.html#get_models_in_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.find_models.get_models_in_module" title="Link to this definition"></a></dt>
+<dd><p>Finds all ComponentModel subclasses in a module and returns them as
+ComponentModelWrapper objects. Ignores underscore-prefixed classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_ids</strong> (<em>set</em>) – A set of model IDs to avoid duplicates.</p></li>
+<li><p><strong>_return_wrappers</strong> (<em>bool</em>) – Whether to return ComponentModelWrapper objects or ComponentModel objects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentModelWrapper</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#hwcomponents.model.ComponentModel" title="hwcomponents.model.ComponentModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentModel</span></code></a>]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of ComponentModelWrapper objects.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.find_models.installed_models">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.find_models.</span></span><span class="sig-name descname"><span class="pre">installed_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_return_wrappers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/find_models.html#installed_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.find_models.installed_models" title="Link to this definition"></a></dt>
+<dd><p>Lists all Python packages installed that are prefixed with “<a href="#id1"><span class="problematic" id="id2">hwcomponents_</span></a>”. Finds
+ComponentModel subclasses in these packages and returns them as
+ComponentModel or ComponentModelWrapper objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>_return_wrappers</strong> (<em>bool</em>) – Whether to return ComponentModelWrapper objects or
+ComponentModel objects.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentModelWrapper</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#hwcomponents.model.ComponentModel" title="hwcomponents.model.ComponentModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentModel</span></code></a>]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of ComponentModel or ComponentModelWrapper objects.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-hwcomponents.hwcomponents">
+<span id="hwcomponents-hwcomponents-module"></span><h2>hwcomponents.hwcomponents module<a class="headerlink" href="#module-hwcomponents.hwcomponents" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.hwcomponents.list_components">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.hwcomponents.</span></span><span class="sig-name descname"><span class="pre">list_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">printfunc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">print</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/hwcomponents.html#list_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.hwcomponents.list_components" title="Link to this definition"></a></dt>
+<dd><p>Lists all available components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>printfunc</strong> (<em>Callable</em><em>[</em><em>[</em><em>str</em><em>]</em><em>, </em><em>None</em><em>]</em>) – The function to use to print the components.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-hwcomponents.model">
+<span id="hwcomponents-model-module"></span><h2>hwcomponents.model module<a class="headerlink" href="#module-hwcomponents.model" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">hwcomponents.model.</span></span><span class="sig-name descname"><span class="pre">ComponentModel</span></span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ListLoggable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>ComponentModel base class. ComponentModel class must have “name” attribute,
+“priority” attribute, and “get_area” method. ComponentModels may have any number of
+methods that are decorated with &#64;action.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>str</em><em> | </em><em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>) – The name of the component. Must be a string or list/tuple of strings. Can be
+omitted if the component name is the same as the class name.</p></li>
+<li><p><strong>priority</strong> (<em>float</em>) – The priority of the model. Higher priority models are used first. Must be a
+number between 0 and 1.</p></li>
+<li><p><strong>leak_power</strong> (<em>float</em><em> | </em><em>None</em>) – The leakage power of the component in Watts. Must be set if subcomponents is
+not set.</p></li>
+<li><p><strong>area</strong> (<em>float</em><em> | </em><em>None</em>) – The area of the component in m^2. Must be set if subcomponents is not set.</p></li>
+<li><p><strong>energy_scale</strong> (<em>float</em>) – A scale factor for the energy. All calls to &#64;action will be scaled by this
+factor.</p></li>
+<li><p><strong>area_scale</strong> (<em>float</em>) – A scale factor for the area. All calls to area will be scaled by this
+factor.</p></li>
+<li><p><strong>latency_scale</strong> (<em>float</em>) – A scale factor for the latency. All calls to &#64;action will be scaled by this
+factor.</p></li>
+<li><p><strong>leak_power_scale</strong> (<em>float</em>) – A scale factor for the leakage power. All calls to leak_power will be scaled
+by this factor.</p></li>
+<li><p><strong>subcomponents</strong> (<em>list</em><em>[</em><a class="reference internal" href="#hwcomponents.model.ComponentModel" title="hwcomponents.model.ComponentModel"><em>ComponentModel</em></a><em>] </em><em>| </em><em>None</em>) – A list of subcomponents. If set, the area and leak power of the
+subcomponents will be added to the area and leak power of the component. All
+calls to &#64;action functions will be added to the energy and latency of the
+component if they occur during one of the component’s actions. The area,
+energy, latency, and leak power of subcomponents WILL NOT BE scaled by the
+component’s energy_scale, area_scale, or leak_power_scale; if you want to
+scale the subcomponents, multiply their energy_scale, area_scale,
+latency_scale, or leak_power_scale by the desired scale factor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component. Must be a string</em><em> or </em><em>list/tuple of</em>) – strings. Can be omitted if the component name is the same as the class name.</p></li>
+<li><p><strong>priority</strong> (<em>The priority</em><em> of </em><em>the model. Higher priority models are used first.</em>) – Must be a number between 0 and 1.</p></li>
+<li><p><strong>energy_scale</strong> (<em>A scale factor for the energy. All calls to action</em>) – will be scaled by this factor.</p></li>
+<li><p><strong>area_scale</strong> (<em>A scale factor for the area. All calls to area</em>) – will be scaled by this factor.</p></li>
+<li><p><strong>latency_scale</strong> (<em>A scale factor for the latency. All calls to &#64;action</em>) – will be scaled by this factor.</p></li>
+<li><p><strong>leak_power_scale</strong> (<em>A scale factor for the leakage power. All calls to leak_power</em>) – will be scaled by this factor.</p></li>
+<li><p><strong>subcomponents</strong> (<em>A list</em><em> of </em><em>subcomponents. If set</em><em>, </em><em>the area and leak power</em><em> of </em><em>the</em>) – subcomponents will be added to the area and leak power of the component. All
+calls to &#64;action functions will be added to the energy and latency of the
+component if they occur during one of the component’s actions. The area,
+energy, latency, and leak power of subcomponents WILL NOT BE scaled by the
+component’s energy_scale, area_scale, or leak_power_scale; if you want to
+scale the subcomponents, multiply their energy_scale, area_scale,
+latency_scale, or leak_power_scale by the desired scale factor.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.__init__">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leak_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomponents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.area">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">area</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Number</span></span><a class="headerlink" href="#hwcomponents.model.ComponentModel.area" title="Link to this definition"></a></dt>
+<dd><p>Returns the area in m^2 of the component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The area in m^2 of the component.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.assert_int">
+<span class="sig-name descname"><span class="pre">assert_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.assert_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.assert_int" title="Link to this definition"></a></dt>
+<dd><p>Checks that the value is an integer, and if so, returns it as an integer.
+Otherwise, raises a ValueError.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the attribute to check. Used for error messages.</p></li>
+<li><p><strong>value</strong> (<em>int</em><em> | </em><em>float</em><em> | </em><em>Any</em>) – The value to check.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>int</dt><dd><p>The value as an integer.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.assert_match">
+<span class="sig-name descname"><span class="pre">assert_match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.assert_match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.assert_match" title="Link to this definition"></a></dt>
+<dd><p>Checks that the two values are equal, and if so, returns the matched value. If
+one value is None, returns the other value. Raise an error if the two values are
+not equal, or if both are None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value_a</strong> (<em>int</em><em> | </em><em>float</em><em> | </em><em>Any</em>) – The first value to check.</p></li>
+<li><p><strong>value_b</strong> (<em>int</em><em> | </em><em>float</em><em> | </em><em>Any</em>) – The second value to check.</p></li>
+<li><p><strong>name_a</strong> (<em>str</em>) – The name of the first value. Used for error messages.</p></li>
+<li><p><strong>name_b</strong> (<em>str</em>) – The name of the second value. Used for error messages.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>int</dt><dd><p>The matched value.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.component_name">
+<span class="sig-name descname"><span class="pre">component_name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#hwcomponents.model.ComponentModel.component_name" title="Link to this definition"></a></dt>
+<dd><p>Name of the component. Must be a string or list/tuple of strings. Can be omitted if
+the component name is the same as the class name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.get_action_names">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_action_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.get_action_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.get_action_names" title="Link to this definition"></a></dt>
+<dd><p>Returns the names of the actions supported by the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The names of the actions supported by the model.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.get_log_messages">
+<span class="sig-name descname"><span class="pre">get_log_messages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.get_log_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.get_log_messages" title="Link to this definition"></a></dt>
+<dd><p>Returns the log messages for the component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>List[str]</dt><dd><p>The log messages for the component.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.leak_power">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">leak_power</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Number</span></span><a class="headerlink" href="#hwcomponents.model.ComponentModel.leak_power" title="Link to this definition"></a></dt>
+<dd><p>Returns the leakage power of the component in Watts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The leakage power in Watts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.pop_log_messages">
+<span class="sig-name descname"><span class="pre">pop_log_messages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.pop_log_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.pop_log_messages" title="Link to this definition"></a></dt>
+<dd><p>Pops the log messages for the component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>List[str]</dt><dd><p>The log messages for the component.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.priority">
+<span class="sig-name descname"><span class="pre">priority</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Number</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#hwcomponents.model.ComponentModel.priority" title="Link to this definition"></a></dt>
+<dd><p>Priority determines which model is used when multiple models are available for a
+given component. Higher priority models are used first. Must be a number between 0
+and 1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.required_arguments">
+<span class="sig-name descname"><span class="pre">required_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.required_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.required_arguments" title="Link to this definition"></a></dt>
+<dd><p>Returns the required arguments for the given action. If no action is given,
+returns the required arguments for the __init__ method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>action_name</strong> (<em>str</em><em> | </em><em>None</em>) – The name of the action to get the required arguments for.
+If None, returns the required arguments for the __init__ method.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>list[str]</dt><dd><p>The required arguments for the given action.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.resolve_multiple_ways_to_calculate_value">
+<span class="sig-name descname"><span class="pre">resolve_multiple_ways_to_calculate_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.resolve_multiple_ways_to_calculate_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.resolve_multiple_ways_to_calculate_value" title="Link to this definition"></a></dt>
+<dd><p>Parses multiple possible ways to set an attribute, raising errors if the values
+are not consistent.</p>
+<p>Each possible argument is a tuple containing a function and a dictionary of
+keyword arguments. A function fails if any keyword arguments are None, if the
+function raises an error, or if the function returns None.</p>
+<p>The outputs of all non-failing functions are compared, and an error is raised if
+they are not equal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the attribute to set.</p></li>
+<li><p><strong>*args</strong> (<em>tuple</em><em>[</em><em>str</em><em>, </em><em>Callable</em><em>[</em><em>[</em><em>Any</em><em>]</em><em>, </em><em>Any</em><em>]</em><em>, </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>) – The possible ways to set the attribute. Each tuple contains a name, a
+function that takes the current value and returns the new value, and a
+dictionary of keyword arguments to pass to the function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The value of the attribute.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area_scale_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_scale_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency_scale_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_power_scale_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.scale" title="Link to this definition"></a></dt>
+<dd><p>Scales this model’s area, energy, latency, and leak power to the given target.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – The name of the parameter to scale. Used for logging.</p></li>
+<li><p><strong>target</strong> (<em>float</em>) – The target value of the parameter. The value is scaled to this from the
+default.</p></li>
+<li><p><strong>default</strong> (<em>float</em>) – The default value of the parameter. The value is scaled to the target
+from this.</p></li>
+<li><p><strong>area_scale_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – The function to use to scale the area. None if no scaling should be
+done.</p></li>
+<li><p><strong>energy_scale_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – The function to use to scale the energy. None if no scaling should be
+done.</p></li>
+<li><p><strong>latency_scale_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – The function to use to scale the latency. None if no scaling should be
+done.</p></li>
+<li><p><strong>leak_power_scale_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – The function to use to scale the leak power. None if no scaling should
+be done.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.try_call_arbitrary_action">
+<span class="sig-name descname"><span class="pre">try_call_arbitrary_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.try_call_arbitrary_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.try_call_arbitrary_action" title="Link to this definition"></a></dt>
+<dd><p>Tries to call the given action with the given arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>action_name</strong> (<em>str</em>) – The name of the action to call.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – The arguments with which to call the action.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">T</span></code>, bound= ComponentModel)</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.model.ComponentModel.try_init_arbitrary_args">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">try_init_arbitrary_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.try_init_arbitrary_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.ComponentModel.try_init_arbitrary_args" title="Link to this definition"></a></dt>
+<dd><p>Tries to initialize the model with the given arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – The arguments with which to initialize the model.</p></li>
+<li><p><strong>_return_estimation_object</strong> (<em>bool</em>) – Whether to return the Estimation object instead of the model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">T</span></code>, bound= ComponentModel)</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The initialized model. If the model cannot be initialized with the given
+arguments, an exception is raised.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hwcomponents.model.EnergyLatency">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">hwcomponents.model.</span></span><span class="sig-name descname"><span class="pre">EnergyLatency</span></span><a class="reference internal" href="_modules/hwcomponents/model.html#EnergyLatency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.EnergyLatency" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+<p>EnergyLatency(energy, latency)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.model.EnergyLatency.energy">
+<span class="sig-name descname"><span class="pre">energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#hwcomponents.model.EnergyLatency.energy" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.model.EnergyLatency.latency">
+<span class="sig-name descname"><span class="pre">latency</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#hwcomponents.model.EnergyLatency.latency" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.model.action">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.model.</span></span><span class="sig-name descname"><span class="pre">action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits_per_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipelined_subcomponents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.model.action" title="Link to this definition"></a></dt>
+<dd><p>Decorator that adds an action to an energy/area model. If the component has no
+subcomponents, then the action is expected to return a tuple of (energy, latency)
+where energy is in Joules and latency is in seconds. If the component has
+subcomponents, then None return values are assumed to be (0, 0), and subcomponent
+actions that occur during the component’s action will be added to the component’s
+energy and latency. The energy and latency of the subcomponents will NOT be scaled
+by the component’s energy_scale and latency_scale; to scale these, set the
+subcomponents’ scaling factors directly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>Callable</em><em> | </em><em>None</em>) – The function to decorate.</p></li>
+<li><p><strong>bits_per_action</strong> (<em>str</em>) – The attribute of the model that contains the number of bits per action. If
+this is set and a bits_per_action is passed to the function, the energy and
+latency will be scaled by the number of bits. For example, if
+bits_per_action is set to “width”, the function is called with
+bits_per_action=10, and the model has a width attribute of 5, then the
+energy and latency will be scaled by 2.</p></li>
+<li><p><strong>pipelined_subcomponents</strong> (<em>bool</em>) – Whether the subcomponents are pipelined. If True, then the latency of is the
+max of the latency returned and all subcomponent latencies. Otherwise, it is
+the sum. Does nothing if there are no subcomponents.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>, <a class="reference internal" href="#hwcomponents.model.EnergyLatency" title="hwcomponents.model.EnergyLatency"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyLatency</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The decorated function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-hwcomponents.select_models">
+<span id="hwcomponents-select-models-module"></span><h2>hwcomponents.select_models module<a class="headerlink" href="#module-hwcomponents.select_models" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.select_models.get_area">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.select_models.</span></span><span class="sig-name descname"><span class="pre">get_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_relaxed_component_name_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/select_models.html#get_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.select_models.get_area" title="Link to this definition"></a></dt>
+<dd><p>Finds the area using the best-matching model. “Best” is defined as the
+highest-priority model that has all required attributes specified in
+component_attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>component_attributes</strong> (<em>The attributes</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>models</strong> (<em>The models to use.</em>)</p></li>
+<li><p><strong>_return_estimation_object</strong> (<em>Whether to return the estimation object instead of</em>) – the area value.</p></li>
+<li><p><strong>_relaxed_component_name_selection</strong> (<em>Whether to relax the component name</em>) – selection. Relaxed selection ignores underscores in the component name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Estimation</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The area in m^2.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.select_models.get_energy">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.select_models.</span></span><span class="sig-name descname"><span class="pre">get_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_relaxed_component_name_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/select_models.html#get_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.select_models.get_energy" title="Link to this definition"></a></dt>
+<dd><p>Finds the energy using the best-matching model. “Best” is defined as the
+highest-priority model that has all required attributes specified in
+component_attributes and a matching action with all required arguments specified
+in action_arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>component_attributes</strong> (<em>The attributes</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>action_name</strong> (<em>The name</em><em> of </em><em>the action.</em>)</p></li>
+<li><p><strong>action_arguments</strong> (<em>The arguments</em><em> of </em><em>the action.</em>)</p></li>
+<li><p><strong>models</strong> (<em>The models to use.</em>)</p></li>
+<li><p><strong>_return_estimation_object</strong> (<em>Whether to return the estimation object instead of</em>) – the energy value.</p></li>
+<li><p><strong>_relaxed_component_name_selection</strong> (<em>Whether to relax the component name</em>) – selection. Relaxed selection ignores underscores in the component name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Estimation</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The energy in Joules.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.select_models.get_latency">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.select_models.</span></span><span class="sig-name descname"><span class="pre">get_latency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_relaxed_component_name_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/select_models.html#get_latency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.select_models.get_latency" title="Link to this definition"></a></dt>
+<dd><p>Finds the latency using the best-matching model. “Best” is defined as the
+highest-priority model that has all required attributes specified in
+component_attributes and a matching action with all required arguments specified
+in action_arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>component_attributes</strong> (<em>The attributes</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>action_name</strong> (<em>The name</em><em> of </em><em>the action.</em>)</p></li>
+<li><p><strong>action_arguments</strong> (<em>The arguments</em><em> of </em><em>the action.</em>)</p></li>
+<li><p><strong>models</strong> (<em>The models to use.</em>)</p></li>
+<li><p><strong>_return_estimation_object</strong> (<em>Whether to return the estimation object instead of</em>) – the latency value.</p></li>
+<li><p><strong>_relaxed_component_name_selection</strong> (<em>Whether to relax the component name</em>) – selection. Relaxed selection ignores underscores in the component name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Estimation</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The latency in seconds.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.select_models.get_leak_power">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.select_models.</span></span><span class="sig-name descname"><span class="pre">get_leak_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_relaxed_component_name_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/select_models.html#get_leak_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.select_models.get_leak_power" title="Link to this definition"></a></dt>
+<dd><p>Finds the leak power using the best-matching model. “Best” is defined as the
+highest-priority model that has all required attributes specified in
+component_attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>component_attributes</strong> (<em>The attributes</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>models</strong> (<em>The models to use.</em>)</p></li>
+<li><p><strong>_relaxed_component_name_selection</strong> (<em>Whether to relax the component name</em>) – selection. Relaxed selection ignores underscores in the component name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Estimation</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The leak power in Watts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.select_models.get_model">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.select_models.</span></span><span class="sig-name descname"><span class="pre">get_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required_actions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_relaxed_component_name_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/select_models.html#get_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.select_models.get_model" title="Link to this definition"></a></dt>
+<dd><p>Finds the best model for the given component. “Best” is defined as the
+highest-priority model that has all required attributes specified in
+component_attributes, and has actions for all of required_actions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>component_attributes</strong> (<em>The attributes</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>required_actions</strong> (<em>The actions that are required for the component.</em>)</p></li>
+<li><p><strong>models</strong> (<em>The models to use.</em>)</p></li>
+<li><p><strong>_return_estimation_object</strong> (<em>Whether to return the estimation object instead of</em>) – the model wrapper.</p></li>
+<li><p><strong>_relaxed_component_name_selection</strong> (<em>Whether to relax the component name</em>) – selection. Relaxed selection ignores underscores in the component name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentModelWrapper</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The best model wrapper.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-hwcomponents">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hwcomponents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">hwcomponents.</span></span><span class="sig-name descname"><span class="pre">ComponentModel</span></span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ListLoggable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>ComponentModel base class. ComponentModel class must have “name” attribute,
+“priority” attribute, and “get_area” method. ComponentModels may have any number of
+methods that are decorated with &#64;action.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>str</em><em> | </em><em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>) – The name of the component. Must be a string or list/tuple of strings. Can be
+omitted if the component name is the same as the class name.</p></li>
+<li><p><strong>priority</strong> (<em>float</em>) – The priority of the model. Higher priority models are used first. Must be a
+number between 0 and 1.</p></li>
+<li><p><strong>leak_power</strong> (<em>float</em><em> | </em><em>None</em>) – The leakage power of the component in Watts. Must be set if subcomponents is
+not set.</p></li>
+<li><p><strong>area</strong> (<em>float</em><em> | </em><em>None</em>) – The area of the component in m^2. Must be set if subcomponents is not set.</p></li>
+<li><p><strong>energy_scale</strong> (<em>float</em>) – A scale factor for the energy. All calls to &#64;action will be scaled by this
+factor.</p></li>
+<li><p><strong>area_scale</strong> (<em>float</em>) – A scale factor for the area. All calls to area will be scaled by this
+factor.</p></li>
+<li><p><strong>latency_scale</strong> (<em>float</em>) – A scale factor for the latency. All calls to &#64;action will be scaled by this
+factor.</p></li>
+<li><p><strong>leak_power_scale</strong> (<em>float</em>) – A scale factor for the leakage power. All calls to leak_power will be scaled
+by this factor.</p></li>
+<li><p><strong>subcomponents</strong> (<em>list</em><em>[</em><a class="reference internal" href="#hwcomponents.ComponentModel" title="hwcomponents.ComponentModel"><em>ComponentModel</em></a><em>] </em><em>| </em><em>None</em>) – A list of subcomponents. If set, the area and leak power of the
+subcomponents will be added to the area and leak power of the component. All
+calls to &#64;action functions will be added to the energy and latency of the
+component if they occur during one of the component’s actions. The area,
+energy, latency, and leak power of subcomponents WILL NOT BE scaled by the
+component’s energy_scale, area_scale, or leak_power_scale; if you want to
+scale the subcomponents, multiply their energy_scale, area_scale,
+latency_scale, or leak_power_scale by the desired scale factor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component. Must be a string</em><em> or </em><em>list/tuple of</em>) – strings. Can be omitted if the component name is the same as the class name.</p></li>
+<li><p><strong>priority</strong> (<em>The priority</em><em> of </em><em>the model. Higher priority models are used first.</em>) – Must be a number between 0 and 1.</p></li>
+<li><p><strong>energy_scale</strong> (<em>A scale factor for the energy. All calls to action</em>) – will be scaled by this factor.</p></li>
+<li><p><strong>area_scale</strong> (<em>A scale factor for the area. All calls to area</em>) – will be scaled by this factor.</p></li>
+<li><p><strong>latency_scale</strong> (<em>A scale factor for the latency. All calls to &#64;action</em>) – will be scaled by this factor.</p></li>
+<li><p><strong>leak_power_scale</strong> (<em>A scale factor for the leakage power. All calls to leak_power</em>) – will be scaled by this factor.</p></li>
+<li><p><strong>subcomponents</strong> (<em>A list</em><em> of </em><em>subcomponents. If set</em><em>, </em><em>the area and leak power</em><em> of </em><em>the</em>) – subcomponents will be added to the area and leak power of the component. All
+calls to &#64;action functions will be added to the energy and latency of the
+component if they occur during one of the component’s actions. The area,
+energy, latency, and leak power of subcomponents WILL NOT BE scaled by the
+component’s energy_scale, area_scale, or leak_power_scale; if you want to
+scale the subcomponents, multiply their energy_scale, area_scale,
+latency_scale, or leak_power_scale by the desired scale factor.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.__init__">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leak_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomponents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.area">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">area</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Number</span></span><a class="headerlink" href="#hwcomponents.ComponentModel.area" title="Link to this definition"></a></dt>
+<dd><p>Returns the area in m^2 of the component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The area in m^2 of the component.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.area_scale">
+<span class="sig-name descname"><span class="pre">area_scale</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#hwcomponents.ComponentModel.area_scale" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.assert_int">
+<span class="sig-name descname"><span class="pre">assert_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.assert_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.assert_int" title="Link to this definition"></a></dt>
+<dd><p>Checks that the value is an integer, and if so, returns it as an integer.
+Otherwise, raises a ValueError.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the attribute to check. Used for error messages.</p></li>
+<li><p><strong>value</strong> (<em>int</em><em> | </em><em>float</em><em> | </em><em>Any</em>) – The value to check.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>int</dt><dd><p>The value as an integer.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.assert_match">
+<span class="sig-name descname"><span class="pre">assert_match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.assert_match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.assert_match" title="Link to this definition"></a></dt>
+<dd><p>Checks that the two values are equal, and if so, returns the matched value. If
+one value is None, returns the other value. Raise an error if the two values are
+not equal, or if both are None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value_a</strong> (<em>int</em><em> | </em><em>float</em><em> | </em><em>Any</em>) – The first value to check.</p></li>
+<li><p><strong>value_b</strong> (<em>int</em><em> | </em><em>float</em><em> | </em><em>Any</em>) – The second value to check.</p></li>
+<li><p><strong>name_a</strong> (<em>str</em>) – The name of the first value. Used for error messages.</p></li>
+<li><p><strong>name_b</strong> (<em>str</em>) – The name of the second value. Used for error messages.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>int</dt><dd><p>The matched value.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.component_name">
+<span class="sig-name descname"><span class="pre">component_name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#hwcomponents.ComponentModel.component_name" title="Link to this definition"></a></dt>
+<dd><p>Name of the component. Must be a string or list/tuple of strings. Can be omitted if
+the component name is the same as the class name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.energy_scale">
+<span class="sig-name descname"><span class="pre">energy_scale</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#hwcomponents.ComponentModel.energy_scale" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.get_action_names">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_action_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.get_action_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.get_action_names" title="Link to this definition"></a></dt>
+<dd><p>Returns the names of the actions supported by the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The names of the actions supported by the model.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.get_log_messages">
+<span class="sig-name descname"><span class="pre">get_log_messages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.get_log_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.get_log_messages" title="Link to this definition"></a></dt>
+<dd><p>Returns the log messages for the component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>List[str]</dt><dd><p>The log messages for the component.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.latency_scale">
+<span class="sig-name descname"><span class="pre">latency_scale</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#hwcomponents.ComponentModel.latency_scale" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.leak_power">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">leak_power</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Number</span></span><a class="headerlink" href="#hwcomponents.ComponentModel.leak_power" title="Link to this definition"></a></dt>
+<dd><p>Returns the leakage power of the component in Watts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The leakage power in Watts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.leak_power_scale">
+<span class="sig-name descname"><span class="pre">leak_power_scale</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#hwcomponents.ComponentModel.leak_power_scale" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.pop_log_messages">
+<span class="sig-name descname"><span class="pre">pop_log_messages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.pop_log_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.pop_log_messages" title="Link to this definition"></a></dt>
+<dd><p>Pops the log messages for the component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>List[str]</dt><dd><p>The log messages for the component.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.priority">
+<span class="sig-name descname"><span class="pre">priority</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Number</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#hwcomponents.ComponentModel.priority" title="Link to this definition"></a></dt>
+<dd><p>Priority determines which model is used when multiple models are available for a
+given component. Higher priority models are used first. Must be a number between 0
+and 1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.required_arguments">
+<span class="sig-name descname"><span class="pre">required_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.required_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.required_arguments" title="Link to this definition"></a></dt>
+<dd><p>Returns the required arguments for the given action. If no action is given,
+returns the required arguments for the __init__ method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>action_name</strong> (<em>str</em><em> | </em><em>None</em>) – The name of the action to get the required arguments for.
+If None, returns the required arguments for the __init__ method.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>list[str]</dt><dd><p>The required arguments for the given action.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.resolve_multiple_ways_to_calculate_value">
+<span class="sig-name descname"><span class="pre">resolve_multiple_ways_to_calculate_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.resolve_multiple_ways_to_calculate_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.resolve_multiple_ways_to_calculate_value" title="Link to this definition"></a></dt>
+<dd><p>Parses multiple possible ways to set an attribute, raising errors if the values
+are not consistent.</p>
+<p>Each possible argument is a tuple containing a function and a dictionary of
+keyword arguments. A function fails if any keyword arguments are None, if the
+function raises an error, or if the function returns None.</p>
+<p>The outputs of all non-failing functions are compared, and an error is raised if
+they are not equal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the attribute to set.</p></li>
+<li><p><strong>*args</strong> (<em>tuple</em><em>[</em><em>str</em><em>, </em><em>Callable</em><em>[</em><em>[</em><em>Any</em><em>]</em><em>, </em><em>Any</em><em>]</em><em>, </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>) – The possible ways to set the attribute. Each tuple contains a name, a
+function that takes the current value and returns the new value, and a
+dictionary of keyword arguments to pass to the function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The value of the attribute.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area_scale_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_scale_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latency_scale_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_power_scale_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.scale" title="Link to this definition"></a></dt>
+<dd><p>Scales this model’s area, energy, latency, and leak power to the given target.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – The name of the parameter to scale. Used for logging.</p></li>
+<li><p><strong>target</strong> (<em>float</em>) – The target value of the parameter. The value is scaled to this from the
+default.</p></li>
+<li><p><strong>default</strong> (<em>float</em>) – The default value of the parameter. The value is scaled to the target
+from this.</p></li>
+<li><p><strong>area_scale_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – The function to use to scale the area. None if no scaling should be
+done.</p></li>
+<li><p><strong>energy_scale_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – The function to use to scale the energy. None if no scaling should be
+done.</p></li>
+<li><p><strong>latency_scale_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – The function to use to scale the latency. None if no scaling should be
+done.</p></li>
+<li><p><strong>leak_power_scale_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>, </em><em>float</em><em>]</em>) – The function to use to scale the leak power. None if no scaling should
+be done.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.subcomponents">
+<span class="sig-name descname"><span class="pre">subcomponents</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#hwcomponents.model.ComponentModel" title="hwcomponents.model.ComponentModel"><span class="pre">ComponentModel</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#hwcomponents.ComponentModel.subcomponents" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.try_call_arbitrary_action">
+<span class="sig-name descname"><span class="pre">try_call_arbitrary_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.try_call_arbitrary_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.try_call_arbitrary_action" title="Link to this definition"></a></dt>
+<dd><p>Tries to call the given action with the given arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>action_name</strong> (<em>str</em>) – The name of the action to call.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – The arguments with which to call the action.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">T</span></code>, bound= ComponentModel)</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hwcomponents.ComponentModel.try_init_arbitrary_args">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">try_init_arbitrary_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#ComponentModel.try_init_arbitrary_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.ComponentModel.try_init_arbitrary_args" title="Link to this definition"></a></dt>
+<dd><p>Tries to initialize the model with the given arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – The arguments with which to initialize the model.</p></li>
+<li><p><strong>_return_estimation_object</strong> (<em>bool</em>) – Whether to return the Estimation object instead of the model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">T</span></code>, bound= ComponentModel)</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The initialized model. If the model cannot be initialized with the given
+arguments, an exception is raised.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hwcomponents.EnergyLatency">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">hwcomponents.</span></span><span class="sig-name descname"><span class="pre">EnergyLatency</span></span><a class="reference internal" href="_modules/hwcomponents/model.html#EnergyLatency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.EnergyLatency" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+<p>EnergyLatency(energy, latency)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.EnergyLatency.energy">
+<span class="sig-name descname"><span class="pre">energy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#hwcomponents.EnergyLatency.energy" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hwcomponents.EnergyLatency.latency">
+<span class="sig-name descname"><span class="pre">latency</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#hwcomponents.EnergyLatency.latency" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.action">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.</span></span><span class="sig-name descname"><span class="pre">action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits_per_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pipelined_subcomponents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/model.html#action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.action" title="Link to this definition"></a></dt>
+<dd><p>Decorator that adds an action to an energy/area model. If the component has no
+subcomponents, then the action is expected to return a tuple of (energy, latency)
+where energy is in Joules and latency is in seconds. If the component has
+subcomponents, then None return values are assumed to be (0, 0), and subcomponent
+actions that occur during the component’s action will be added to the component’s
+energy and latency. The energy and latency of the subcomponents will NOT be scaled
+by the component’s energy_scale and latency_scale; to scale these, set the
+subcomponents’ scaling factors directly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<em>Callable</em><em> | </em><em>None</em>) – The function to decorate.</p></li>
+<li><p><strong>bits_per_action</strong> (<em>str</em>) – The attribute of the model that contains the number of bits per action. If
+this is set and a bits_per_action is passed to the function, the energy and
+latency will be scaled by the number of bits. For example, if
+bits_per_action is set to “width”, the function is called with
+bits_per_action=10, and the model has a width attribute of 5, then the
+energy and latency will be scaled by 2.</p></li>
+<li><p><strong>pipelined_subcomponents</strong> (<em>bool</em>) – Whether the subcomponents are pipelined. If True, then the latency of is the
+max of the latency returned and all subcomponent latencies. Otherwise, it is
+the sum. Does nothing if there are no subcomponents.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>, <a class="reference internal" href="#hwcomponents.model.EnergyLatency" title="hwcomponents.model.EnergyLatency"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyLatency</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The decorated function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.get_area">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.</span></span><span class="sig-name descname"><span class="pre">get_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_relaxed_component_name_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/select_models.html#get_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.get_area" title="Link to this definition"></a></dt>
+<dd><p>Finds the area using the best-matching model. “Best” is defined as the
+highest-priority model that has all required attributes specified in
+component_attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>component_attributes</strong> (<em>The attributes</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>models</strong> (<em>The models to use.</em>)</p></li>
+<li><p><strong>_return_estimation_object</strong> (<em>Whether to return the estimation object instead of</em>) – the area value.</p></li>
+<li><p><strong>_relaxed_component_name_selection</strong> (<em>Whether to relax the component name</em>) – selection. Relaxed selection ignores underscores in the component name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Estimation</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The area in m^2.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.get_energy">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.</span></span><span class="sig-name descname"><span class="pre">get_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_relaxed_component_name_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/select_models.html#get_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.get_energy" title="Link to this definition"></a></dt>
+<dd><p>Finds the energy using the best-matching model. “Best” is defined as the
+highest-priority model that has all required attributes specified in
+component_attributes and a matching action with all required arguments specified
+in action_arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>component_attributes</strong> (<em>The attributes</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>action_name</strong> (<em>The name</em><em> of </em><em>the action.</em>)</p></li>
+<li><p><strong>action_arguments</strong> (<em>The arguments</em><em> of </em><em>the action.</em>)</p></li>
+<li><p><strong>models</strong> (<em>The models to use.</em>)</p></li>
+<li><p><strong>_return_estimation_object</strong> (<em>Whether to return the estimation object instead of</em>) – the energy value.</p></li>
+<li><p><strong>_relaxed_component_name_selection</strong> (<em>Whether to relax the component name</em>) – selection. Relaxed selection ignores underscores in the component name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Estimation</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The energy in Joules.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.get_latency">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.</span></span><span class="sig-name descname"><span class="pre">get_latency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_relaxed_component_name_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/select_models.html#get_latency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.get_latency" title="Link to this definition"></a></dt>
+<dd><p>Finds the latency using the best-matching model. “Best” is defined as the
+highest-priority model that has all required attributes specified in
+component_attributes and a matching action with all required arguments specified
+in action_arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>component_attributes</strong> (<em>The attributes</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>action_name</strong> (<em>The name</em><em> of </em><em>the action.</em>)</p></li>
+<li><p><strong>action_arguments</strong> (<em>The arguments</em><em> of </em><em>the action.</em>)</p></li>
+<li><p><strong>models</strong> (<em>The models to use.</em>)</p></li>
+<li><p><strong>_return_estimation_object</strong> (<em>Whether to return the estimation object instead of</em>) – the latency value.</p></li>
+<li><p><strong>_relaxed_component_name_selection</strong> (<em>Whether to relax the component name</em>) – selection. Relaxed selection ignores underscores in the component name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Estimation</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The latency in seconds.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.get_leak_power">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.</span></span><span class="sig-name descname"><span class="pre">get_leak_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_relaxed_component_name_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/select_models.html#get_leak_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.get_leak_power" title="Link to this definition"></a></dt>
+<dd><p>Finds the leak power using the best-matching model. “Best” is defined as the
+highest-priority model that has all required attributes specified in
+component_attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>component_attributes</strong> (<em>The attributes</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>models</strong> (<em>The models to use.</em>)</p></li>
+<li><p><strong>_relaxed_component_name_selection</strong> (<em>Whether to relax the component name</em>) – selection. Relaxed selection ignores underscores in the component name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Estimation</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The leak power in Watts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.get_model">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.</span></span><span class="sig-name descname"><span class="pre">get_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required_actions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_estimation_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_relaxed_component_name_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/select_models.html#get_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.get_model" title="Link to this definition"></a></dt>
+<dd><p>Finds the best model for the given component. “Best” is defined as the
+highest-priority model that has all required attributes specified in
+component_attributes, and has actions for all of required_actions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component_name</strong> (<em>The name</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>component_attributes</strong> (<em>The attributes</em><em> of </em><em>the component.</em>)</p></li>
+<li><p><strong>required_actions</strong> (<em>The actions that are required for the component.</em>)</p></li>
+<li><p><strong>models</strong> (<em>The models to use.</em>)</p></li>
+<li><p><strong>_return_estimation_object</strong> (<em>Whether to return the estimation object instead of</em>) – the model wrapper.</p></li>
+<li><p><strong>_relaxed_component_name_selection</strong> (<em>Whether to relax the component name</em>) – selection. Relaxed selection ignores underscores in the component name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentModelWrapper</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The best model wrapper.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hwcomponents.get_models">
+<span class="sig-prename descclassname"><span class="pre">hwcomponents.</span></span><span class="sig-name descname"><span class="pre">get_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">paths_or_packages_or_models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_installed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_must_include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_return_wrappers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hwcomponents/find_models.html#get_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hwcomponents.get_models" title="Link to this definition"></a></dt>
+<dd><p>Instantiate a list of model objects for later queries. Searches for models in the
+given paths and packages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>paths_or_packages_or_models</strong> (<em>list</em>) – A list of paths or packages to search for models.</p></li>
+<li><p><strong>include_installed</strong> (<em>bool</em>) – Whether to include models from installed packages.</p></li>
+<li><p><strong>name_must_include</strong> (<em>str</em>) – If provided, a model will only be returned if its name includes this string.
+Non-case-sensitive.</p></li>
+<li><p><strong>_return_wrappers</strong> (<em>bool</em>) – Whether to return ComponentModelWrapper objects or
+ComponentModel objects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentModelWrapper</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#hwcomponents.model.ComponentModel" title="hwcomponents.model.ComponentModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComponentModel</span></code></a>]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of ComponentModelWrapper objects or ComponentModel objects.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="hwcomponents" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hwcomponents.scaling.html" class="btn btn-neutral float-right" title="hwcomponents.scaling package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
