@@ -19,7 +19,7 @@ class EnergyLatency(NamedTuple):
 
 def action(
     func: Callable[..., Union[float, tuple[float, float]]] = None,
-    bits_per_action: str = None,
+    bits_per_action: str | Number = None,
     pipelined_subcomponents: bool = False,
 ) -> Callable[..., EnergyLatency]:
     """
@@ -78,6 +78,8 @@ def action(
                     nominal_bits = getattr(self, bits_per_action)
                 except:
                     pass
+                if isinstance(bits_per_action, Number):
+                    nominal_bits = bits_per_action
                 if nominal_bits is None:
                     raise ValueError(
                         f"{self.__name__} has no attribute {bits_per_action}. "
