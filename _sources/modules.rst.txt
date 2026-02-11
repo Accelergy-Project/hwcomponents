@@ -1,0 +1,7 @@
+hwcomponents
+============
+
+.. toctree::
+   :maxdepth: 4
+
+   hwcomponents

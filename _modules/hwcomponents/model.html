@@ -1,0 +1,766 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hwcomponents.model &mdash; HWComponents 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            HWComponents
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">hwcomponents</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/finding_and_using_models.html">Finding and Using Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notes/making_models.html">Making Models</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HWComponents</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">hwcomponents.model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hwcomponents.model</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span> <span class="nn">hwcomponents._logging</span> <span class="kn">import</span> <span class="n">ListLoggable</span><span class="p">,</span> <span class="n">messages_from_logger</span><span class="p">,</span> <span class="n">pop_all_messages</span>
+<span class="kn">from</span> <span class="nn">hwcomponents._util</span> <span class="kn">import</span> <span class="n">parse_float</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;ComponentModel&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="EnergyLatency">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.EnergyLatency">[docs]</a>
+<span class="k">class</span> <span class="nc">EnergyLatency</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">latency</span><span class="p">:</span> <span class="nb">float</span>
+
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;EnergyLatency&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;EnergyLatency&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">EnergyLatency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">latency</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">latency</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="action">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.action">[docs]</a>
+<span class="k">def</span> <span class="nf">action</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">bits_per_action</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Number</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">pipelined_subcomponents</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">EnergyLatency</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator that adds an action to an energy/area model. If the component has no</span>
+<span class="sd">    subcomponents, then the action is expected to return a tuple of (energy, latency)</span>
+<span class="sd">    where energy is in Joules and latency is in seconds. If the component has</span>
+<span class="sd">    subcomponents, then None return values are assumed to be (0, 0), and subcomponent</span>
+<span class="sd">    actions that occur during the component&#39;s action will be added to the component&#39;s</span>
+<span class="sd">    energy and latency. The energy and latency of the subcomponents will NOT be scaled</span>
+<span class="sd">    by the component&#39;s energy_scale and latency_scale; to scale these, set the</span>
+<span class="sd">    subcomponents&#39; scaling factors directly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        func : Callable | None</span>
+<span class="sd">            The function to decorate.</span>
+<span class="sd">        bits_per_action : str</span>
+<span class="sd">            The attribute of the model that contains the number of bits per action. If</span>
+<span class="sd">            this is set and a bits_per_action is passed to the function, the energy and</span>
+<span class="sd">            latency will be scaled by the number of bits. For example, if</span>
+<span class="sd">            bits_per_action is set to &quot;width&quot;, the function is called with</span>
+<span class="sd">            bits_per_action=10, and the model has a width attribute of 5, then the</span>
+<span class="sd">            energy and latency will be scaled by 2.</span>
+<span class="sd">        pipelined_subcomponents : bool</span>
+<span class="sd">            Whether the subcomponents are pipelined. If True, then the latency of is the</span>
+<span class="sd">            max of the latency returned and all subcomponent latencies. Otherwise, it is</span>
+<span class="sd">            the sum. Does nothing if there are no subcomponents.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        The decorated function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="n">func</span><span class="p">:</span> <span class="n">action</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">bits_per_action</span><span class="p">)</span>
+
+    <span class="n">additional_kwargs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">bits_per_action</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">additional_kwargs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;bits_per_action&quot;</span><span class="p">)</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;ComponentModel&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">was_already_calling_action</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_currently_calling_action&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_currently_calling_action</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Calling action </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> with arguments </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">kwargs</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">subcomponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">:</span>
+                <span class="n">subcomponent</span><span class="o">.</span><span class="n">_energy_used</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">subcomponent</span><span class="o">.</span><span class="n">_latency_used</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">scalestr</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">bits_per_action</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">&quot;bits_per_action&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">nominal_bits</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">nominal_bits</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits_per_action</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bits_per_action</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+                    <span class="n">nominal_bits</span> <span class="o">=</span> <span class="n">bits_per_action</span>
+                <span class="k">if</span> <span class="n">nominal_bits</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">bits_per_action</span><span class="si">}</span><span class="s2">. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Ensure that the attributes referenced in @action &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;are defined in the class.&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bits_per_action&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">nominal_bits</span>
+                <span class="n">scalestr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Scaling by </span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;bits_per_action&#39;</span><span class="p">]</span><span class="si">=}</span><span class="s2"> / </span><span class="si">{</span><span class="n">nominal_bits</span><span class="si">=}</span><span class="s2">&quot;</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">additional_kwargs</span><span class="p">}</span>
+            <span class="n">returned_value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># Normalize return to (energy, latency)</span>
+            <span class="k">if</span> <span class="n">returned_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subcomponents_set</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;@action function </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> did not return a value. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;This is permitted if and only if the component has no &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;subcomponents. Please either initialize subcomponents or ensure &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;that the @action function returns a tuple of (energy, latency).&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">energy_val</span><span class="p">,</span> <span class="n">latency_val</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">returned_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">returned_value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">energy_val</span><span class="p">,</span> <span class="n">latency_val</span> <span class="o">=</span> <span class="n">returned_value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;@action function </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> returned an invalid value. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Expected a tuple of (energy, latency), got </span><span class="si">{</span><span class="n">returned_value</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Function </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> returned energy </span><span class="si">{</span><span class="n">energy_val</span><span class="si">}</span><span class="s2"> and latency </span><span class="si">{</span><span class="n">latency_val</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">scalestr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">scalestr</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">was_already_calling_action</span><span class="p">:</span>
+                <span class="n">energy_val</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_scale</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_scale</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scaling energy by </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_scale</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">subcomponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Adding subcomponent </span><span class="si">{</span><span class="n">subcomponent</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> energy </span><span class="si">{</span><span class="n">subcomponent</span><span class="o">.</span><span class="n">_energy_used</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">energy_val</span> <span class="o">+=</span> <span class="n">subcomponent</span><span class="o">.</span><span class="n">_energy_used</span>
+                    <span class="n">subcomponent</span><span class="o">.</span><span class="n">_energy_used</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">energy_val</span> <span class="o">*=</span> <span class="n">scale</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_energy_used</span> <span class="o">+=</span> <span class="n">energy_val</span>
+
+                <span class="n">latency_val</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latency_scale</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">latency_scale</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scaling latency by </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latency_scale</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">target_func</span> <span class="o">=</span> <span class="nb">max</span> <span class="k">if</span> <span class="n">pipelined_subcomponents</span> <span class="k">else</span> <span class="nb">sum</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;Max&quot;</span> <span class="k">if</span> <span class="n">pipelined_subcomponents</span> <span class="k">else</span> <span class="s2">&quot;Summ&quot;</span>
+                <span class="k">for</span> <span class="n">subcomponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">ing subcomponent </span><span class="si">{</span><span class="n">subcomponent</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> latency </span><span class="si">{</span><span class="n">subcomponent</span><span class="o">.</span><span class="n">_latency_used</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">latency_val</span> <span class="o">=</span> <span class="n">target_func</span><span class="p">((</span><span class="n">latency_val</span><span class="p">,</span> <span class="n">subcomponent</span><span class="o">.</span><span class="n">_latency_used</span><span class="p">))</span>
+                    <span class="n">subcomponent</span><span class="o">.</span><span class="n">_latency_used</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">latency_val</span> <span class="o">*=</span> <span class="n">scale</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_latency_used</span> <span class="o">+=</span> <span class="n">latency_val</span>
+
+                <span class="k">for</span> <span class="n">subcomponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log for subcomponent </span><span class="si">{</span><span class="n">subcomponent</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">pop_all_messages</span><span class="p">(</span><span class="n">subcomponent</span><span class="o">.</span><span class="n">logger</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">message</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;** Final return value for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: energy </span><span class="si">{</span><span class="n">energy_val</span><span class="si">}</span><span class="s2"> and latency </span><span class="si">{</span><span class="n">latency_val</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">EnergyLatency</span><span class="p">(</span><span class="n">energy_val</span><span class="p">,</span> <span class="n">latency_val</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_currently_calling_action</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">wrapper</span><span class="o">.</span><span class="n">_is_component_action</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">wrapper</span><span class="o">.</span><span class="n">_original_function</span> <span class="o">=</span> <span class="n">func</span>
+    <span class="n">wrapper</span><span class="o">.</span><span class="n">_additional_kwargs</span> <span class="o">=</span> <span class="n">additional_kwargs</span>
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+
+<div class="viewcode-block" id="ComponentModel">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel">[docs]</a>
+<span class="k">class</span> <span class="nc">ComponentModel</span><span class="p">(</span><span class="n">ListLoggable</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ComponentModel base class. ComponentModel class must have &quot;name&quot; attribute,</span>
+<span class="sd">    &quot;priority&quot; attribute, and &quot;get_area&quot; method. ComponentModels may have any number of</span>
+<span class="sd">    methods that are decorated with @action.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        component_name: str | list[str] | None</span>
+<span class="sd">            The name of the component. Must be a string or list/tuple of strings. Can be</span>
+<span class="sd">            omitted if the component name is the same as the class name.</span>
+<span class="sd">        priority: float</span>
+<span class="sd">            The priority of the model. Higher priority models are used first. Must be a</span>
+<span class="sd">            number between 0 and 1.</span>
+<span class="sd">        leak_power: float | None</span>
+<span class="sd">            The leakage power of the component in Watts. Must be set if subcomponents is</span>
+<span class="sd">            not set.</span>
+<span class="sd">        area: float | None</span>
+<span class="sd">            The area of the component in m^2. Must be set if subcomponents is not set.</span>
+<span class="sd">        energy_scale: float</span>
+<span class="sd">            A scale factor for the energy. All calls to @action will be scaled by this</span>
+<span class="sd">            factor.</span>
+<span class="sd">        area_scale: float</span>
+<span class="sd">            A scale factor for the area. All calls to area will be scaled by this</span>
+<span class="sd">            factor.</span>
+<span class="sd">        latency_scale: float</span>
+<span class="sd">            A scale factor for the latency. All calls to @action will be scaled by this</span>
+<span class="sd">            factor.</span>
+<span class="sd">        leak_power_scale: float</span>
+<span class="sd">            A scale factor for the leakage power. All calls to leak_power will be scaled</span>
+<span class="sd">            by this factor.</span>
+<span class="sd">        subcomponents: list[ComponentModel] | None</span>
+<span class="sd">            A list of subcomponents. If set, the area and leak power of the</span>
+<span class="sd">            subcomponents will be added to the area and leak power of the component. All</span>
+<span class="sd">            calls to @action functions will be added to the energy and latency of the</span>
+<span class="sd">            component if they occur during one of the component&#39;s actions. The area,</span>
+<span class="sd">            energy, latency, and leak power of subcomponents WILL NOT BE scaled by the</span>
+<span class="sd">            component&#39;s energy_scale, area_scale, or leak_power_scale; if you want to</span>
+<span class="sd">            scale the subcomponents, multiply their energy_scale, area_scale,</span>
+<span class="sd">            latency_scale, or leak_power_scale by the desired scale factor.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">        component_name: The name of the component. Must be a string or list/tuple of</span>
+<span class="sd">            strings. Can be omitted if the component name is the same as the class name.</span>
+<span class="sd">        priority: The priority of the model. Higher priority models are used first.</span>
+<span class="sd">            Must be a number between 0 and 1.</span>
+<span class="sd">        energy_scale: A scale factor for the energy. All calls to action</span>
+<span class="sd">            will be scaled by this factor.</span>
+<span class="sd">        area_scale: A scale factor for the area. All calls to area</span>
+<span class="sd">            will be scaled by this factor.</span>
+<span class="sd">        latency_scale: A scale factor for the latency. All calls to @action</span>
+<span class="sd">            will be scaled by this factor.</span>
+<span class="sd">        leak_power_scale: A scale factor for the leakage power. All calls to leak_power</span>
+<span class="sd">            will be scaled by this factor.</span>
+<span class="sd">        subcomponents: A list of subcomponents. If set, the area and leak power of the</span>
+<span class="sd">            subcomponents will be added to the area and leak power of the component. All</span>
+<span class="sd">            calls to @action functions will be added to the energy and latency of the</span>
+<span class="sd">            component if they occur during one of the component&#39;s actions. The area,</span>
+<span class="sd">            energy, latency, and leak power of subcomponents WILL NOT BE scaled by the</span>
+<span class="sd">            component&#39;s energy_scale, area_scale, or leak_power_scale; if you want to</span>
+<span class="sd">            scale the subcomponents, multiply their energy_scale, area_scale,</span>
+<span class="sd">            latency_scale, or leak_power_scale by the desired scale factor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">component_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Name of the component. Must be a string or list/tuple of strings. Can be omitted if</span>
+<span class="sd">    the component name is the same as the class name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">priority</span><span class="p">:</span> <span class="n">Number</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Priority determines which model is used when multiple models are available for a</span>
+<span class="sd">    given component. Higher priority models are used first. Must be a number between 0</span>
+<span class="sd">    and 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ComponentModel.__init__">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.__init__">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">leak_power</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">area</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">subcomponents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;ComponentModel&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">subcomponents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">leak_power</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">area</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Either subcomponents must be set, or BOTH leak_power and area&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;must be set.&quot;</span>
+                <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">area_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latency_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leak_power_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_leak_power</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">leak_power</span> <span class="k">if</span> <span class="n">leak_power</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_area</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">area</span> <span class="k">if</span> <span class="n">area</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;ComponentModel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[]</span> <span class="k">if</span> <span class="n">subcomponents</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">subcomponents</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subcomponents_set</span> <span class="o">=</span> <span class="n">subcomponents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energy_used</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_latency_used</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">leak_power</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Number</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the leakage power of the component in Watts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            The leakage power in Watts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_leak_power</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">leak_power_scale</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">leak_power</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Number</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the area in m^2 of the component.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            The area in m^2 of the component.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">area_scale</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">area</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_component_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">component_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">component_name</span>
+
+<div class="viewcode-block" id="ComponentModel.scale">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.scale">[docs]</a>
+    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">default</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">area_scale_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">energy_scale_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">latency_scale_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">leak_power_scale_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scales this model&#39;s area, energy, latency, and leak power to the given target.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            key: str</span>
+<span class="sd">                The name of the parameter to scale. Used for logging.</span>
+<span class="sd">            target: float</span>
+<span class="sd">                The target value of the parameter. The value is scaled to this from the</span>
+<span class="sd">                default.</span>
+<span class="sd">            default: float</span>
+<span class="sd">                The default value of the parameter. The value is scaled to the target</span>
+<span class="sd">                from this.</span>
+<span class="sd">            area_scale_function: Callable[[float, float], float]</span>
+<span class="sd">                The function to use to scale the area. None if no scaling should be</span>
+<span class="sd">                done.</span>
+<span class="sd">            energy_scale_function: Callable[[float, float], float]</span>
+<span class="sd">                The function to use to scale the energy. None if no scaling should be</span>
+<span class="sd">                done.</span>
+<span class="sd">            latency_scale_function: Callable[[float, float], float]</span>
+<span class="sd">                The function to use to scale the latency. None if no scaling should be</span>
+<span class="sd">                done.</span>
+<span class="sd">            leak_power_scale_function: Callable[[float, float], float]</span>
+<span class="sd">                The function to use to scale the leak power. None if no scaling should</span>
+<span class="sd">                be done.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_init_logger</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_component_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="n">default</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">target</span>
+
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">callfunc</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;area_scale&quot;</span><span class="p">,</span> <span class="n">area_scale_function</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;energy_scale&quot;</span><span class="p">,</span> <span class="n">energy_scale_function</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;latency_scale&quot;</span><span class="p">,</span> <span class="n">latency_scale_function</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;leak_power_scale&quot;</span><span class="p">,</span> <span class="n">leak_power_scale_function</span><span class="p">),</span>
+        <span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">callfunc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">prev_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="n">callfunc</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">prev_val</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Scaled </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">default</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2"> multiplied by </span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">target_float</span> <span class="o">=</span> <span class="n">parse_float</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_component_name</span><span class="p">()</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">default_float</span> <span class="o">=</span> <span class="n">parse_float</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_component_name</span><span class="p">()</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="n">callfunc</span><span class="p">(</span><span class="n">target_float</span><span class="p">,</span> <span class="n">default_float</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">prev_val</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Scaled </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">default</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2"> multiplied by </span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">target</span></div>
+
+
+<div class="viewcode-block" id="ComponentModel.get_action_names">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.get_action_names">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_action_names</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the names of the actions supported by the model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            The names of the actions supported by the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">base</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s2">&quot;_is_component_action&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">names</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ComponentModel.required_arguments">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.required_arguments">[docs]</a>
+    <span class="k">def</span> <span class="nf">required_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the required arguments for the given action. If no action is given,</span>
+<span class="sd">        returns the required arguments for the __init__ method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            action_name : str | None</span>
+<span class="sd">                The name of the action to get the required arguments for.</span>
+<span class="sd">                If None, returns the required arguments for the __init__ method.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            list[str]</span>
+<span class="sd">                The required arguments for the given action.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">action_name</span> <span class="o">=</span> <span class="s2">&quot;__init__&quot;</span> <span class="k">if</span> <span class="n">action_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">action_name</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">action_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_name</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no action </span><span class="si">{</span><span class="n">action_name</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Supported actions are: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_action_names</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">action_func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ComponentModel.try_init_arbitrary_args">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.try_init_arbitrary_args">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">try_init_arbitrary_args</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">_return_estimation_object</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tries to initialize the model with the given arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            **kwargs : dict</span>
+<span class="sd">                The arguments with which to initialize the model.</span>
+<span class="sd">            _return_estimation_object : bool</span>
+<span class="sd">                Whether to return the Estimation object instead of the model.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            The initialized model. If the model cannot be initialized with the given</span>
+<span class="sd">            arguments, an exception is raised.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">hwcomponents._model_wrapper</span> <span class="kn">import</span> <span class="n">ModelQuery</span><span class="p">,</span> <span class="n">ComponentModelWrapper</span>
+
+        <span class="n">wrapper</span> <span class="o">=</span> <span class="n">ComponentModelWrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">component_name</span><span class="p">)</span>
+        <span class="n">cname</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">component_name</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">ModelQuery</span><span class="p">(</span>
+            <span class="n">component_name</span><span class="o">=</span><span class="n">cname</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">cname</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">component_attributes</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">wrapper</span><span class="o">.</span><span class="n">get_initialized_subclass</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_return_estimation_object</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="ComponentModel.try_call_arbitrary_action">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.try_call_arbitrary_action">[docs]</a>
+    <span class="k">def</span> <span class="nf">try_call_arbitrary_action</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">action_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_return_estimation_object</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tries to call the given action with the given arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            action_name : str</span>
+<span class="sd">                The name of the action to call.</span>
+<span class="sd">            **kwargs : dict</span>
+<span class="sd">                The arguments with which to call the action.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">hwcomponents._model_wrapper</span> <span class="kn">import</span> <span class="n">ModelQuery</span><span class="p">,</span> <span class="n">ComponentModelWrapper</span>
+
+        <span class="n">wrapper</span> <span class="o">=</span> <span class="n">ComponentModelWrapper</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_name</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">ModelQuery</span><span class="p">(</span>
+            <span class="n">component_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">component_name</span><span class="p">,</span>
+            <span class="n">component_attributes</span><span class="o">=</span><span class="p">{},</span>
+            <span class="n">action_name</span><span class="o">=</span><span class="n">action_name</span><span class="p">,</span>
+            <span class="n">action_arguments</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">wrapper</span><span class="o">.</span><span class="n">get_action_energy_latency</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">initialized_obj</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_return_estimation_object</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="ComponentModel.assert_int">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.assert_int">[docs]</a>
+    <span class="k">def</span> <span class="nf">assert_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks that the value is an integer, and if so, returns it as an integer.</span>
+<span class="sd">        Otherwise, raises a ValueError.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            name: str</span>
+<span class="sd">                The name of the attribute to check. Used for error messages.</span>
+<span class="sd">            value: int | float | Any</span>
+<span class="sd">                The value to check.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            int</span>
+<span class="sd">                The value as an integer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">is_integer</span><span class="p">():</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an integer. Got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ComponentModel.assert_match">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.assert_match">[docs]</a>
+    <span class="k">def</span> <span class="nf">assert_match</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">value_a</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">value_b</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name_a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name_b</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks that the two values are equal, and if so, returns the matched value. If</span>
+<span class="sd">        one value is None, returns the other value. Raise an error if the two values are</span>
+<span class="sd">        not equal, or if both are None.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            value_a: int | float | Any</span>
+<span class="sd">                The first value to check.</span>
+<span class="sd">            value_b: int | float | Any</span>
+<span class="sd">                The second value to check.</span>
+<span class="sd">            name_a: str</span>
+<span class="sd">                The name of the first value. Used for error messages.</span>
+<span class="sd">            name_b: str</span>
+<span class="sd">                The name of the second value. Used for error messages.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            int</span>
+<span class="sd">                The matched value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value_a</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value_b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Both </span><span class="si">{</span><span class="n">name_a</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">name_b</span><span class="si">}</span><span class="s2"> are None. At least one must be provided.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">value_a</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value_b</span>
+        <span class="k">if</span> <span class="n">value_b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value_a</span>
+
+        <span class="k">if</span> <span class="n">value_a</span> <span class="o">!=</span> <span class="n">value_b</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Mismatch between </span><span class="si">{</span><span class="n">name_a</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">name_b</span><span class="si">}</span><span class="s2">. Got </span><span class="si">{</span><span class="n">value_a</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">value_b</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">value_a</span></div>
+
+
+<div class="viewcode-block" id="ComponentModel.resolve_multiple_ways_to_calculate_value">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.resolve_multiple_ways_to_calculate_value">[docs]</a>
+    <span class="k">def</span> <span class="nf">resolve_multiple_ways_to_calculate_value</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses multiple possible ways to set an attribute, raising errors if the values</span>
+<span class="sd">        are not consistent.</span>
+
+<span class="sd">        Each possible argument is a tuple containing a function and a dictionary of</span>
+<span class="sd">        keyword arguments. A function fails if any keyword arguments are None, if the</span>
+<span class="sd">        function raises an error, or if the function returns None.</span>
+
+<span class="sd">        The outputs of all non-failing functions are compared, and an error is raised if</span>
+<span class="sd">        they are not equal.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            name: str</span>
+<span class="sd">                The name of the attribute to set.</span>
+<span class="sd">            *args: tuple[str, Callable[[Any], Any], dict[str, Any]]</span>
+<span class="sd">                The possible ways to set the attribute. Each tuple contains a name, a</span>
+<span class="sd">                function that takes the current value and returns the new value, and a</span>
+<span class="sd">                dictionary of keyword arguments to pass to the function.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            The value of the attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">error_messages</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">success_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">fname</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">error_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> is None.&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">error_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2"> raised </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">error_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2"> returned None.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">success_values</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">fname</span><span class="p">,</span> <span class="n">new_value</span><span class="p">))</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">success_values</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Could not set </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> with any of the following options:</span><span class="se">\n\t</span><span class="s2">&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">error_messages</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Different ways to set </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> returned conflicting values:</span><span class="se">\n\t</span><span class="s2">&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">fname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">success_values</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">values</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ComponentModel.get_log_messages">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.get_log_messages">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_log_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the log messages for the component.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            List[str]</span>
+<span class="sd">                The log messages for the component.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">messages_from_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ComponentModel.pop_log_messages">
+<a class="viewcode-back" href="../../hwcomponents.html#hwcomponents.model.ComponentModel.pop_log_messages">[docs]</a>
+    <span class="k">def</span> <span class="nf">pop_log_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pops the log messages for the component.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            List[str]</span>
+<span class="sd">                The log messages for the component.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pop_all_messages</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

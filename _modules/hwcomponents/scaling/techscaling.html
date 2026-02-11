@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hwcomponents.scaling.techscaling &mdash; HWComponents 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            HWComponents
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">hwcomponents</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/finding_and_using_models.html">Finding and Using Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/making_models.html">Making Models</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HWComponents</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">hwcomponents.scaling.techscaling</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hwcomponents.scaling.techscaling</h1><div class="highlight"><pre>
+<span></span><span class="c1"># CMOS scaling based on: Aaron Stillmaker, Bevan Baas, Scaling equations for the</span>
+<span class="c1"># accurate prediction of CMOS device performance from 180nm to 7nm, Integration,</span>
+<span class="c1"># Volume 58, 2017, Pages 74-81, ISSN 0167-9260,</span>
+<span class="c1"># https://doi.org/10.1016/j.vlsi.2017.02.002.</span>
+<span class="c1"># Scaling from tech node X to tech node Y involves multiplying area from</span>
+<span class="c1"># AREA_SCALING[X][Y].</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">floor</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+
+<span class="n">TECH_NODES</span> <span class="o">=</span> <span class="p">[</span><span class="mf">130e-9</span><span class="p">,</span> <span class="mf">90e-9</span><span class="p">,</span> <span class="mf">65e-9</span><span class="p">,</span> <span class="mf">45e-9</span><span class="p">,</span> <span class="mf">32e-9</span><span class="p">,</span> <span class="mf">20e-9</span><span class="p">,</span> <span class="mf">16e-9</span><span class="p">,</span> <span class="mf">14e-9</span><span class="p">,</span> <span class="mf">10e-9</span><span class="p">,</span> <span class="mf">7e-9</span><span class="p">]</span>
+<span class="n">AREA_SCALING</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.23</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">,</span> <span class="mf">0.072</span><span class="p">,</span> <span class="mf">0.033</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.027</span><span class="p">,</span> <span class="mf">0.016</span><span class="p">,</span> <span class="mf">0.0092</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.53</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">,</span> <span class="mf">0.075</span><span class="p">,</span> <span class="mf">0.067</span><span class="p">,</span> <span class="mf">0.061</span><span class="p">,</span> <span class="mf">0.036</span><span class="p">,</span> <span class="mf">0.021</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">4.3</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.66</span><span class="p">,</span> <span class="mf">0.31</span><span class="p">,</span> <span class="mf">0.14</span><span class="p">,</span> <span class="mf">0.13</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.068</span><span class="p">,</span> <span class="mf">0.039</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">2.8</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.46</span><span class="p">,</span> <span class="mf">0.21</span><span class="p">,</span> <span class="mf">0.19</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.059</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mf">6.1</span><span class="p">,</span> <span class="mf">3.3</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.46</span><span class="p">,</span> <span class="mf">0.41</span><span class="p">,</span> <span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.22</span><span class="p">,</span> <span class="mf">0.13</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mf">7.1</span><span class="p">,</span> <span class="mf">4.7</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span> <span class="mf">0.82</span><span class="p">,</span> <span class="mf">0.48</span><span class="p">,</span> <span class="mf">0.28</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">34</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mf">7.9</span><span class="p">,</span> <span class="mf">5.3</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.91</span><span class="p">,</span> <span class="mf">0.54</span><span class="p">,</span> <span class="mf">0.31</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">37</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mf">8.7</span><span class="p">,</span> <span class="mf">5.8</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.59</span><span class="p">,</span> <span class="mf">0.34</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">63</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mf">9.8</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.58</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">110</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">,</span> <span class="mf">2.9</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="c1"># Scaling from tech node X to tech node Y involves multiplying energy by</span>
+<span class="c1"># ENERGY_SCALING[Y][0]Vdd^2+ENERGY_SCALING[Y][1]Vdd+ENERGY_SCALING[Y][2] and</span>
+<span class="c1"># dividing by</span>
+<span class="c1"># ENERGY_SCALING[X][0]Vdd^2+ENERGY_SCALING[X][1]Vdd+ENERGY_SCALING[X][2]</span>
+<span class="n">ENERGY_SCALING</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mf">7.171</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.709</span><span class="p">,</span> <span class="mf">2.904</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">4.762</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.781</span><span class="p">,</span> <span class="mf">2.092</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">3.755</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.398</span><span class="p">,</span> <span class="mf">1.975</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">1.103</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.362</span><span class="p">,</span> <span class="mf">0.2767</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.9559</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.7823</span><span class="p">,</span> <span class="mf">0.471</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.373</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1582</span><span class="p">,</span> <span class="mf">0.04104</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.2958</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1241</span><span class="p">,</span> <span class="mf">0.03024</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.2363</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.09675</span><span class="p">,</span> <span class="mf">0.02239</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.2068</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.09311</span><span class="p">,</span> <span class="mf">0.02375</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.1776</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.09097</span><span class="p">,</span> <span class="mf">0.02447</span><span class="p">],</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_technology_node_index</span><span class="p">(</span><span class="n">tech_node</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the index of the technology node in the TECH_NODES array.</span>
+<span class="sd">    Interpolates if necessary.&quot;&quot;&quot;</span>
+    <span class="n">larger_idx</span><span class="p">,</span> <span class="n">smaller_idx</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">TECH_NODES</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tech_node</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="p">:</span>
+            <span class="n">larger_idx</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">if</span> <span class="n">tech_node</span> <span class="o">&gt;=</span> <span class="n">t</span><span class="p">:</span>
+            <span class="n">smaller_idx</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">break</span>
+
+    <span class="n">failed</span> <span class="o">=</span> <span class="n">larger_idx</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">smaller_idx</span> <span class="ow">is</span> <span class="kc">None</span>
+
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">failed</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Technology node </span><span class="si">{</span><span class="n">tech_node</span><span class="si">}</span><span class="s2"> not supported. Ensure all technology &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;nodes are in the range [</span><span class="si">{</span><span class="n">TECH_NODES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">TECH_NODES</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span>
+    <span class="p">)</span>
+    <span class="n">l_node</span><span class="p">,</span> <span class="n">s_node</span> <span class="o">=</span> <span class="n">TECH_NODES</span><span class="p">[</span><span class="n">larger_idx</span><span class="p">],</span> <span class="n">TECH_NODES</span><span class="p">[</span><span class="n">smaller_idx</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">larger_idx</span> <span class="o">==</span> <span class="n">smaller_idx</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">larger_idx</span>
+    <span class="n">interp</span> <span class="o">=</span> <span class="p">(</span><span class="n">tech_node</span> <span class="o">-</span> <span class="n">s_node</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">l_node</span> <span class="o">-</span> <span class="n">s_node</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">larger_idx</span> <span class="o">+</span> <span class="p">(</span><span class="n">smaller_idx</span> <span class="o">-</span> <span class="n">larger_idx</span><span class="p">)</span> <span class="o">*</span> <span class="n">interp</span>
+
+
+<span class="k">def</span> <span class="nf">_constrain_to_tech_nodes</span><span class="p">(</span><span class="n">tech_node</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">tech_node</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">(</span><span class="n">TECH_NODES</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">TECH_NODES</span><span class="p">),</span> <span class="n">tech_node</span> <span class="o">/</span> <span class="nb">min</span><span class="p">(</span><span class="n">TECH_NODES</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tech_node</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">(</span><span class="n">TECH_NODES</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">TECH_NODES</span><span class="p">),</span> <span class="n">tech_node</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">TECH_NODES</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tech_node</span><span class="p">,</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="tech_node_area">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.techscaling.tech_node_area">[docs]</a>
+<span class="k">def</span> <span class="nf">tech_node_area</span><span class="p">(</span><span class="n">to_node</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">from_node</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the scaling factor for area from the technology node</span>
+<span class="sd">    `from_node` to the technology node `to_node`. Interpolates if necessary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        to_node: The technology node to scale to.</span>
+<span class="sd">        from_node: The technology node to scale from.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The scaling factor for area.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">from_node</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">_constrain_to_tech_nodes</span><span class="p">(</span><span class="n">from_node</span><span class="p">)</span>
+    <span class="n">to_node</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">_constrain_to_tech_nodes</span><span class="p">(</span><span class="n">to_node</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">y</span> <span class="o">/</span> <span class="n">x</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">_get_technology_node_index</span><span class="p">(</span><span class="n">from_node</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">_get_technology_node_index</span><span class="p">(</span><span class="n">to_node</span><span class="p">)</span>
+
+    <span class="c1"># Any unaccounted for scaling with &quot;scale&quot; variable is assumed to scale</span>
+    <span class="c1"># linearly with tech node based on IDRS 2016 and 2017 predicted estimated</span>
+    <span class="c1"># SoC area</span>
+    <span class="k">return</span> <span class="n">scale</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">AREA_SCALING</span><span class="p">[</span><span class="n">floor</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="n">floor</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span> <span class="o">%</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">AREA_SCALING</span><span class="p">[</span><span class="n">floor</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="n">ceil</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">%</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">AREA_SCALING</span><span class="p">[</span><span class="n">ceil</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="n">floor</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span> <span class="o">%</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">AREA_SCALING</span><span class="p">[</span><span class="n">ceil</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="n">ceil</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">%</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="tech_node_energy">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.techscaling.tech_node_energy">[docs]</a>
+<span class="k">def</span> <span class="nf">tech_node_energy</span><span class="p">(</span>
+    <span class="n">to_node</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">from_node</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">vdd</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the scaling factor for energy from the technology node</span>
+<span class="sd">    `from_node` to the technology node `to_node`. Interpolates if necessary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        to_node: The technology node to scale to.</span>
+<span class="sd">        from_node: The technology node to scale from.</span>
+<span class="sd">        vdd: The voltage to scale by. If not provided, 0.8V is used.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The scaling factor for energy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Based on IRDS 2022, energy stops scaling after 1nm</span>
+    <span class="n">from_node</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">from_node</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>
+    <span class="n">to_node</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">to_node</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>
+
+    <span class="n">from_node</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">_constrain_to_tech_nodes</span><span class="p">(</span><span class="n">from_node</span><span class="p">)</span>
+    <span class="n">to_node</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">_constrain_to_tech_nodes</span><span class="p">(</span><span class="n">to_node</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">/</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">_get_technology_node_index</span><span class="p">(</span><span class="n">from_node</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">_get_technology_node_index</span><span class="p">(</span><span class="n">to_node</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">vdd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">vdd</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="c1"># Outer sum does linear interpolation</span>
+    <span class="n">x_e_factor</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="c1"># These sums do aVdd^2 + bVdd + c</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">ENERGY_SCALING</span><span class="p">[</span><span class="n">floor</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">vdd</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">ENERGY_SCALING</span><span class="p">[</span><span class="n">ceil</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">vdd</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="c1"># Outer sum does linear interpolation</span>
+    <span class="n">y_e_factor</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="c1"># These sums do aVdd^2 + bVdd + c</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">ENERGY_SCALING</span><span class="p">[</span><span class="n">floor</span><span class="p">(</span><span class="n">y</span><span class="p">)][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">vdd</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span> <span class="o">%</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">ENERGY_SCALING</span><span class="p">[</span><span class="n">ceil</span><span class="p">(</span><span class="n">y</span><span class="p">)][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">vdd</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">%</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Any unaccounted for scaling with &quot;scale&quot; variable is assumed to scale with</span>
+    <span class="c1"># square root of tech node based on IDRS 2016 and 2017 predicted estimated</span>
+    <span class="c1"># fJ/switch</span>
+    <span class="k">return</span> <span class="n">y_e_factor</span> <span class="o">/</span> <span class="n">x_e_factor</span> <span class="o">*</span> <span class="n">scale</span></div>
+
+
+
+<div class="viewcode-block" id="tech_node_leak">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.techscaling.tech_node_leak">[docs]</a>
+<span class="k">def</span> <span class="nf">tech_node_leak</span><span class="p">(</span>
+    <span class="n">to_node</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">from_node</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">vdd</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the scaling factor for leakage power from the technology node</span>
+<span class="sd">    `from_node` to the technology node `to_node`. Interpolates if necessary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        to_node: The technology node to scale to.</span>
+<span class="sd">        from_node: The technology node to scale from.</span>
+<span class="sd">        vdd: The voltage to scale by. If not provided, 0.8V is used.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The scaling factor for leakage power.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tech_node_energy</span><span class="p">(</span><span class="n">to_node</span><span class="p">,</span> <span class="n">from_node</span><span class="p">,</span> <span class="n">vdd</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="tech_node_latency">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.techscaling.tech_node_latency">[docs]</a>
+<span class="k">def</span> <span class="nf">tech_node_latency</span><span class="p">(</span><span class="n">to_node</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">from_node</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the scaling factor for latency from the technology node</span>
+<span class="sd">    `from_node` to the technology node `to_node`. Interpolates if necessary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        to_node: The technology node to scale to.</span>
+<span class="sd">        from_node: The technology node to scale from.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The scaling factor for latency.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">to_node</span> <span class="o">/</span> <span class="n">from_node</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
