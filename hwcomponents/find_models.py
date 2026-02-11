@@ -154,7 +154,7 @@ def get_models(
         ):
             models.append(path_or_package)
         elif isinstance(path_or_package, (str, Path)):
-            globbed = glob.glob(path_or_package, recursive=True)
+            globbed = glob.glob(str(path_or_package), recursive=True)
             flattened.extend(globbed)
         else:
             raise ValueError(f"Invalid type: {type(path_or_package)}")
