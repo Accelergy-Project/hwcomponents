@@ -364,6 +364,36 @@ class ComponentModel(ListLoggable, ABC):
 
         return target
 
+    def scale_tech_node(self, target: float, default: float) -> float:
+        """
+        Scales the tech node of the component to the given target.
+
+        Parameters
+        ----------
+            target: float
+                The target tech node.
+            default: float
+                The default tech node.
+
+        Returns
+        -------
+            The scaled tech node.
+        """
+        from hwcomponents.scaling import (
+            tech_node_area,
+            tech_node_energy,
+            tech_node_latency,
+            tech_node_leak,
+        )
+        return self.scale(
+            "tech_node",
+            target, default,
+            tech_node_area,
+            tech_node_energy,
+            tech_node_latency,
+            tech_node_leak,
+        )
+
     @classmethod
     def get_action_names(cls) -> List[str]:
         """
