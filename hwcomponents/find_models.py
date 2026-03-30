@@ -227,13 +227,16 @@ def get_models(
             logging.info(
                 f"Loading models from {path}. Errors below are likely due to the model."
             )
-            prev_sys_path = copy.deepcopy(sys.path)
-            sys.path.append(os.path.dirname(os.path.abspath(path)))
-            python_module = SourceFileLoader(f"model{n_models}", path).load_module()
+            abs_dir = os.path.dirname(os.path.abspath(path))
+            base_name = os.path.splitext(os.path.basename(path))[0]
+            module_name = f"_hwc_model_{base_name}_{n_models}"
+            if abs_dir not in sys.path:
+                sys.path.append(abs_dir)
+            python_module = SourceFileLoader(module_name, path).load_module()
+            sys.modules[module_name] = python_module
             new_models += get_models_in_module(
                 python_module, model_ids, _return_wrappers
             )
-            sys.path = prev_sys_path
             n_models += 1
 
         if not new_models:
