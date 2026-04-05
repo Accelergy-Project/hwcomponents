@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hwcomponents.scaling.scalefuncs &mdash; HWComponents 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            HWComponents
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">hwcomponents</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/finding_and_using_models.html">Finding and Using Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notes/making_models.html">Making Models</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HWComponents</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">hwcomponents.scaling.scalefuncs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hwcomponents.scaling.scalefuncs</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># General scaling functions</span>
+<span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="linear">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.linear">[docs]</a>
+<span class="k">def</span> <span class="nf">linear</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scalefrom</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Linear scaling function. Returns target / scalefrom.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        target: The target value.</span>
+<span class="sd">        scalefrom: The value to scale from.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The scaled value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">target</span> <span class="o">/</span> <span class="n">scalefrom</span></div>
+
+
+
+<div class="viewcode-block" id="reciprocal">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.reciprocal">[docs]</a>
+<span class="k">def</span> <span class="nf">reciprocal</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scalefrom</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reciprocal scaling function. Returns 1 / (target / scalefrom).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        target: The target value.</span>
+<span class="sd">        scalefrom: The value to scale from.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The scaled value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">scalefrom</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="pow_base">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.pow_base">[docs]</a>
+<span class="k">def</span> <span class="nf">pow_base</span><span class="p">(</span><span class="n">power</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Power scaling function. Returns a lambda that computes (target - scalefrom) **</span>
+<span class="sd">    power.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        power: The power to scale by.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A lambda that computes (target - scalefrom) ** power.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">target</span><span class="p">,</span> <span class="n">scalefrom</span><span class="p">:</span> <span class="p">(</span><span class="n">target</span> <span class="o">-</span> <span class="n">scalefrom</span><span class="p">)</span> <span class="o">**</span> <span class="n">power</span></div>
+
+
+
+<div class="viewcode-block" id="quadratic">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.quadratic">[docs]</a>
+<span class="k">def</span> <span class="nf">quadratic</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scalefrom</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quadratic scaling function. Returns (target / scalefrom) ** 2.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">scalefrom</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="nlog_base">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.nlog_base">[docs]</a>
+<span class="k">def</span> <span class="nf">nlog_base</span><span class="p">(</span><span class="n">power</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logarithmic scaling function. Returns a lambda that computes (target *</span>
+<span class="sd">    math.log(target, power)) / (scalefrom * math.log(scalefrom, power)).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        power: The power to scale by.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        A lambda that computes (target * math.log(target, power)) / (scalefrom *</span>
+<span class="sd">        math.log(scalefrom, power)).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">target</span><span class="p">,</span> <span class="n">scalefrom</span><span class="p">:</span> <span class="p">(</span><span class="n">target</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">power</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span>
+        <span class="n">scalefrom</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">scalefrom</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="nlog2n">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.nlog2n">[docs]</a>
+<span class="k">def</span> <span class="nf">nlog2n</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scalefrom</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logarithmic scaling function. Returns (target / scalefrom) * math.log(target /</span>
+<span class="sd">    scalefrom, 2).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">scalefrom</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">scalefrom</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="cacti_depth_energy">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.cacti_depth_energy">[docs]</a>
+<span class="k">def</span> <span class="nf">cacti_depth_energy</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scalefrom</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CACTI depth scaling. Based on empirical measurement of CACTI, for which energy</span>
+<span class="sd">    scales with depth to the power of (1.56 / 2).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        target: The target depth.</span>
+<span class="sd">        scalefrom: The depth to scale from.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The scaled energy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">target</span> <span class="o">/</span> <span class="n">scalefrom</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.56</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Based on CACTI scaling</span></div>
+
+
+
+<div class="viewcode-block" id="cacti_depth_area">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.cacti_depth_area">[docs]</a>
+<span class="k">def</span> <span class="nf">cacti_depth_area</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scalefrom</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CACTI depth scaling. Based on empirical measurement of CACTI, for which area scales</span>
+<span class="sd">    linearly with depth.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        target: The target depth.</span>
+<span class="sd">        scalefrom: The depth to scale from.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The scaled area.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">target</span> <span class="o">/</span> <span class="n">scalefrom</span>  <span class="c1"># Based on CACTI scaling</span></div>
+
+
+
+<div class="viewcode-block" id="cacti_depth_leak">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.cacti_depth_leak">[docs]</a>
+<span class="k">def</span> <span class="nf">cacti_depth_leak</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scalefrom</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CACTI depth scaling. Based on empirical measurement of CACTI, for which leakage</span>
+<span class="sd">    power scales linearly with depth.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        target: The target depth.</span>
+<span class="sd">        scalefrom: The depth to scale from.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The scaled leakage power.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">target</span> <span class="o">/</span> <span class="n">scalefrom</span>  <span class="c1"># Based on CACTI scaling</span></div>
+
+
+
+<div class="viewcode-block" id="noscale">
+<a class="viewcode-back" href="../../../hwcomponents.scaling.html#hwcomponents.scaling.scalefuncs.noscale">[docs]</a>
+<span class="k">def</span> <span class="nf">noscale</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scalefrom</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="mi">1</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
