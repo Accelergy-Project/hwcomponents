@@ -80,6 +80,13 @@ If you use this package in your work, please cite the CiMLoop project:
 
 .. code-block:: bibtex
 
+    @software{hwcomponents,
+    author={Andrulis, Tanner and Gilbert, Michael},
+    title={HWComponents},
+    url={https://github.com/Accelergy-Project/hwcomponents},
+    license={MIT},
+    }
+
     @INPROCEEDINGS{cimloop,
     author={Andrulis, Tanner and Emer, Joel S. and Sze, Vivienne},
     booktitle={2024 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS)},
