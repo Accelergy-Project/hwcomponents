@@ -38,7 +38,18 @@ def installed_models(
     if _ALL_ESTIMATORS is not None:
         return _ALL_ESTIMATORS
 
-    modules = [p.name for p in iter_modules() if p.name.startswith("hwcomponents_")]
+    modules = {p.name for p in iter_modules() if p.name.startswith("hwcomponents_")}
+    # pip install -e registers a finder in sys.path_hooks rather than a real package in
+    # iter_modules()
+    for dist in importlib.metadata.distributions():
+        name = dist.metadata["Name"] or ""
+        if not name.startswith("hwcomponents"):
+            continue
+        for line in (dist.read_text("top_level.txt") or "").splitlines():
+            line = line.strip()
+            if line.startswith("hwcomponents_"):
+                modules.add(line)
+    modules = sorted(modules)
     for m in modules:
         logging.info(f"Importing from module: {m}")
 
@@ -229,7 +240,7 @@ def get_models(
             )
             abs_dir = os.path.dirname(os.path.abspath(path))
             base_name = os.path.splitext(os.path.basename(path))[0]
-            module_name = f"_hwc_model_{base_name}_{n_models}"
+            module_name = f"_hwc_model_{base_name}_{abs(hash(os.path.abspath(path)))}"
             if abs_dir not in sys.path:
                 sys.path.append(abs_dir)
             python_module = SourceFileLoader(module_name, path).load_module()

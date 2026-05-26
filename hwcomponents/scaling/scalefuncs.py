@@ -33,15 +33,17 @@ def reciprocal(target: float, scalefrom: float) -> float:
 
 def pow_base(power: float) -> Callable[[float, float], float]:
     """
-    Power scaling function. Returns a lambda that computes (target - scalefrom) **
-    power.
+    Power scaling function. Returns a lambda that computes power **
+    (target - scalefrom). For example, pow_base(2) models exponential
+    energy/area scaling with an integer resolution: at target=scalefrom the
+    multiplier is 1; at target=scalefrom+1 the multiplier is the base (2).
 
     Args:
-        power: The power to scale by.
+        power: The base to scale by.
     Returns:
-        A lambda that computes (target - scalefrom) ** power.
+        A lambda that computes power ** (target - scalefrom).
     """
-    return lambda target, scalefrom: (target - scalefrom) ** power
+    return lambda target, scalefrom: power ** (target - scalefrom)
 
 
 def quadratic(target: float, scalefrom: float) -> float:
