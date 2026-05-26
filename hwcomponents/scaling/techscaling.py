@@ -61,7 +61,7 @@ def _get_technology_node_index(tech_node: float) -> float:
     if larger_idx == smaller_idx:
         return larger_idx
     interp = (tech_node - s_node) / (l_node - s_node)
-    return larger_idx + (smaller_idx - larger_idx) * interp
+    return smaller_idx + (larger_idx - smaller_idx) * interp
 
 
 def _constrain_to_tech_nodes(tech_node: float):
