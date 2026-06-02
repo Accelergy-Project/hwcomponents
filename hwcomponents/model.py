@@ -9,28 +9,64 @@ from hwcomponents._util import parse_float
 T = TypeVar("T", bound="ComponentModel")
 
 
-class EnergyLatency(NamedTuple):
-    energy: float
-    latency: float
+class ActionCost:
+    """
+    The cost of an action, returned by @action functions.
 
-    def __add__(self, other: "EnergyLatency") -> "EnergyLatency":
-        return EnergyLatency(self.energy + other.energy, self.latency + other.latency)
+    Parameters
+    ----------
+    energy: float
+        The energy of the action in Joules.
+    latency: float
+        The latency of the action in seconds.
+    throughput: float
+        The throughput of the action in actions/second.
+    """
+
+    def __init__(self, energy: float, latency: float, throughput: float):
+        self.energy = energy
+        self.latency = latency
+        self.throughput = throughput
+
+    def __repr__(self):
+        return (
+            f"ActionCost(energy={self.energy!r}, latency={self.latency!r}, "
+            f"throughput={self.throughput!r})"
+        )
+
+
+def _apply_scale_func(callfunc, target: float, default: float) -> float:
+    """Apply a scaling function, or a tuple of composed scaling functions. For a tuple,
+    the first function is called with (target, default) and each subsequent function
+    transforms the running value. For example, (tech_node_latency, reciprocal) yields
+    the reciprocal of the latency scaling."""
+    if isinstance(callfunc, tuple):
+        value = callfunc[0](target, default)
+        for func in callfunc[1:]:
+            value = func(value, 1)
+        return value
+    return callfunc(target, default)
 
 
 def action(
-    func: Callable[..., Union[float, tuple[float, float]]] = None,
+    func: Callable[..., ActionCost] = None,
     bits_per_action: str | Number = None,
-    pipelined_subcomponents: bool = False,
-) -> Callable[..., EnergyLatency]:
+) -> Callable[..., ActionCost]:
     """
-    Decorator that adds an action to an energy/area model. If the component has no
-    subcomponents, then the action is expected to return a tuple of (energy, latency)
-    where energy is in Joules and latency is in seconds. If the component has
-    subcomponents, then None return values are assumed to be (0, 0), and subcomponent
-    actions that occur during the component's action will be added to the component's
-    energy and latency. The energy and latency of the subcomponents will NOT be scaled
-    by the component's energy_scale and latency_scale; to scale these, set the
-    subcomponents' scaling factors directly.
+    Decorator that adds an action to a model. If the component has no subcomponents,
+    then the action is expected to return an ActionCost(energy, throughput, latency)
+    where energy is in Joules, throughput is in actions/second, and latency is in
+    seconds. If the component has subcomponents, then None return values are assumed to
+    be zero cost, and subcomponent actions that occur during the component's action will
+    be added to the component's cost. Subcomponents are not affected by the scaling
+    factors of the component; to scale these, set the subcomponents' scaling factors
+    directly.
+
+    Costs compose in the following ways for subcomponents:
+
+    - Energy: Summed
+    - Latency: Summed
+    - Throughput: Minned
 
     Parameters
     ----------
@@ -38,15 +74,12 @@ def action(
             The function to decorate.
         bits_per_action : str
             The attribute of the model that contains the number of bits per action. If
-            this is set and a bits_per_action is passed to the function, the energy and
-            latency will be scaled by the number of bits. For example, if
-            bits_per_action is set to "width", the function is called with
-            bits_per_action=10, and the model has a width attribute of 5, then the
-            energy and latency will be scaled by 2.
-        pipelined_subcomponents : bool
-            Whether the subcomponents are pipelined. If True, then the latency of is the
-            max of the latency returned and all subcomponent latencies. Otherwise, it is
-            the sum. Does nothing if there are no subcomponents.
+            this is set and a bits_per_action is passed to the function, the energy will
+            be scaled by the number of bits and the throughput will be scaled by its
+            reciprocal. Latency is per-action and does NOT scale with bits_per_action.
+            For example, if bits_per_action is set to "width", the function is called
+            with bits_per_action=10, and the model has a width attribute of 5, then the
+            energy will be scaled by 2 and the throughput will be halved.
     Returns
     -------
         The decorated function.
@@ -70,6 +103,7 @@ def action(
             for subcomponent in self.subcomponents:
                 subcomponent._energy_used = 0
                 subcomponent._latency_used = 0
+                subcomponent._throughput_used = float("inf")
             scale = 1
             scalestr = None
             if bits_per_action is not None and "bits_per_action" in kwargs:
@@ -90,68 +124,76 @@ def action(
                 scalestr = f"Scaling by {kwargs['bits_per_action']=} / {nominal_bits=}"
             kwargs = {k: v for k, v in kwargs.items() if k not in additional_kwargs}
             returned_value = func(self, *args, **kwargs)
-            # Normalize return to (energy, latency)
             if returned_value is None:
                 if not self._subcomponents_set and not self.subcomponents:
                     raise ValueError(
                         f"@action function {func.__name__} did not return a value. "
                         f"This is permitted if and only if the component has no "
                         f"subcomponents. Please either initialize subcomponents or ensure "
-                        f"that the @action function returns a tuple of (energy, latency)."
+                        f"that the @action function returns an "
+                        f"ActionCost(energy, throughput, latency)."
                     )
-                energy_val, latency_val = 0.0, 0.0
-            elif isinstance(returned_value, (tuple, list)) and len(returned_value) == 2:
-                energy_val, latency_val = returned_value
+                cost = ActionCost(energy=0.0, latency=0.0, throughput=float("inf"))
+            elif isinstance(returned_value, ActionCost):
+                cost = returned_value
             else:
                 raise ValueError(
                     f"@action function {func.__name__} returned an invalid value. "
-                    f"Expected a tuple of (energy, latency), got {returned_value}."
+                    f"Expected an ActionCost, got {returned_value}."
                 )
 
-            self.logger.info(
-                f"Function {func.__name__} returned energy {energy_val} and latency {latency_val}"
-            )
+            energy_val = cost.energy
+            latency_val = cost.latency
+            throughput_val = cost.throughput
+
+            self.logger.info(f"Function {func.__name__} returned {cost}")
             if scalestr is not None:
                 self.logger.info(scalestr)
 
             if not was_already_calling_action:
                 energy_val *= self.energy_scale
+                latency_val *= self.latency_scale
+                throughput_val *= self.throughput_scale
                 if self.energy_scale != 1:
                     self.logger.info(f"Scaling energy by {self.energy_scale=}")
-                for subcomponent in self.subcomponents:
-                    self.logger.info(
-                        f"Adding subcomponent {subcomponent.__class__.__name__} energy {subcomponent._energy_used}"
-                    )
-                    energy_val += subcomponent._energy_used
-                    subcomponent._energy_used = 0
-                energy_val *= scale
-                self._energy_used += energy_val
-
-                latency_val *= self.latency_scale
                 if self.latency_scale != 1:
                     self.logger.info(f"Scaling latency by {self.latency_scale=}")
-                target_func = max if pipelined_subcomponents else sum
-                x = "Max" if pipelined_subcomponents else "Summ"
+                if self.throughput_scale != 1:
+                    self.logger.info(f"Scaling throughput by {self.throughput_scale=}")
                 for subcomponent in self.subcomponents:
                     self.logger.info(
-                        f"{x}ing subcomponent {subcomponent.__class__.__name__} latency {subcomponent._latency_used}"
+                        f"Adding subcomponent {subcomponent.__class__.__name__} cost: "
+                        f"energy {subcomponent._energy_used} latency {subcomponent._latency_used} "
+                        f"throughput {subcomponent._throughput_used}"
                     )
-                    latency_val = target_func((latency_val, subcomponent._latency_used))
+                    energy_val += subcomponent._energy_used
+                    latency_val += subcomponent._latency_used
+                    throughput_val = min(throughput_val, subcomponent._throughput_used)
+                    subcomponent._energy_used = 0
                     subcomponent._latency_used = 0
-                latency_val *= scale
+                    subcomponent._throughput_used = float("inf")
+                energy_val *= scale
+                throughput_val /= scale
+                self._energy_used += energy_val
                 self._latency_used += latency_val
+                self._throughput_used = min(self._throughput_used, throughput_val)
 
                 for subcomponent in self.subcomponents:
-                    self.logger.info(f"Log for subcomponent {subcomponent.__class__.__name__}:")
+                    self.logger.info(
+                        f"Log for subcomponent {subcomponent.__class__.__name__}:"
+                    )
                     for message in pop_all_messages(subcomponent.logger):
                         if message:
                             self.logger.info(f"\t{message}")
 
                 self.logger.info(
-                    f"** Final return value for {self.__class__.__name__}.{func.__name__}: energy {energy_val} and latency {latency_val}"
+                    f"** Final return value for {self.__class__.__name__}.{func.__name__}: "
+                    f"energy {energy_val}, throughput {throughput_val}, latency {latency_val}"
                 )
 
-            return EnergyLatency(energy_val, latency_val)
+            return ActionCost(
+                energy=energy_val, latency=latency_val, throughput=throughput_val
+            )
         except:
             raise
         finally:
@@ -188,6 +230,9 @@ class ComponentModel(ListLoggable, ABC):
         area_scale: float
             A scale factor for the area. All calls to area will be scaled by this
             factor.
+        throughput_scale: float
+            A scale factor for the throughput. All calls to @action will be scaled by
+            this factor.
         latency_scale: float
             A scale factor for the latency. All calls to @action will be scaled by this
             factor.
@@ -197,12 +242,12 @@ class ComponentModel(ListLoggable, ABC):
         subcomponents: list[ComponentModel] | None
             A list of subcomponents. If set, the area and leak power of the
             subcomponents will be added to the area and leak power of the component. All
-            calls to @action functions will be added to the energy and latency of the
-            component if they occur during one of the component's actions. The area,
-            energy, latency, and leak power of subcomponents WILL NOT BE scaled by the
-            component's energy_scale, area_scale, or leak_power_scale; if you want to
-            scale the subcomponents, multiply their energy_scale, area_scale,
-            latency_scale, or leak_power_scale by the desired scale factor.
+            calls to @action functions will be added to the cost of the component if
+            they occur during one of the component's actions. The area, energy, leak
+            power, and throughput of subcomponents WILL NOT BE scaled by the component's
+            energy_scale, area_scale, throughput_scale, or leak_power_scale; if you want
+            to scale the subcomponents, multiply their energy_scale, area_scale,
+            throughput_scale, or leak_power_scale by the desired scale factor.
 
     Attributes
     ----------
@@ -214,18 +259,20 @@ class ComponentModel(ListLoggable, ABC):
             will be scaled by this factor.
         area_scale: A scale factor for the area. All calls to area
             will be scaled by this factor.
+        throughput_scale: A scale factor for the throughput. All calls to @action
+            will be scaled by this factor.
         latency_scale: A scale factor for the latency. All calls to @action
             will be scaled by this factor.
         leak_power_scale: A scale factor for the leakage power. All calls to leak_power
             will be scaled by this factor.
         subcomponents: A list of subcomponents. If set, the area and leak power of the
             subcomponents will be added to the area and leak power of the component. All
-            calls to @action functions will be added to the energy and latency of the
-            component if they occur during one of the component's actions. The area,
-            energy, latency, and leak power of subcomponents WILL NOT BE scaled by the
-            component's energy_scale, area_scale, or leak_power_scale; if you want to
-            scale the subcomponents, multiply their energy_scale, area_scale,
-            latency_scale, or leak_power_scale by the desired scale factor.
+            calls to @action functions will be added to the cost of the component if
+            they occur during one of the component's actions. The area, energy, leak
+            power, and throughput of subcomponents WILL NOT BE scaled by the component's
+            energy_scale, area_scale, throughput_scale, or leak_power_scale; if you want
+            to scale the subcomponents, multiply their energy_scale, area_scale,
+            throughput_scale, or leak_power_scale by the desired scale factor.
     """
 
     component_name: Union[str, List[str], None] = None
@@ -258,6 +305,7 @@ class ComponentModel(ListLoggable, ABC):
         self.area_scale: float = 1
         self.energy_scale: float = 1
         self.latency_scale: float = 1
+        self.throughput_scale: float = 1
         self.leak_power_scale: float = 1
         self._leak_power: float = leak_power if leak_power is not None else 0
         self._area: float = area if area is not None else 0
@@ -267,6 +315,7 @@ class ComponentModel(ListLoggable, ABC):
         self._subcomponents_set = subcomponents is not None
         self._energy_used: float = 0
         self._latency_used: float = 0
+        self._throughput_used: float = float("inf")
 
     @property
     def leak_power(self) -> Number:
@@ -307,9 +356,13 @@ class ComponentModel(ListLoggable, ABC):
         energy_scale_function: Callable[[float, float], float] | None = None,
         latency_scale_function: Callable[[float, float], float] | None = None,
         leak_power_scale_function: Callable[[float, float], float] | None = None,
+        throughput_scale_function: (
+            Callable[[float, float], float] | tuple | None
+        ) = None,
     ) -> float:
         """
-        Scales this model's area, energy, latency, and leak power to the given target.
+        Scales this model's area, energy, latency, leak power, and throughput to the
+        given target.
 
         Parameters
         ----------
@@ -333,6 +386,9 @@ class ComponentModel(ListLoggable, ABC):
             leak_power_scale_function: Callable[[float, float], float]
                 The function to use to scale the leak power. None if no scaling should
                 be done.
+            throughput_scale_function: Callable[[float, float], float] | tuple
+                The function (or tuple of composed functions) to use to scale the
+                throughput. None if no scaling should be done.
         """
         super()._init_logger(f"{self._component_name()}")
         if target == default:
@@ -343,12 +399,13 @@ class ComponentModel(ListLoggable, ABC):
             ("energy_scale", energy_scale_function),
             ("latency_scale", latency_scale_function),
             ("leak_power_scale", leak_power_scale_function),
+            ("throughput_scale", throughput_scale_function),
         ]:
             try:
                 if callfunc is None:
                     continue
                 prev_val = getattr(self, attr)
-                scale = callfunc(target, default)
+                scale = _apply_scale_func(callfunc, target, default)
                 setattr(self, attr, prev_val * scale)
                 self.logger.info(
                     f"Scaled {key} from {default} to {target}: {attr} multiplied by {scale}"
@@ -356,7 +413,7 @@ class ComponentModel(ListLoggable, ABC):
             except:
                 target_float = parse_float(target, f"{self._component_name()}.{key}")
                 default_float = parse_float(default, f"{self._component_name()}.{key}")
-                scale = callfunc(target_float, default_float)
+                scale = _apply_scale_func(callfunc, target_float, default_float)
                 setattr(self, attr, prev_val * scale)
                 self.logger.info(
                     f"Scaled {key} from {default} to {target}: {attr} multiplied by {scale}"
@@ -383,15 +440,19 @@ class ComponentModel(ListLoggable, ABC):
             tech_node_area,
             tech_node_energy,
             tech_node_latency,
+            tech_node_throughput,
             tech_node_leak,
         )
+
         return self.scale(
             "tech_node",
-            target, default,
-            tech_node_area,
-            tech_node_energy,
-            tech_node_latency,
-            tech_node_leak,
+            target,
+            default,
+            area_scale_function=tech_node_area,
+            energy_scale_function=tech_node_energy,
+            latency_scale_function=tech_node_latency,
+            leak_power_scale_function=tech_node_leak,
+            throughput_scale_function=tech_node_throughput,
         )
 
     @classmethod
@@ -489,7 +550,7 @@ class ComponentModel(ListLoggable, ABC):
             action_name=action_name,
             action_arguments=kwargs,
         )
-        value = wrapper.get_action_energy_latency(query, initialized_obj=self)
+        value = wrapper.get_action_cost(query, initialized_obj=self)
         if _return_estimation_object:
             return value
         return value.value

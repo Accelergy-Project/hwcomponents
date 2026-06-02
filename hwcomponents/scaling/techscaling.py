@@ -77,10 +77,16 @@ def tech_node_area(to_node: float, from_node: float) -> float:
     Returns the scaling factor for area from the technology node
     `from_node` to the technology node `to_node`. Interpolates if necessary.
 
-    Args:
-        to_node: The technology node to scale to.
-        from_node: The technology node to scale from.
-    Returns:
+    Parameters
+    ----------
+    to_node : float
+        The technology node to scale to.
+    from_node : float
+        The technology node to scale from.
+
+    Returns
+    -------
+    float
         The scaling factor for area.
     """
     from_node, x = _constrain_to_tech_nodes(from_node)
@@ -109,11 +115,18 @@ def tech_node_energy(
     """Returns the scaling factor for energy from the technology node
     `from_node` to the technology node `to_node`. Interpolates if necessary.
 
-    Args:
-        to_node: The technology node to scale to.
-        from_node: The technology node to scale from.
-        vdd: The voltage to scale by. If not provided, 0.8V is used.
-    Returns:
+    Parameters
+    ----------
+    to_node : float
+        The technology node to scale to.
+    from_node : float
+        The technology node to scale from.
+    vdd : Union[float, None]
+        The voltage to scale by. If not provided, 0.8V is used.
+
+    Returns
+    -------
+    float
         The scaling factor for energy.
     """
     # Based on IRDS 2022, energy stops scaling after 1nm
@@ -162,11 +175,18 @@ def tech_node_leak(
     """Returns the scaling factor for leakage power from the technology node
     `from_node` to the technology node `to_node`. Interpolates if necessary.
 
-    Args:
-        to_node: The technology node to scale to.
-        from_node: The technology node to scale from.
-        vdd: The voltage to scale by. If not provided, 0.8V is used.
-    Returns:
+    Parameters
+    ----------
+    to_node : float
+        The technology node to scale to.
+    from_node : float
+        The technology node to scale from.
+    vdd : Union[float, None]
+        The voltage to scale by. If not provided, 0.8V is used.
+
+    Returns
+    -------
+    float
         The scaling factor for leakage power.
     """
     return tech_node_energy(to_node, from_node, vdd)
@@ -176,10 +196,35 @@ def tech_node_latency(to_node: float, from_node: float) -> float:
     """Returns the scaling factor for latency from the technology node
     `from_node` to the technology node `to_node`. Interpolates if necessary.
 
-    Args:
-        to_node: The technology node to scale to.
-        from_node: The technology node to scale from.
-    Returns:
+    Parameters
+    ----------
+    to_node : float
+        The technology node to scale to.
+    from_node : float
+        The technology node to scale from.
+
+    Returns
+    -------
+    float
         The scaling factor for latency.
     """
     return to_node / from_node
+
+
+def tech_node_throughput(to_node: float, from_node: float) -> float:
+    """Returns the scaling factor for throughput from the technology node
+    `from_node` to the technology node `to_node`. Interpolates if necessary.
+
+    Parameters
+    ----------
+    to_node : float
+        The technology node to scale to.
+    from_node : float
+        The technology node to scale from.
+
+    Returns
+    -------
+    float
+        The scaling factor for throughput.
+    """
+    return from_node / to_node

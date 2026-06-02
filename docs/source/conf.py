@@ -1,34 +1,36 @@
 import os
 import sys
-sys.path.insert(0, os.path.abspath('_ext'))
-sys.path.insert(0, os.path.abspath('../..'))  # Make your repo importable
+
+sys.path.insert(0, os.path.abspath("_ext"))
+sys.path.insert(0, os.path.abspath("../.."))  # Make your repo importable
 
 import locale
-locale.setlocale(locale.LC_ALL, 'C.UTF-8')
+
+locale.setlocale(locale.LC_ALL, "C.UTF-8")
 
 # -- Project information -----------------------------------------------------
-project = 'HWComponents'
-author = 'Tanner Andrulis'
-release = '0.1.0'
+project = "HWComponents"
+author = "Tanner Andrulis"
+release = "0.1.0"
 
 # -- HTML output -------------------------------------------------------------
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 # html_static_path = ['_static']
 
 extensions = [
-    'sphinx.ext.autodoc',            # Pull docstrings
-    'sphinx.ext.napoleon',           # NumPy / Google style docstrings
-    'sphinx.ext.autosummary',        # Generate autodoc summaries
-    'sphinx.ext.viewcode',           # Add links to source code
-    'sphinx_autodoc_typehints',      # Include type hints
-    'include_docstring',             # Include docstrings
-    'include_notebook',              # Include notebooks
+    "sphinx.ext.autodoc",  # Pull docstrings
+    "sphinx.ext.napoleon",  # NumPy / Google style docstrings
+    "sphinx.ext.autosummary",  # Generate autodoc summaries
+    "sphinx.ext.viewcode",  # Add links to source code
+    "sphinx_autodoc_typehints",  # Include type hints
+    "include_docstring",  # Include docstrings
+    "include_notebook",  # Include notebooks
 ]
 
 autodoc_default_options = {
-    'members': True,
-    'undoc-members': False,
-    'exclude-members': 'model_config,model_fields,__pydantic_fields__,model_post_init'
+    "members": True,
+    "undoc-members": False,
+    "exclude-members": "model_config,model_fields,__pydantic_fields__,model_post_init",
 }
 
 # ---------- Autodoc settings ----------

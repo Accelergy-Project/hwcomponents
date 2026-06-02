@@ -64,19 +64,25 @@ def _call_model(
 def _get_energy_estimation(
     model: ComponentModelWrapper, query: ModelQuery
 ) -> FloatEstimation:
-    e = _call_model(model, query, model.get_action_energy_latency)
+    e = _call_model(model, query, model.get_action_cost)
     if e.success:
-        e.value = e.value[0]
+        e.value = e.value.energy
     return e
 
 
-def _get_latency_estimation(
+def _get_throughput_estimation(
     model: ComponentModelWrapper, query: ModelQuery
 ) -> FloatEstimation:
-    e = _call_model(model, query, model.get_action_energy_latency)
+    e = _call_model(model, query, model.get_action_cost)
     if e.success:
-        e.value = e.value[1]
+        e.value = e.value.throughput
     return e
+
+
+def _get_action_cost_estimation(
+    model: ComponentModelWrapper, query: ModelQuery
+) -> Estimation:
+    return _call_model(model, query, model.get_action_cost)
 
 
 def _get_area_estimation(
@@ -134,8 +140,10 @@ def _get_best_estimate(
 
     if target == "energy":
         est_func = _get_energy_estimation
-    elif target == "latency":
-        est_func = _get_latency_estimation
+    elif target == "throughput":
+        est_func = _get_throughput_estimation
+    elif target == "action_cost":
+        est_func = _get_action_cost_estimation
     elif target == "area":
         est_func = _get_area_estimation
     elif target == "model":
@@ -272,7 +280,7 @@ def _get_best_estimate(
     )
 
 
-def get_energy(
+def get_action_cost(
     component_name: str,
     component_attributes: Dict[str, Any],
     action_name: str,
@@ -280,9 +288,9 @@ def get_energy(
     models: List[ComponentModelWrapper] = None,
     _return_estimation_object: bool = False,
     _relaxed_component_name_selection: bool = False,
-) -> float | Estimation:
+) -> "ActionCost | Estimation":
     """
-    Finds the energy using the best-matching model. "Best" is defined as the
+    Finds the action cost using the best-matching model. "Best" is defined as the
     highest-priority model that has all required attributes specified in
     component_attributes and a matching action with all required arguments specified
     in action_arguments.
@@ -295,63 +303,21 @@ def get_energy(
         action_arguments: The arguments of the action.
         models: The models to use.
         _return_estimation_object: Whether to return the estimation object instead of
-            the energy value.
+            the action cost value.
         _relaxed_component_name_selection: Whether to relax the component name
             selection. Relaxed selection ignores underscores in the component name.
 
     Returns
     -------
-        The energy in Joules.
+        ActionCost
+            The cost of this action.
     """
     query = ModelQuery(
         component_name.lower(), component_attributes, action_name, action_arguments
     )
     return _get_best_estimate(
         query,
-        "energy",
-        models,
-        _return_estimation_object,
-        _relaxed_component_name_selection,
-    )
-
-
-def get_latency(
-    component_name: str,
-    component_attributes: Dict[str, Any],
-    action_name: str,
-    action_arguments: Dict[str, Any],
-    models: List[ComponentModelWrapper] = None,
-    _return_estimation_object: bool = False,
-    _relaxed_component_name_selection: bool = False,
-) -> float | Estimation:
-    """
-    Finds the latency using the best-matching model. "Best" is defined as the
-    highest-priority model that has all required attributes specified in
-    component_attributes and a matching action with all required arguments specified
-    in action_arguments.
-
-    Parameters
-    ----------
-        component_name: The name of the component.
-        component_attributes: The attributes of the component.
-        action_name: The name of the action.
-        action_arguments: The arguments of the action.
-        models: The models to use.
-        _return_estimation_object: Whether to return the estimation object instead of
-            the latency value.
-        _relaxed_component_name_selection: Whether to relax the component name
-            selection. Relaxed selection ignores underscores in the component name.
-
-    Returns
-    -------
-        The latency in seconds.
-    """
-    query = ModelQuery(
-        component_name.lower(), component_attributes, action_name, action_arguments
-    )
-    return _get_best_estimate(
-        query,
-        "latency",
+        "action_cost",
         models,
         _return_estimation_object,
         _relaxed_component_name_selection,

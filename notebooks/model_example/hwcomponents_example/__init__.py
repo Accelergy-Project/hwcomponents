@@ -1,3 +1,3 @@
-from .TernaryMAC import TernaryMAC
+from .ternary_mac import TernaryMAC
 
 __all__ = ["TernaryMAC"]

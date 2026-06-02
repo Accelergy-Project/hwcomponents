@@ -9,10 +9,16 @@ def linear(target: float, scalefrom: float) -> float:
     """
     Linear scaling function. Returns target / scalefrom.
 
-    Args:
-        target: The target value.
-        scalefrom: The value to scale from.
-    Returns:
+    Parameters
+    ----------
+    target : float
+        The target value.
+    scalefrom : float
+        The value to scale from.
+
+    Returns
+    -------
+    float
         The scaled value.
     """
     return target / scalefrom
@@ -22,10 +28,16 @@ def reciprocal(target: float, scalefrom: float) -> float:
     """
     Reciprocal scaling function. Returns 1 / (target / scalefrom).
 
-    Args:
-        target: The target value.
-        scalefrom: The value to scale from.
-    Returns:
+    Parameters
+    ----------
+    target : float
+        The target value.
+    scalefrom : float
+        The value to scale from.
+
+    Returns
+    -------
+    float
         The scaled value.
     """
     return 1 / (target / scalefrom)
@@ -38,9 +50,14 @@ def pow_base(power: float) -> Callable[[float, float], float]:
     energy/area scaling with an integer resolution: at target=scalefrom the
     multiplier is 1; at target=scalefrom+1 the multiplier is the base (2).
 
-    Args:
-        power: The base to scale by.
-    Returns:
+    Parameters
+    ----------
+    power : float
+        The base to scale by.
+
+    Returns
+    -------
+    Callable[[float, float], float]
         A lambda that computes power ** (target - scalefrom).
     """
     return lambda target, scalefrom: power ** (target - scalefrom)
@@ -56,9 +73,14 @@ def nlog_base(power: float) -> Callable[[float, float], float]:
     Logarithmic scaling function. Returns a lambda that computes (target *
     math.log(target, power)) / (scalefrom * math.log(scalefrom, power)).
 
-    Args:
-        power: The power to scale by.
-    Returns:
+    Parameters
+    ----------
+    power : float
+        The power to scale by.
+
+    Returns
+    -------
+    Callable[[float, float], float]
         A lambda that computes (target * math.log(target, power)) / (scalefrom *
         math.log(scalefrom, power)).
     """
@@ -80,10 +102,16 @@ def cacti_depth_energy(target: float, scalefrom: float) -> float:
     CACTI depth scaling. Based on empirical measurement of CACTI, for which energy
     scales with depth to the power of (1.56 / 2).
 
-    Args:
-        target: The target depth.
-        scalefrom: The depth to scale from.
-    Returns:
+    Parameters
+    ----------
+    target : float
+        The target depth.
+    scalefrom : float
+        The depth to scale from.
+
+    Returns
+    -------
+    float
         The scaled energy.
     """
     return (target / scalefrom) ** (1.56 / 2)  # Based on CACTI scaling
@@ -94,10 +122,16 @@ def cacti_depth_area(target: float, scalefrom: float) -> float:
     CACTI depth scaling. Based on empirical measurement of CACTI, for which area scales
     linearly with depth.
 
-    Args:
-        target: The target depth.
-        scalefrom: The depth to scale from.
-    Returns:
+    Parameters
+    ----------
+    target : float
+        The target depth.
+    scalefrom : float
+        The depth to scale from.
+
+    Returns
+    -------
+    float
         The scaled area.
     """
     return target / scalefrom  # Based on CACTI scaling
@@ -108,10 +142,16 @@ def cacti_depth_leak(target: float, scalefrom: float) -> float:
     CACTI depth scaling. Based on empirical measurement of CACTI, for which leakage
     power scales linearly with depth.
 
-    Args:
-        target: The target depth.
-        scalefrom: The depth to scale from.
-    Returns:
+    Parameters
+    ----------
+    target : float
+        The target depth.
+    scalefrom : float
+        The depth to scale from.
+
+    Returns
+    -------
+    float
         The scaled leakage power.
     """
     return target / scalefrom  # Based on CACTI scaling

@@ -382,10 +382,10 @@ class ComponentModelWrapper(ListLoggable):
             )
         return matching_name_and_arg_actions
 
-    def get_action_energy_latency(
+    def get_action_cost(
         self, query: ModelQuery, initialized_obj: ComponentModel = None
     ) -> Estimation:
-        """Returns the energy and latency estimation for the given action."""
+        """Returns the ActionCost estimation for the given action."""
         if initialized_obj is None:
             initialized_obj = self.get_initialized_subclass(query)
             move_queue_from_one_logger_to_another(initialized_obj.logger, self.logger)
@@ -400,10 +400,7 @@ class ComponentModelWrapper(ListLoggable):
             result = supported_actions[0].call(
                 query.action_arguments, self.component_name, initialized_obj
             )
-            energy_value, latency_value = result
-            estimation = FloatEstimation(
-                value=(energy_value, latency_value),
-            )
+            estimation = FloatEstimation(value=result)
         except Exception as e:
             move_queue_from_one_logger_to_another(initialized_obj.logger, self.logger)
             raise e
