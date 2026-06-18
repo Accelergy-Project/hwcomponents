@@ -1,5 +1,6 @@
 import glob
 import importlib
+import importlib.util
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from types import ModuleType
@@ -10,9 +11,11 @@ import logging
 import copy
 import sys
 import os
+import threading
 from pkgutil import iter_modules
 
 _ALL_ESTIMATORS = None
+_MODULE_LOAD_LOCK = threading.Lock()
 
 
 def installed_models(
@@ -243,8 +246,17 @@ def get_models(
             module_name = f"_hwc_model_{base_name}_{abs(hash(os.path.abspath(path)))}"
             if abs_dir not in sys.path:
                 sys.path.append(abs_dir)
-            python_module = SourceFileLoader(module_name, path).load_module()
-            sys.modules[module_name] = python_module
+            with _MODULE_LOAD_LOCK:
+                python_module = sys.modules.get(module_name)
+                if python_module is None:
+                    spec = importlib.util.spec_from_file_location(module_name, path)
+                    python_module = importlib.util.module_from_spec(spec)
+                    sys.modules[module_name] = python_module
+                    try:
+                        spec.loader.exec_module(python_module)
+                    except BaseException:
+                        sys.modules.pop(module_name, None)
+                        raise
             new_models += get_models_in_module(
                 python_module, model_ids, _return_wrappers
             )

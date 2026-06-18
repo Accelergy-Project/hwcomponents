@@ -7,7 +7,6 @@
 from math import ceil, floor
 from typing import Union
 
-
 TECH_NODES = [130e-9, 90e-9, 65e-9, 45e-9, 32e-9, 20e-9, 16e-9, 14e-9, 10e-9, 7e-9]
 AREA_SCALING = [
     [1, 0.44, 0.23, 0.16, 0.072, 0.033, 0.03, 0.027, 0.016, 0.0092],
