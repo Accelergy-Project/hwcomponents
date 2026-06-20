@@ -58,9 +58,7 @@ def action(
     where energy is in Joules, throughput is in actions/second, and latency is in
     seconds. If the component has subcomponents, then None return values are assumed to
     be zero cost, and subcomponent actions that occur during the component's action will
-    be added to the component's cost. Subcomponents are not affected by the scaling
-    factors of the component; to scale these, set the subcomponents' scaling factors
-    directly.
+    be added to the component's cost.
 
     Costs compose in the following ways for subcomponents:
 
@@ -224,30 +222,11 @@ class ComponentModel(ListLoggable, ABC):
             not set.
         area: float | None
             The area of the component in m^2. Must be set if subcomponents is not set.
-        energy_scale: float
-            A scale factor for the energy. All calls to @action will be scaled by this
-            factor.
-        area_scale: float
-            A scale factor for the area. All calls to area will be scaled by this
-            factor.
-        throughput_scale: float
-            A scale factor for the throughput. All calls to @action will be scaled by
-            this factor.
-        latency_scale: float
-            A scale factor for the latency. All calls to @action will be scaled by this
-            factor.
-        leak_power_scale: float
-            A scale factor for the leakage power. All calls to leak_power will be scaled
-            by this factor.
         subcomponents: list[ComponentModel] | None
             A list of subcomponents. If set, the area and leak power of the
             subcomponents will be added to the area and leak power of the component. All
             calls to @action functions will be added to the cost of the component if
-            they occur during one of the component's actions. The area, energy, leak
-            power, and throughput of subcomponents WILL NOT BE scaled by the component's
-            energy_scale, area_scale, throughput_scale, or leak_power_scale; if you want
-            to scale the subcomponents, multiply their energy_scale, area_scale,
-            throughput_scale, or leak_power_scale by the desired scale factor.
+            they occur during one of the component's actions.
 
     Attributes
     ----------
@@ -255,24 +234,32 @@ class ComponentModel(ListLoggable, ABC):
             strings. Can be omitted if the component name is the same as the class name.
         priority: The priority of the model. Higher priority models are used first.
             Must be a number between 0 and 1.
-        energy_scale: A scale factor for the energy. All calls to action
-            will be scaled by this factor.
-        area_scale: A scale factor for the area. All calls to area
-            will be scaled by this factor.
-        throughput_scale: A scale factor for the throughput. All calls to @action
-            will be scaled by this factor.
-        latency_scale: A scale factor for the latency. All calls to @action
-            will be scaled by this factor.
-        leak_power_scale: A scale factor for the leakage power. All calls to leak_power
-            will be scaled by this factor.
+        energy_scale:
+            A scale factor for the energy of this component. The energy of all calls to
+            actions will be scaled by this factor. WILL NOT AFFECT SUBCOMPONENT ENERGY.
+        area_scale:
+            A scale factor for the area of this component. All accesses to area will be
+            scaled by this factor. WILL NOT AFFECT SUBCOMPONENT AREA.
+        throughput_scale:
+            A scale factor for the throughput of this component. The throughput of all
+            calls to @action will be scaled by this factor. WILL NOT AFFECT SUBCOMPONENT
+            THROUGHPUT.
+        latency_scale:
+            A scale factor for the latency of this component. The latency of all calls
+            to @action will be scaled by this factor. WILL NOT AFFECT SUBCOMPONENT
+            LATENCY.
+        leak_power_scale: A scale factor for the leakage power of this component. All
+            accesses to leak_power will be scaled by this factor. WILL NOT AFFECT
+            SUBCOMPONENT LEAK POWER.
         subcomponents: A list of subcomponents. If set, the area and leak power of the
-            subcomponents will be added to the area and leak power of the component. All
-            calls to @action functions will be added to the cost of the component if
-            they occur during one of the component's actions. The area, energy, leak
-            power, and throughput of subcomponents WILL NOT BE scaled by the component's
+            subcomponents are added to the area and leak power of the component, and all
+            calls to @action functions are added to the cost of the component if they
+            occur during one of the component's actions. The area, energy, leak power,
+            and throughput of subcomponents WILL NOT BE scaled by the component's
             energy_scale, area_scale, throughput_scale, or leak_power_scale; if you want
-            to scale the subcomponents, multiply their energy_scale, area_scale,
-            throughput_scale, or leak_power_scale by the desired scale factor.
+            to scale the subcomponents, use scale_area, scale_energy, scale_latency,
+            scale_throughput, scale_leak_power, or scale with include_subcomponents=True
+            or call scaling functions on the subcomponents directly.
     """
 
     component_name: Union[str, List[str], None] = None
@@ -302,11 +289,11 @@ class ComponentModel(ListLoggable, ABC):
                     f"must be set."
                 )
         super().__init__()
-        self.area_scale: float = 1
-        self.energy_scale: float = 1
-        self.latency_scale: float = 1
-        self.throughput_scale: float = 1
-        self.leak_power_scale: float = 1
+        self._area_scale: float = 1
+        self._energy_scale: float = 1
+        self._latency_scale: float = 1
+        self._throughput_scale: float = 1
+        self._leak_power_scale: float = 1
         self._leak_power: float = leak_power if leak_power is not None else 0
         self._area: float = area if area is not None else 0
         self.subcomponents: list["ComponentModel"] = (
@@ -326,7 +313,7 @@ class ComponentModel(ListLoggable, ABC):
         -------
             The leakage power in Watts.
         """
-        return self._leak_power * self.leak_power_scale + sum(
+        return self._leak_power * self._leak_power_scale + sum(
             s.leak_power for s in self.subcomponents
         )
 
@@ -339,7 +326,167 @@ class ComponentModel(ListLoggable, ABC):
         -------
             The area in m^2 of the component.
         """
-        return self._area * self.area_scale + sum(s.area for s in self.subcomponents)
+        return self._area * self._area_scale + sum(s.area for s in self.subcomponents)
+
+    @property
+    def area_scale(self) -> float:
+        """
+        A scale factor for the area of this component. All accesses to area will be
+        scaled by this factor. WILL NOT AFFECT SUBCOMPONENT AREA.
+        """
+        return self._area_scale
+
+    @area_scale.setter
+    def area_scale(self, value: float):
+        """Do not set area_scale directly. Use scale_area instead."""
+        raise AttributeError(
+            "area_scale cannot be set directly. Use scale_area instead."
+        )
+
+    @property
+    def energy_scale(self) -> float:
+        """
+        A scale factor for the energy of this component. The energy of all calls to
+        actions will be scaled by this factor. WILL NOT AFFECT SUBCOMPONENT ENERGY.
+        """
+        return self._energy_scale
+
+    @energy_scale.setter
+    def energy_scale(self, value: float):
+        """Do not set energy_scale directly. Use scale_energy instead."""
+        raise AttributeError(
+            "energy_scale cannot be set directly. Use scale_energy instead."
+        )
+
+    @property
+    def latency_scale(self) -> float:
+        """
+        A scale factor for the latency of this component. The latency of all calls to
+        @action will be scaled by this factor. WILL NOT AFFECT SUBCOMPONENT LATENCY.
+        """
+        return self._latency_scale
+
+    @latency_scale.setter
+    def latency_scale(self, value: float):
+        """Do not set latency_scale directly. Use scale_latency instead."""
+        raise AttributeError(
+            "latency_scale cannot be set directly. Use scale_latency instead."
+        )
+
+    @property
+    def throughput_scale(self) -> float:
+        """
+        A scale factor for the throughput of this component. The throughput of all calls
+        to @action will be scaled by this factor. WILL NOT AFFECT SUBCOMPONENT
+        THROUGHPUT.
+        """
+        return self._throughput_scale
+
+    @throughput_scale.setter
+    def throughput_scale(self, value: float):
+        """Do not set throughput_scale directly. Use scale_throughput instead."""
+        raise AttributeError(
+            "throughput_scale cannot be set directly. Use scale_throughput instead."
+        )
+
+    @property
+    def leak_power_scale(self) -> float:
+        """
+        A scale factor for the leakage power of this component. All accesses to
+        leak_power will be scaled by this factor. WILL NOT AFFECT SUBCOMPONENT LEAK
+        POWER.
+        """
+        return self._leak_power_scale
+
+    @leak_power_scale.setter
+    def leak_power_scale(self, value: float):
+        """Do not set leak_power_scale directly. Use scale_leak_power instead."""
+        raise AttributeError(
+            "leak_power_scale cannot be set directly. Use scale_leak_power instead."
+        )
+
+    def _scale_attr(self, attr: str, scale: float, include_subcomponents: bool):
+        setattr(self, attr, getattr(self, attr) * scale)
+        if include_subcomponents:
+            for s in self.subcomponents:
+                s._scale_attr(attr, scale, include_subcomponents)
+
+    def scale_area(self, scale: float, include_subcomponents: bool):
+        """
+        Multiplies this component's area scale factor by ``scale``. If
+        ``include_subcomponents`` is True, then subcomponent area is scaled as well.
+
+        Parameters
+        ----------
+        scale: float
+            The factor by which to scale the area.
+        include_subcomponents: bool
+            Whether to scale subcomponent area by the same factor. Finds all
+            subcomponents recursively.
+        """
+        self._scale_attr("_area_scale", scale, include_subcomponents)
+
+    def scale_energy(self, scale: float, include_subcomponents: bool):
+        """
+        Multiplies this component's energy scale factor by ``scale``. If
+        ``include_subcomponents`` is True, then subcomponent energy is scaled as well.
+
+        Parameters
+        ----------
+        scale: float
+            The factor by which to scale the energy.
+        include_subcomponents: bool
+            Whether to scale subcomponent energy by the same factor. Finds all
+            subcomponents recursively.
+        """
+        self._scale_attr("_energy_scale", scale, include_subcomponents)
+
+    def scale_latency(self, scale: float, include_subcomponents: bool):
+        """
+        Multiplies this component's latency scale factor by ``scale``. If
+        ``include_subcomponents`` is True, then subcomponent latency is scaled as well.
+
+        Parameters
+        ----------
+        scale: float
+            The factor by which to scale the latency.
+        include_subcomponents: bool
+            Whether to scale subcomponent latency by the same factor. Finds all
+            subcomponents recursively.
+        """
+        self._scale_attr("_latency_scale", scale, include_subcomponents)
+
+    def scale_throughput(self, scale: float, include_subcomponents: bool):
+        """
+        Multiplies this component's throughput scale factor by ``scale``. If
+        ``include_subcomponents`` is True, then subcomponent throughput is scaled as
+        well.
+
+        Parameters
+        ----------
+        scale: float
+            The factor by which to scale the throughput.
+        include_subcomponents: bool
+            Whether to scale subcomponent throughput by the same factor. Finds all
+            subcomponents recursively.
+        """
+        self._scale_attr("_throughput_scale", scale, include_subcomponents)
+
+    def scale_leak_power(self, scale: float, include_subcomponents: bool):
+        """
+        Multiplies this component's leak power scale factor by ``scale``. If
+        ``include_subcomponents`` is True, then subcomponent leak power is scaled as
+        well.
+
+        Parameters
+        ----------
+        scale: float
+            The factor by which to scale the leak power.
+        include_subcomponents: bool
+            Whether to scale subcomponent leak power by the same factor. Finds all
+            subcomponents recursively.
+        """
+        self._scale_attr("_leak_power_scale", scale, include_subcomponents)
 
     @classmethod
     def _component_name(cls) -> str:
@@ -359,6 +506,7 @@ class ComponentModel(ListLoggable, ABC):
         throughput_scale_function: (
             Callable[[float, float], float] | tuple | None
         ) = None,
+        include_subcomponents: bool = True,
     ) -> float:
         """
         Scales this model's area, energy, latency, leak power, and throughput to the
@@ -389,35 +537,33 @@ class ComponentModel(ListLoggable, ABC):
             throughput_scale_function: Callable[[float, float], float] | tuple
                 The function (or tuple of composed functions) to use to scale the
                 throughput. None if no scaling should be done.
+            include_subcomponents: bool
+                Whether to also scale the subcomponents by the same factors. Defaults to
+                True. When True, subcomponents are scaled as well.
         """
         super()._init_logger(f"{self._component_name()}")
         if target == default:
             return target
 
-        for attr, callfunc in [
-            ("area_scale", area_scale_function),
-            ("energy_scale", energy_scale_function),
-            ("latency_scale", latency_scale_function),
-            ("leak_power_scale", leak_power_scale_function),
-            ("throughput_scale", throughput_scale_function),
+        for attr, scale_method, callfunc in [
+            ("area_scale", self.scale_area, area_scale_function),
+            ("energy_scale", self.scale_energy, energy_scale_function),
+            ("latency_scale", self.scale_latency, latency_scale_function),
+            ("leak_power_scale", self.scale_leak_power, leak_power_scale_function),
+            ("throughput_scale", self.scale_throughput, throughput_scale_function),
         ]:
+            if callfunc is None:
+                continue
             try:
-                if callfunc is None:
-                    continue
-                prev_val = getattr(self, attr)
                 scale = _apply_scale_func(callfunc, target, default)
-                setattr(self, attr, prev_val * scale)
-                self.logger.info(
-                    f"Scaled {key} from {default} to {target}: {attr} multiplied by {scale}"
-                )
             except:
                 target_float = parse_float(target, f"{self._component_name()}.{key}")
                 default_float = parse_float(default, f"{self._component_name()}.{key}")
                 scale = _apply_scale_func(callfunc, target_float, default_float)
-                setattr(self, attr, prev_val * scale)
-                self.logger.info(
-                    f"Scaled {key} from {default} to {target}: {attr} multiplied by {scale}"
-                )
+            scale_method(scale, include_subcomponents)
+            self.logger.info(
+                f"Scaled {key} from {default} to {target}: {attr} multiplied by {scale}"
+            )
 
         return target
 

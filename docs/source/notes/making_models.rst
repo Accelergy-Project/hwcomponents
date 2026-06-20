@@ -38,6 +38,8 @@ model. The ``self.scale`` function takes the following arguments:
   no scaling should be done.
 - ``leak_scaling_function``: The scaling function to use for leakage power. Use ``None``
   if no scaling should be done.
+- ``include_subcomponents``: Whether to also scale the subcomponents by the same
+  factors. Defaults to ``True``.
 
 **Note: Area, Energy, Latency, and Leak Power are always in alphabetical order in the
 function arguments.**
@@ -84,9 +86,10 @@ subcomponents.
 
 The area, energy, latency, and leak power of subcomponents will NOT be scaled by the
 component's ``area_scale``, ``energy_scale``, ``latency_scale``, and
-``leak_power_scale``; if you want to scale the subcomponents, multiply the
-subcomponents' ``area_scale``, ``energy_scale``, ``latency_scale``, and
-``leak_power_scale`` by the desired scale factor.
+``leak_power_scale``; if you want to scale the subcomponents, either call ``self.scale``
+with ``include_subcomponents=True``, call the ``scale_area``, ``scale_energy``,
+``scale_latency``, or ``scale_leak_power`` methods with ``include_subcomponents=True``,
+or call any of these on the subcomponents directly.
 
 .. include-notebook:: ../../notebooks/2_making_models.ipynb
    :name: smartbuffer_sram
