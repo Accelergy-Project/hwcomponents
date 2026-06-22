@@ -413,7 +413,7 @@ class ComponentModel(ListLoggable, ABC):
             for s in self.subcomponents:
                 s._scale_attr(attr, scale, include_subcomponents)
 
-    def scale_area(self, scale: float, include_subcomponents: bool):
+    def scale_area(self, scale: float, include_subcomponents: bool = True):
         """
         Multiplies this component's area scale factor by ``scale``. If
         ``include_subcomponents`` is True, then subcomponent area is scaled as well.
@@ -428,7 +428,7 @@ class ComponentModel(ListLoggable, ABC):
         """
         self._scale_attr("_area_scale", scale, include_subcomponents)
 
-    def scale_energy(self, scale: float, include_subcomponents: bool):
+    def scale_energy(self, scale: float, include_subcomponents: bool = True):
         """
         Multiplies this component's energy scale factor by ``scale``. If
         ``include_subcomponents`` is True, then subcomponent energy is scaled as well.
@@ -443,7 +443,7 @@ class ComponentModel(ListLoggable, ABC):
         """
         self._scale_attr("_energy_scale", scale, include_subcomponents)
 
-    def scale_latency(self, scale: float, include_subcomponents: bool):
+    def scale_latency(self, scale: float, include_subcomponents: bool = True):
         """
         Multiplies this component's latency scale factor by ``scale``. If
         ``include_subcomponents`` is True, then subcomponent latency is scaled as well.
@@ -458,7 +458,7 @@ class ComponentModel(ListLoggable, ABC):
         """
         self._scale_attr("_latency_scale", scale, include_subcomponents)
 
-    def scale_throughput(self, scale: float, include_subcomponents: bool):
+    def scale_throughput(self, scale: float, include_subcomponents: bool = True):
         """
         Multiplies this component's throughput scale factor by ``scale``. If
         ``include_subcomponents`` is True, then subcomponent throughput is scaled as
@@ -474,7 +474,7 @@ class ComponentModel(ListLoggable, ABC):
         """
         self._scale_attr("_throughput_scale", scale, include_subcomponents)
 
-    def scale_leak_power(self, scale: float, include_subcomponents: bool):
+    def scale_leak_power(self, scale: float, include_subcomponents: bool = True):
         """
         Multiplies this component's leak power scale factor by ``scale``. If
         ``include_subcomponents`` is True, then subcomponent leak power is scaled as
