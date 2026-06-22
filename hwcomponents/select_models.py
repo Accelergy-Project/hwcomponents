@@ -10,6 +10,7 @@ from hwcomponents._logging import (
 )
 from hwcomponents._model_wrapper import (
     ComponentModelWrapper,
+    CallableFunction,
     ModelQuery,
     Estimation,
     EstimatorError,
@@ -126,6 +127,40 @@ def _wrap_model(
     return ComponentModelWrapper(model, model.__name__)
 
 
+def _count_arg_matches(
+    func: CallableFunction, provided: Dict[str, Any]
+) -> Tuple[int, int]:
+    accepted = (
+        set(func.non_default_args) | set(func.default_args) | func.additional_kwargs
+    )
+    provided_present = sum(1 for k in provided if k in accepted)
+    defaulted_unfilled = sum(1 for a in func.default_args if a not in provided)
+    return provided_present, defaulted_unfilled
+
+
+def _selection_key(model: ComponentModelWrapper, query: ModelQuery) -> tuple:
+    action_present = action_unfilled = 0
+    if query.action_name is not None:
+        counts = [
+            _count_arg_matches(a, query.action_arguments)
+            for a in model.actions
+            if a.function_name == query.action_name
+        ]
+        if counts:
+            action_present, action_unfilled = max(counts, key=lambda c: (c[0], -c[1]))
+    init_present, init_unfilled = _count_arg_matches(
+        model.init_function, query.component_attributes
+    )
+    return (
+        -model.priority,
+        -action_present,
+        -init_present,
+        action_unfilled,
+        init_unfilled,
+        f"{model.model_cls.__module__}.{model.model_cls.__qualname__}",
+    )
+
+
 def _get_best_estimate(
     query: ModelQuery,
     target: str,
@@ -211,6 +246,8 @@ def _get_best_estimate(
             e += "\n" + "\n".join(err_str)
         raise EstimatorError(e)
 
+    supported_models = sorted(supported_models, key=lambda m: _selection_key(m, query))
+
     estimation = None
     for model in supported_models:
         estimation = est_func(model, copy.deepcopy(query))
@@ -290,10 +327,11 @@ def get_action_cost(
     _relaxed_component_name_selection: bool = False,
 ) -> "ActionCost | Estimation":
     """
-    Finds the action cost using the best-matching model. "Best" is defined as the
-    highest-priority model that has all required attributes specified in
-    component_attributes and a matching action with all required arguments specified
-    in action_arguments.
+    Finds the action cost using the best-matching model. A model is a candidate if its
+    component name matches, all required attributes in component_attributes are
+    provided, and it has a matching action with all required arguments in
+    action_arguments provided. See :py:func:`get_model` for how the best model is
+    chosen.
 
     Parameters
     ----------
@@ -332,9 +370,9 @@ def get_area(
     _relaxed_component_name_selection: bool = False,
 ) -> float | Estimation:
     """
-    Finds the area using the best-matching model. "Best" is defined as the
-    highest-priority model that has all required attributes specified in
-    component_attributes.
+    Finds the area using the best-matching model. A model is a candidate if its
+    component name matches and all required attributes in component_attributes are
+    provided. See :py:func:`get_model` for how the best model is chosen.
 
     Parameters
     ----------
@@ -368,9 +406,9 @@ def get_leak_power(
     _relaxed_component_name_selection: bool = False,
 ) -> float | Estimation:
     """
-    Finds the leak power using the best-matching model. "Best" is defined as the
-    highest-priority model that has all required attributes specified in
-    component_attributes.
+    Finds the leak power using the best-matching model. A model is a candidate if its
+    component name matches and all required attributes in component_attributes are
+    provided. See :py:func:`get_model` for how the best candidate is chosen.
 
     Parameters
     ----------
@@ -403,9 +441,23 @@ def get_model(
     _relaxed_component_name_selection: bool = False,
 ) -> ComponentModelWrapper:
     """
-    Finds the best model for the given component. "Best" is defined as the
-    highest-priority model that has all required attributes specified in
-    component_attributes, and has actions for all of required_actions.
+    Finds the best model for the given component. A model is a candidate if its
+    component name matches, all required attributes in component_attributes are
+    provided, and it has actions for all of required_actions.
+
+    The best-matching candidate is chosen by the following in descending order of
+    importance:
+
+    1. ``priority``, higher first (defaults to 0.5).
+    2. If an action is required, the number of provided action arguments that the action
+       accepts, more first.
+    3. Number of provided attributes that the init function accepts, more first.
+    4. If an action is required, number of the action's defaulted arguments not provided
+       by the query, fewer first.
+    5. Number of the init function's defaulted arguments not provided by the query,
+       fewer first.
+    6. The fully-qualified class name (module and qualified name), lower-alphabetically
+       first.
 
     Parameters
     ----------

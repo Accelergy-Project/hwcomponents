@@ -46,3 +46,25 @@ invoke a model. There are three ways to find a component model:
 .. include-notebook:: ../../notebooks/1_finding_and_using_models.ipynb
    :name: ways_to_find_components
    :language: python
+
+How the Best Model is Chosen
+----------------------------
+
+When several models support a query, hwcomponents tries them in order and uses the
+first one that returns successfully. If a model raises an error, the next one is tried.
+The order is determined by the following, in this order:
+
+1. ``priority``, higher first. Defaults to 0.5.
+2. The number of provided action arguments that the action accepts, more first (only
+   when an action is queried).
+3. The number of provided attributes that the init function accepts, more first.
+4. The number of the action's defaulted arguments not provided by the query, fewer
+   first (only when an action is queried).
+5. The number of the init function's defaulted arguments not provided by the query,
+   fewer first.
+6. The fully-qualified class name (module and qualified name), lower-alphabetically
+   first.
+
+In short, the highest-priority model wins, and ties are broken in favor of the model
+that most closely matches the query. See
+:py:func:`~hwcomponents.select_models.get_model` for the API.

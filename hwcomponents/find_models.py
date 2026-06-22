@@ -1,6 +1,7 @@
 import glob
 import importlib
 import importlib.util
+import importlib.metadata
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from types import ModuleType

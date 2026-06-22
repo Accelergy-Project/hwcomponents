@@ -8,11 +8,14 @@ Basic Components
 
 Models can be created by subclassing the :py:class:`~hwcomponents.model.ComponentModel`
 class. Models estimate the energy, area, and leakage power of a component. Each model
-requires the following:
+defines the following:
 
 - ``component_name``: The name of the component. This may also be a list of components if
   multiple aliases are used.
-- ``priority``: This is used to break ties if multiple models support a given query.
+- ``priority`` (optional): Determines which model is favored when multiple models
+  support a given query. Higher-priority models are used first. Must be between 0 and 1;
+  defaults to 0.5. Ties are broken by how closely each model matches the query (see
+  :py:func:`~hwcomponents.select_models.get_model`).
 - A call to ``super().__init__(area, leak_power, subcomponents)``. This is used to
   initialize the model and set the area and leakage power.
 

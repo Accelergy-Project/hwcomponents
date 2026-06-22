@@ -216,7 +216,7 @@ class ComponentModel(ListLoggable, ABC):
             omitted if the component name is the same as the class name.
         priority: float
             The priority of the model. Higher priority models are used first. Must be a
-            number between 0 and 1.
+            number between 0 and 1. Defaults to 0.5.
         leak_power: float | None
             The leakage power of the component in Watts. Must be set if subcomponents is
             not set.
@@ -233,7 +233,7 @@ class ComponentModel(ListLoggable, ABC):
         component_name: The name of the component. Must be a string or list/tuple of
             strings. Can be omitted if the component name is the same as the class name.
         priority: The priority of the model. Higher priority models are used first.
-            Must be a number between 0 and 1.
+            Must be a number between 0 and 1. Defaults to 0.5.
         energy_scale:
             A scale factor for the energy of this component. The energy of all calls to
             actions will be scaled by this factor. WILL NOT AFFECT SUBCOMPONENT ENERGY.
@@ -268,11 +268,13 @@ class ComponentModel(ListLoggable, ABC):
     the component name is the same as the class name.
     """
 
-    priority: Number = None
+    priority: Number = 0.5
     """
     Priority determines which model is used when multiple models are available for a
     given component. Higher priority models are used first. Must be a number between 0
-    and 1.
+    and 1. Defaults to 0.5. Ties in priority are broken by how closely each model
+    matches the query; see :py:func:`~hwcomponents.select_models.get_model` for the full
+    order.
     """
 
     @abstractmethod
