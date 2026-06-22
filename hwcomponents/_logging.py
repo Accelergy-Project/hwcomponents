@@ -23,7 +23,7 @@ def queue_from_logger(logger: Union[logging.Logger, str]) -> List[str]:
 
 
 def messages_from_logger(logger: Union[logging.Logger, str]) -> List[str]:
-    return [m.getMessage() for m in queue_from_logger(logger).queue]
+    return [m.getMessage() for m in list(queue_from_logger(logger).queue)]
 
 
 def get_logger(name: str) -> logging.Logger:
